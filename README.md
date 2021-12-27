@@ -3,6 +3,13 @@ Pentesting cheatsheet with all the commands and techniques I learned during my l
 
 ## Index
 * [General](#General)
+* [Windows AD](windows-ad/readme.md)
+  * [Local privilege escalation](windows-ad/Local-Privilege-Escalation.md)
+  * [Domain Enumeration](windows-ad/Domain-Enumeration.md) 
+  * [Lateral Movement](windows-ad/Lateral-Movement.md)
+  * [Powershell Evasion](windows-ad/PowerShell-Evasion.md)
+  * [Domain privilege escalation](windows-ad/Domain-Privilege-Escalation.md)
+  * [Domain Persistence](windows-ad/Domain-Persistence.md)
 * [Cloud](cloud/readme.md)
   * [Recon \ OSINT](cloud/recon.md)
   * [Initial access attacks](cloud/initial-access-attacks.md)
