@@ -3,6 +3,13 @@ Pentesting cheatsheet with all the commands and techniques I learned during my l
 
 ## Index
 * [General](#General)
+* [Infrastructure](infrastructure/readme.md)
+  * [Buffer overflow](infrastructure/bufferoverflow.md)
+  * [Enumeration](infrastructure/enumeration.md)
+  * [Exploitation](infrastructure/exploitation.md)
+  * [Privilege Escalation Windows](infrastructure/privesc_windows.md)
+  * [Privilege Escalation Linux](infrastructure/privesc_linux.md)
+  * [Post Exploitation](infrastructure/post_exploitation.md)
 * [Windows AD](windows-ad/readme.md)
   * [Local privilege escalation](windows-ad/Local-Privilege-Escalation.md)
   * [Domain Enumeration](windows-ad/Domain-Enumeration.md) 
