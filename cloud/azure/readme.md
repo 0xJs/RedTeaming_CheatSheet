@@ -6,6 +6,7 @@
 * [Privilege Escalation](privilege-escalation.md)
 * [Cloud <-> On-Prem - Lateral Movement](Cloud-OnPrem-lateral-movement.md)
 * [Persistence](persistence.md)
+* [Post exploitation](post-exploitation.md)
 
 # General
 - List of Microsoft portals https://msportals.io/
