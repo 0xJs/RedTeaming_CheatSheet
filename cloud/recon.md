@@ -4,6 +4,10 @@
 * [Recon tools](#Recon-tools)
 * [Recon techniques](#Recon-techniques)
 * [Azure](#Azure)
+  * [Manually](#Manually)
+  * [AADinternals](#AADinternals)
+  * [Microburst](#Microburst)
+  * [Valid emails](#Valid-emails)
 
 ## Recon steps for cloud asset discovery
 1. Traditional host discovery still applies
