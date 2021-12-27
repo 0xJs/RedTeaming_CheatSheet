@@ -1,4 +1,10 @@
 # Recon on the target
+## Index
+
+* [Recon tools](#Recon tools)
+* [Recon techniques](#Recon-techniques)
+* [Azure](#Azure)
+
 ## Recon steps for cloud asset discovery
 1. Traditional host discovery still applies
 2. After host discovery resolve all names, then perforn whois lookups to determine where are they hosted.
@@ -66,36 +72,83 @@ https://login.microsoftonline.com/<TARGET DOMAIN>/v2.0/.well-known/openid-config
 - Look for any login portals
 - https://companyname.account.box.com
 
-## Recon employees
+### Recon employees
 - Build a user list with linkedin
 - Determine username scheme via public file metadata (PDF, DOCX, XLSX, etc)
   - Powermeta https://github.com/dafthack/PowerMeta
   - FOCA https://github.com/ElevenPaths/FOCA
 
-## User enumeration
+### User enumeration
 - Azure can be performed at https://login.microsoft.com/common/oauth2/token
 - This endpoint tells you if a user exists or not
 - Detect invalid users while password spraying with MSOL spray
 
-## Password spraying
-#### Azure password spray
-- https://github.com/dafthack/MSOLSpray
+## Azure
+### Manually
+#### Get if tenant is in use and if fedaration is in use.
+- Federation with Azure AD or O365 enables users to authenticate using on-premises credentials and access all resources in cloud.
 ```
-Import-Module .\MSOLSpray.ps1
-Invoke-MSOLSpray -UserList validemails.txt -Password <PASSWORD> -Verbose
+https://login.microsoftonline.com/getuserrealm.srf?login=<USER>@<DOMAIN>&xml=1
+https://login.microsoftonline.com/getuserrealm.srf?login=root@defcorphq.onmicrosoft.com&xml=1
 ```
 
-## Find data in public storage
-- https://github.com/initstring/cloud_enum can scan all three cloud services for multiple services.
+#### Get the Tenant ID
+```
+https://login.microsoftonline.com/<DOMAIN>/.well-known/openid-configuration
+https://login.microsoftonline.com/defcorphq.onmicrosoft.com/.well-known/openid-configuration
+```
 
-#### Public azure blobs
+### AADinternals
+https://github.com/Gerenios/AADInternals
+https://o365blog.com/aadinternals/
+#### Import the AADinternals module
+```
+import-module .\AADInternals.psd1
+```
+
+####  Get tenant name, authentication, brand name (usually same as directory name) and domain name
+```
+Get-AADIntLoginInformation -UserName <RANDOM USER>@<DOMAIN>
+```
+
+#### Get tenant ID
+```
+Get-AADIntTenantID -Domain <DOMAIN>
+```
+
+#### Get tenant domains
+```
+Get-AADIntTenantDomains -Domain <DOMAIN>
+```
+
+#### Get all the information
+```
+Invoke-AADIntReconAsOutsider -DomainName <DOMAIN>
+```
+
+## Microburst
+#### Enumerate used services
 - https://github.com/NetSPI/MicroBurst
+- Edit the permutations.txt to add permutations such as career, hr, users, file and backup
 ```
-Invoke-EnumerateAzureBlobs –Base <base name>
+Import-Module MicroBurst.psm1 -Verbose
+Invoke-EnumerateAzureSubDomains -Base <SHORT DOMAIN NAME> -Verbose
 ```
 
-#### Public AWS blobs
-- https://github.com/RhinoSecurityLabs/pacu
+#### Enumerate Azureblobs
+- add permutations to permutations.txt like common, backup, code in the misc directory.
+```
+Import-Module ./Microburst.psm1
+Invoke-EnumerateAzureBlobs -Base <SHORT DOMAIN> -OutputFile azureblobs.txt
+```
 
-#### Public Google Storage Buckets
-- https://github.com/initstring/cloud_enum
+## Valid emails
+#### Check for Email ID's
+- https://github.com/LMGsec/o365creeper
+- Could gather list of emails from something like harvester or hunter.io or smth and validate them!
+- admin, root, test, contact (try those default for exam)
+```
+python o365creeper.py -f list_of_emails.txt -o validemails.txt
+```
+- Possible to use https://github.com/nyxgeek/onedrive_user_enum (Non-lab-tool)
+
