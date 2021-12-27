@@ -1,10 +1,7 @@
-# CARTP-cheatsheet
-Azure AD cheatsheet for the CARTP course
+# Azure-cheatsheet
 
 # Index
 * [General](#General)
-* [Recon \ OSINT](recon.md)
-* [Initial access attacks](initial-access-attacks.md)
 * [Authenticated enumeration](Authenticated-enumeration.md )
 * [Privilege Escalation](privilege-escalation.md)
 * [Cloud <-> On-Prem - Lateral Movement](Cloud-OnPrem-lateral-movement.md)
@@ -16,20 +13,6 @@ Azure AD cheatsheet for the CARTP course
   - https://pentestbook.six2dez.com/enumeration/cloud/azure
   - https://github.com/Kyuu-Ji/Awesome-Azure-Pentest
   - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/Azure.md
-#### Access C disk of a computer (check local admin)
-```
-ls \\<COMPUTERNAME>\c$
-```
-
-#### Use this parameter to not print errors powershell
-```
--ErrorAction SilentlyContinue
-```
-
-#### Rename powershell windows
-```
-$host.ui.RawUI.WindowTitle = "<NAME>"
-```
 
 #### Save Credentials
 ```
