@@ -1,13 +1,4 @@
-# Breaching the cloud cheatsheet
-## Index
-* [General](#General)
-* [Scaning tools](#Scanning-tools)
-* Links to subpages
-  * [Recon \ OSINT](recon.md)
-  * [Initial access attacks](initial-access-attacks.md)
-  * [Azure](azure/readme.md)
-  * [Amazon Web Services](aws/readme.md)
-  * [Google Cloud Platform](gcb/readme.md)
+# Pentesting the cloud cheatsheet
 
 ## General
 - Google Cloud Platform != Google Workspace
