@@ -14,6 +14,7 @@
   * [Illicit Consent Grant phishing](#Illicit-Consent-Grant-phishing)
   * [Google workspace calendar event injection](#Google-workspace-calendar-event-injection)
 * [Public storage](#public-storage)
+* [Misc](#misc)
 
 ## Password and credentials attacks
 ### Password spraying
@@ -309,4 +310,16 @@ sudo aws s3 sync s3://<BUCKET> s3-files-dir --profile <PROFILE>
 ### Public SQL database
 - https://github.com/initstring/cloud_enum can scan all three cloud services for multiple services.
 - Might be able to bruteforce port 1433
+
+## Misc
+## S3 code injection
+- If a webapp is loading content from an s3 bucket made publicly writeable. Attackers can upload malicious JS to get executed by visitors.
+
+## Domain hijacking
+- Hijack S3 domain by finding references in a webapp to S3 buckets that dont exist anymore.
+- Or subdomains were linked to S3 buckets with CNAME that still exist.
+- When assessing webapps look for 404's to ```*.s3.amazonaws.com```
+1. When brute forcing subdomains for an org look for 404’s with ‘NoSuchBucket’ error
+2. Go create the S3 bucket with the same name and region
+3. 3. Load malicious content to the new S3 bucket that will be executed when visitors hit the site
 
