@@ -1,6 +1,6 @@
 # Initial access attacks
 
-* [Password attacks](#Password-attacks)
+* [Password and crentials attacks](#Password--and-credentials-attacks)
   * [Password spraying](#Password-spraying)
   * [Key disclosure in public repositories](#Key-disclosure-in-public-repositories)
   * [Reused access](#Reused-access)
@@ -15,7 +15,7 @@
   * [Google workspace calendar event injection](#Google-workspace-calendar-event-injection)
 * [Public storage](#public-storage)
 
-## Password attacks
+## Password and credentials attacks
 ### Password spraying
 - https://github.com/dafthack/MSOLSpray
 - https://github.com/ustayready/fireprox
