@@ -1,6 +1,6 @@
 # Windows-Domain-Cheatsheet
 
-# Summary
+# Index
 * [General](#General)
 * [Local privilege escalation](Local-Privilege-Escalation.md)
 * [Domain Enumeration](Domain-Enumeration.md) 
