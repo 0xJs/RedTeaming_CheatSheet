@@ -1,0 +1,49 @@
+{
+    "queries": [
+		{
+            "name": "Find all users who have the Global Administrator role",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p =(n)-[r:AZGlobalAdmin*1..]->(m) RETURN p"
+                }
+            ]
+        },
+		{
+            "name": "Find all paths to an Azure VM",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (n)-[r]->(g: AZVM) RETURN p"
+                }
+            ]
+        },
+		{
+            "name": "Find all paths to an Azure KeyVault",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (n)-[r]->(g:AZKeyVault) RETURN p"
+                }
+            ]
+        },
+		{
+            "name": "Find all paths to an Azure Resource Group",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (n)-[r]->(g:AZResourceGroup) RETURN p"
+                }
+            ]
+        },
+		{
+            "name": "Find Owners of Azure Groups",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (n)-[r:AZOwns]->(g:AZGroup) RETURN p"
+                }
+            ]
+        },
+	]
+}
