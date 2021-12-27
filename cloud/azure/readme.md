@@ -3,7 +3,6 @@
 # Index
 * [General](#General)
 * [Recon \ OSINT](recon.md)
-* [Initial access attacks](initial-access-attacks.md)
 * [Authenticated enumeration](Authenticated-enumeration.md )
 * [Privilege Escalation](privilege-escalation.md)
 * [Cloud <-> On-Prem - Lateral Movement](Cloud-OnPrem-lateral-movement.md)
