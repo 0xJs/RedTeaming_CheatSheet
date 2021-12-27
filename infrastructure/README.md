@@ -1,4 +1,6 @@
-# OSCP_cheatsheet summary
+# Infrastructure cheatsheet
+
+## Index
 * [General](#General)
    * [Buffer overflow](bufferoverflow.md)
    * [Metasploit](metasploit.md)
