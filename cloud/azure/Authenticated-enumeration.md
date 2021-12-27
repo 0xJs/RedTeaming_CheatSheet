@@ -27,6 +27,8 @@
   * [Roadtools](#Roadtools)
   * [Stormspotter](#Stormspotter)
   * [Bloodhound / Azurehound](#Bloodhound-/-Azurehound)
+  * [Powerzure](#Powerzure-enumeration)
+  * [MFAsweep](#MFASweep)
 
 # General
 - The three main tools used to enumerate
@@ -1200,4 +1202,72 @@ MATCH p = (n)-[r]->(g:AZResourceGroup) RETURN p
 #### Find Owners of Azure Groups
 ```
 MATCH p = (n)-[r:AZOwns]->(g:AZGroup) RETURN p
+```
+
+## Powerzure enumeration
+- https://github.com/hausec/PowerZure
+- https://powerzure.readthedocs.io/en/latest/
+
+#### Whoami
+```
+Show-AzureCurrentUser
+```
+
+### List all users
+```
+Get-AzureUser -All
+```
+
+#### List all groups
+```
+Get-AzureGroup -All
+```
+
+#### List all users of a group
+```
+Get-AzureGroup –Group ‘Global Admins’
+```
+
+#### List resources
+```
+Get-AzureTargets
+```
+
+#### List out owners of applications
+```
+Get-AzureAppOwners
+```
+
+#### Lists members of a role
+```
+Get-AzureADRole -Role <ROLE NAME>
+```
+
+#### Lists key vaults
+```
+Show-AzureKeyVaultContent
+```
+
+#### List storage accounts
+```
+Show-AzureStorageContent
+```
+
+#### Lists runbook contents
+```
+Get-AzureRunbookContent
+```
+
+#### Create link to download a VM disk
+```
+Get-AzureVMDisk 
+```
+
+## MFASweep
+- Use MFASweep to find inconsistensies through MFA requirements
+- https://github.com/dafthack/MFASweep
+- Blogpost: https://www.blackhillsinfosec.com/exploiting-mfa-inconsistencies-on-microsoft-services/
+```
+Import-Module MFASweep.ps1
+Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
 ```
