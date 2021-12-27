@@ -5,9 +5,10 @@
   * [Scaning tools](#Scanning-tools)
 * [Recon \ OSINT](recon.md)
 * [Initial access attacks](initial-access-attacks.md)
-* [Azure](azure/readme.md)
-* [Amazon Web Services](aws/readme.md)
-* [Google Cloud Platform](gcb/readme.md)
+* [Cloud Services](readme.md)
+  * [Azure](azure/readme.md)
+  * [Amazon Web Services](aws/readme.md)
+  * [Google Cloud Platform](gcb/readme.md)
   
 
 ## General
