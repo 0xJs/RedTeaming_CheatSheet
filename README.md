@@ -3,7 +3,7 @@ Pentesting cheatsheet with all the commands and techniques I learned during my l
 
 ## Index
 * [General](#General)
-* [Cloud](#cloud/readme.md)
+* [Cloud](cloud/readme.md)
   * [Recon \ OSINT](cloud/recon.md)
   * [Initial access attacks](cloud/initial-access-attacks.md)
   * [Azure](cloud/azure/readme.md)
