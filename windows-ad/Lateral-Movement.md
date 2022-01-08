@@ -287,7 +287,7 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 ```
 
 ### Overpass The Hash
-- Over Pass the hash (OPTH) generate tokens from hashes or keys. Needs elevation (Run as administrator)
+- Over Pass the hash (OPTH) generate tokens(kerberos) from hashes or keys. Needs elevation (Run as administrator)
 
 #### Mimikatz overpass the hash
 ```
