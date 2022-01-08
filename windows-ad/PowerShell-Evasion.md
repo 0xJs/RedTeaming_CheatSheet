@@ -22,6 +22,13 @@ S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{
 ```
 - Fuck around with invoke-obfuscation till it doesn't get detected anymore
 
+#### Creating scripts that bypass amsi
+- http://www.powertheshell.com/
+- Remove all comments + whitespaces
+- https://github.com/RythmStick/AMSITrigger
+- Check for amsi strings
+- Then obfuscate with https://github.com/danielbohannon/Invoke-Obfuscation
+
 ## Execution-policy
 #### Get Execution policy
 ```
