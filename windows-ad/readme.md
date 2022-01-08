@@ -52,6 +52,11 @@ add the register key if error blablah\DemoDLL_RemoteProcess.vcxproj.filters
 REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
 ```
 
+#### Change tickets .kirbi to .ccache and vice versa
+```
+python3 ticket_converter.py Administrator.kirbi Administrator.ccache
+````
+
 ## PSSession
 #### Save pssession in variable
 ```
