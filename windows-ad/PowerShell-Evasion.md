@@ -23,11 +23,10 @@ S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{
 - Fuck around with invoke-obfuscation till it doesn't get detected anymore
 
 #### Creating scripts that bypass amsi
-- http://www.powertheshell.com/
-- Remove all comments + whitespaces
-- https://github.com/RythmStick/AMSITrigger
-- Check for amsi strings
-- Then obfuscate with https://github.com/danielbohannon/Invoke-Obfuscation
+- Remove all comments + whitespaces http://www.powertheshell.com/
+- Check for amsi strings https://github.com/RythmStick/AMSITrigger
+- Then obfuscate strings with https://github.com/danielbohannon/Invoke-Obfuscation
+- Repeat
 
 ## Execution-policy
 #### Get Execution policy
