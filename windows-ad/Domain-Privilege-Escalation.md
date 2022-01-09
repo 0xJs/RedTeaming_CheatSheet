@@ -110,7 +110,7 @@ Set-DomainObject -Identity <username> -Set @{serviceprincipalname=’<ops/whatev
 - Local Administrator Password Solution (LAPS)
 - On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
 
-#### Find all users who can read passwords in clear test machines in OU's
+#### Find all users who can read passwords in clear text machines in OU's
 ```
 Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
 ```
