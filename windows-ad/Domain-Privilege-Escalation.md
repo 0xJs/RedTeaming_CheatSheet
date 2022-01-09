@@ -934,7 +934,7 @@ Find-InterestingDomainAcl -Domain <TRUST FOREST>
 Get-ADTrust -Filter {(ForestTransitive -eq $True) -and (SIDFilteringQuarantined -eq $False)}
 ```
 
-#### Check which users are members of the shadow principalks
+#### Check which users are members of the shadow principals
 - Run on the DC
 ```
 {Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
@@ -943,4 +943,9 @@ Get-ADTrust -Filter {(ForestTransitive -eq $True) -and (SIDFilteringQuarantined 
 #### Pssession to the other forest machine
 ```
 Enter-PSSession <IP> -Authentication NegotiateWithImplicitCredential
+```
+
+#### Check if the current forest is managed by another one
+```
+Get-DomainTrust -Filter {(ForestTransitive -eq $True)}
 ```
