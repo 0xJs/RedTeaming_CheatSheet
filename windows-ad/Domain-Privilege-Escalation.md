@@ -15,6 +15,7 @@
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
 * [Cross Domain attacks](#Cross-Domain-attacks)
+  * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
   * [Azure AD](#Azure-AD)
   * [Trust abuse SQL](#Trust-abuse-SQL)
