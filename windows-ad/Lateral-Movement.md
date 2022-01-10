@@ -12,6 +12,14 @@
 * [Check Local Admin Access](#Check-Local-Admin-Access)  
 * [Offensive .NET](#Offensive-.NET)
 * [Lateral Movement Techniques](#Lateral-Movement-Techniques)
+  * [PSExec](#PSExec)
+  * [SC.exe](#SC.exe)
+  * [Schtasks.exe](#schtasks.exe)
+  * [AT](#AT)
+  * [WMI](#WMI)
+  * [Poisonhandler](#Poisonhandler)
+  * [RDP](#RDP)
+
 
 ## General
 #### Add domain user to localadmin
@@ -382,7 +390,7 @@ wmiexec.py <DOMAIN>/<USER>:<PASSWORD>@<TARGET>
 ### PoisonHandler
 - https://github.com/Mr-Un1k0d3r/PoisonHandler
 
-### Rdp
+### RDP
 #### Pass the hash rdp xfreerdp
 ```
 xfreerdp /u:<USER> /d:<DOMAIN> /pth:<NTLM HASH> /v:<TARGET>
