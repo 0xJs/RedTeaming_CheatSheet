@@ -7,6 +7,7 @@
   * [Mimikatz](#Mimikatz) 
   * [DC-Sync](#DC-Sync)
   * [Token manipulation](#Token-manipulation)
+  * [DPAPI](#DPAPI)
 * [Pass The Hash](#Pass-The-Hash)
   * [Overpass The Hash](#Overpass-The-Hash)
 * [Check Local Admin Access](#Check-Local-Admin-Access)  
@@ -253,6 +254,9 @@ netsh wlan show profiles
 ```
 netsh wlan show profiles name=<NAME> key=clear
 ```
+
+## DPAPI
+- https://www.ired.team/offensive-security/credential-access-and-credential-dumping/reading-dpapi-encrypted-secrets-with-mimikatz-and-c++
 
 ## Check Local Admin Access
 #### Crackmapexec
