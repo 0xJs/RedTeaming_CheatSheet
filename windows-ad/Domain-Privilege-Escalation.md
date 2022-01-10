@@ -121,7 +121,7 @@ Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlog
 ```
 Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
 Get-DomainGPO -Identity *LAPS*
-Get-DomainComputer -filter {ms-Mcs-AdmPwdExpirationTime- like *} -Propterties ms-Mcs-AdmPwdExpirationTime like
+Get-DomainComputer -filter {ms-Mcs-AdmPwdExpirationTime- like *} -Propterties ms-Mcs-AdmPwdExpirationTime -like 
 ```
 
 #### Check the LAPS configuration
