@@ -332,7 +332,7 @@ runas /netonly /user:<DOMAIN>\<COMPUTERACCOUNTNAME> powershell
 ## System persistence
 ### Userland
 #### Startup
-- Batch script inside user directory $env:APPDATA'\Microsoft\Windows\Start Menu\Programs\Startup\'
+- Batch script inside user directory ```$env:APPDATA'\Microsoft\Windows\Start Menu\Programs\Startup\'```
 
 #### Registery keys
 - https://attack.mitre.org/techniques/T1060/
