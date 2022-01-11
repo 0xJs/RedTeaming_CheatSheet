@@ -1,9 +1,10 @@
 ## Covenant C2 Framework
 - https://github.com/cobbr/Covenant
 
-#### Installation
+### Installation
 - https://github.com/cobbr/Covenant/wiki/Installation-And-Startup
 
+### General
 #### Start Covenant
 ```
 /opt/Covenant/Covenant > dotnet run
@@ -34,3 +35,8 @@ self.close
 ```
 
 #### Go back to listener and upload the HTA file
+
+### Run executables on target
+- Interact with the grunt.
+- Go to tasks, select Assembly, select executable and run!
+- Was only able to run Watson, not others.
