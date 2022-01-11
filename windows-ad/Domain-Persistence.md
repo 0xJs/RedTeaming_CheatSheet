@@ -353,6 +353,7 @@ schtasks /create /tn "NotEvil" /tr C:\backdoor.exe /sc onidle /i 10
 #### Microsoft Office Trusted Locations
 - Allow DLL or macros to execute despite the configured security settings (Ignored if macro's or add-ins have been blocked by GPO)
 - Create a new Excel document with a module containing the persistence mechanism. Save it as "Excel Add-in" inside ```%APPDATA%\Microsoft\Excel\XLSTART``` and it will be launched every tim the user opens MS Excel application.
+- https://labs.f-secure.com/archive/add-in-opportunities-for-office-persistence/
 
 ### Elevated
 #### Schtasks
