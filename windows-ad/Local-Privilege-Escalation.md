@@ -42,3 +42,13 @@ Get-ModifiableService -Verbose
 Invoke-ServiceAbuse
 Invoke-ServiceAbuse -Name '<SERVICE NAME>' -UserName '<DOMAIN>\<USERNAME>'
 ```
+
+#### Sharup
+- https://github.com/GhostPack/SharpUp
+
+
+#### Watson
+- https://github.com/rasta-mouse/Watson
+
+#### Sherlock
+- https://github.com/rasta-mouse/Sherlock
