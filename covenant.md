@@ -25,7 +25,7 @@
 Function DoStuff()
 Dim wsh
 Set wsh = CreateObject("Wscript.Shell") 
-wsh.run "[YOUR LAUNCHER]" 
+wsh.run "[YOUR ENCODED LAUNCHER]" 
 Set wsh = Nothing
 End Function 
 DoStuff
