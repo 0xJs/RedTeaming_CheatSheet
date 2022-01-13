@@ -82,3 +82,8 @@ MakeToken /username:"<USER>" /domain:"<DOMAIN>" /password:"<PASSWORD>" /logontyp
 ### Import scripts
 - Interact with the grunt.
 - Go to tasks, select PowerShellImport and select the powershell script
+
+### Runas command
+```
+ShellRunAs /shellcommand:"whoami" /username:"<USERNAME>" /domain:"<DOMAIN>" /password:"<PASSWORD>"
+```
