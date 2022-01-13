@@ -306,3 +306,7 @@ neo4j.bat start
 Run BloodHound.exe
 #Change credentials and login
 ```
+
+#### Custom queries
+- https://github.com/SadProcessor/Cheats/blob/master/DogWhispererV2.md#v--rest-api
+- https://ernw.de/download/BloodHoundWorkshop/ERNW_DogWhispererHandbook.pdf
