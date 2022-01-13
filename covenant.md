@@ -40,8 +40,8 @@ self.close
 ### Run executables on target
 - Interact with the grunt.
 - Go to tasks, select Assembly, select executable and run!
-- Was only able to run Watson, not others.
-
+- Which works: Watson, Sharphound,
+- 
 ### Escalate to system
 - Run the task processlist and look for a process running as ```NT AUTHORITY\SYSTEM```
 - Then run ImpersonateProcess ```ImpersonateProcess /processid:"<PROCESS ID>"```
