@@ -113,35 +113,42 @@ Set-DomainObject -Identity <username> -Set @{serviceprincipalname=’<ops/whatev
 
 #### Check if LAPS is installed on local computer
 ```
-Get-Childitem 'C:\Program Files\LAPS\CSE directory\library AdmPwd.dll'
-Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions
+Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
+Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions #DOESNT WORK? GOTTA CHECK ECPPTX MATERIAL AGAIN
 ```
 
-#### Check existence of LAPS in domain
+#### Check existence of LAPS in the domain
 ```
 Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
 Get-DomainGPO -Identity *LAPS*
-Get-DomainComputer -filter {ms-Mcs-AdmPwdExpirationTime- like *} -Propterties ms-Mcs-AdmPwdExpirationTime
+```
+
+#### Check to which computers the LAPS GPO is applied to
+```
+Get-DomainOU -GPLink "Distinguishedname from GET-DOMAINGPO -Identity *LAPS*" | select name, distinguishedname
+Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
+```
+
+#### Check all computers without labs
+```
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
 ```
 
 #### Check the LAPS configuration
 - https://github.com/PowerShell/GPRegistryPolicy
 - Password complexity, password length, password expiration, Acccount managing LAPS
+- AdmPwdEnabled 1 = local administrator password is managed
+- Passwordcomplexity 1 = large letters, 2 = large + small letters, 3 = Large + small + numbers, 4 = large + small + numbers + specials
 ```
-Parse-PolFile \\<DC\SYSVOL\<DOMAIN>\Policies\<GUID>\Machine\Registry.pol
-```
-
-#### Check to which computers the LAPS GPO is applied to
-```
-Get-DomainOU -GPLink "<GUID NAME>" -Properties distinguishedname
-Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
+Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
 ```
 
 #### Find all users who can read passwords in clear text machines in OU's
 ```
-Get-DomainOU -Fulldata | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
 
-Get-DomainOU -Fulldata | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentitySID' $(Convert-NameToSid $_.IdentityReference).SID;$_}
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | Select-Object ObjectDN, IdentityName
 ```
 
 ```
@@ -164,7 +171,6 @@ Get-DomainComputer -filter {ms-Mcs-AdmPwdExpirationTime -like '*'}
 #LAPS Powershell cmdlet
 Get-AdmPwdPassword -ComputerName <MACHINE NAME>
 ```
-
 
 ## AS-REP Roasting
 #### Enumerating accounts with kerberos preauth disabled
