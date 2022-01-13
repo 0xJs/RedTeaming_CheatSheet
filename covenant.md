@@ -78,3 +78,7 @@ SafetyKatz
 ```
 MakeToken /username:"<USER>" /domain:"<DOMAIN>" /password:"<PASSWORD>" /logontype:"LOGON32_LOGON_INTERACTIVE"
 ```
+
+### Import scripts
+- Interact with the grunt.
+- Go to tasks, select PowerShellImport and select the powershell script
