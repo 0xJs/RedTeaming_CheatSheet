@@ -254,7 +254,10 @@ setspn.exe -a <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
 Set-DomainObject -Identity <USERNAME> -Set @{serviceprincipalname='<SERVICE>/<SPN>1'}
 ```
 
-
+#### Remove SPN
+```
+setspn.exe -d <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
+```
 
 #### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
