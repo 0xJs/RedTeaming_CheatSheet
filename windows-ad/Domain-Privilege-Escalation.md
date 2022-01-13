@@ -236,6 +236,19 @@ Import-Module ACLight2.psm1
 Start-ACLAnalysis
 ```
 
+### Specific ACL permissions
+#### Scan for specific ACL permissions the user has
+```
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference | Where-Object -Property Identityreference -Match <USERNAME>
+```
+
+#### Scan for all ACL permissions of the user has on another object
+- First get the SID of the user you want the permissions from
+```
+Get-Domainuser <USERNAME>
+Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
+```
+
 ### ACL abuses
 - In case you have a GenericAll permission on a user, you can:
   - Set a SPN on behalf of that user and crack it (stealthy method)
