@@ -69,3 +69,12 @@ Mimikatz lsadump::sam
 ```
 SafetyKatz
 ```
+
+### Impersonate
+- For example when there is no RDP open and want to run on other credentials
+- Open the grunt, Go to task and select "MakeToken"
+- Enter the credentials and type Logontype ```LOGON32_LOGON_INTERACTIVE```
+
+```
+MakeToken /username:"<USER>" /domain:"<DOMAIN>" /password:"<PASSWORD>" /logontype:"LOGON32_LOGON_INTERACTIVE"
+```
