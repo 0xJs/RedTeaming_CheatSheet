@@ -239,7 +239,9 @@ Start-ACLAnalysis
 ### Specific ACL permissions
 #### Scan for specific ACL permissions the user has
 ```
-Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference | Where-Object -Property Identityreference -Match <USERNAME>
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, IdentityreferenceName | Where-Object -Property IdentityreferenceName -Match <USERNAME>
+
+Get-ObjectAcl -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"} | select-object ObjectDN, ObjectAceType
 ```
 
 #### Scan for all ACL permissions of the user has on another object
