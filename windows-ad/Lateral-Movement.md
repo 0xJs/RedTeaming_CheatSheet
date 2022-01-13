@@ -69,6 +69,12 @@ runas /netonly /user:<DOMAIN>\<USER> cmd.exe
 runas /netonly /user:<DOMAIN>\<USER> powershell.exe
 ```
 
+#### Forward RDP port to Windows host
+- Will listen 0.0.0.0 on Kali machine and can connect to it with windows RDP for example for better stability
+```
+socat tcp-l:<PORT LISTENING>,fork tcp:<TARGET IP>:<TARGET PORT>
+```
+
 ## Gathering credentials
 ### Find credentials in files
 #### Look for SAM files
