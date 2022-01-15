@@ -54,7 +54,7 @@ REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem" /v Long
 
 #### Change tickets .kirbi to .ccache and vice versa
 ```
-python3 ticket_converter.py Administrator.kirbi Administrator.ccache
+python3 ticketConverter.py Administrator.kirbi Administrator.ccache
 ````
 
 #### Use tickets with impacket
