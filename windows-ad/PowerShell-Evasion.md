@@ -1,5 +1,10 @@
 # Evasion
-- Not powershell but storing here. UAC bypasses https://github.com/hfiref0x/UACME
+## General
+#### Get all GPO's applied to a machine
+- Run with elevated prompt
+```
+gpresult -h gpos.html
+```
 
 #### Powershell detections
 - System-wide transcription
