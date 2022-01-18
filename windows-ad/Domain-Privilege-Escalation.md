@@ -127,7 +127,7 @@ Get-DomainGPO -Identity *LAPS*
 
 #### Check to which computers the LAPS GPO is applied to
 ```
-Get-DomainOU -GPLink "Distinguishedname from GET-DOMAINGPO -Identity *LAPS*" | select name, distinguishedname
+Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, distinguishedname
 Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
 ```
 
