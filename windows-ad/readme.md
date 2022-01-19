@@ -39,6 +39,11 @@ $creds = New-Object System.Management.Automation.PSCredential('<USERNAME>', $pas
 Get-Childitem -Path C:\ -Force -Include <FILENAME OR WORD TO SEARCH> -Recurse -ErrorAction SilentlyContinue
 ```
 
+#### Check access to a file
+```
+$test = get-acl <PATH>
+$test.Access
+
 #### Crackmapexec on windows
 - Download cme https://github.com/byt3bl33d3r/CrackMapExec/releases/tag/v5.1.1dev
 - Download latest version of python3.8 standalone (Windows embeddable package (64-bit)) https://www.python.org/downloads/windows/
