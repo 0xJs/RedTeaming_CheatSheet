@@ -69,10 +69,18 @@ runas /netonly /user:<DOMAIN>\<USER> cmd.exe
 runas /netonly /user:<DOMAIN>\<USER> powershell.exe
 ```
 
-#### Forward RDP port to Windows host
-- Will listen 0.0.0.0 on Kali machine and can connect to it with windows RDP for example for better stability
+### Remote port forward socat Windows
+- https://netcologne.dl.sourceforge.net/project/unix-utils/socat/1.7.3.2/socat-1.7.3.2-1-x86_64.zip
+- Download all dll's and executable on target
+- First hop is compromised machine
 ```
-socat tcp-l:<PORT LISTENING>,fork tcp:<TARGET IP>:<TARGET PORT>
+socat.exe tcp-listen:<LISTENING PORT>,tcp-connect:<TARGET IP SECOND HOP>:<TARGET PORT>
+```
+
+#### Then let it listen on our kali machine 
+- so we can connect with our windows tool for example
+```
+socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TARGET PORT>
 ```
 
 ## Gathering credentials
