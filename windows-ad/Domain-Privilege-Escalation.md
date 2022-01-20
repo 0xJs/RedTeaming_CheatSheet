@@ -388,6 +388,9 @@ Add-DomainGroupMember -Identity $group -Members $user -Verbose
 - https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
 
 ## Delegation
+- In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
+- In resource based Kerberos delegation, computers (resources) specify who they trust and who can delegate authentications to them.
+
 ### Unconstrained Delegation
 - To execute attack owning the server with unconstrained delegation is required!
 
@@ -550,11 +553,10 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
   − Two, Write permissions over the target service or object to configure msDS-AllowedToActOnBehalfOfOtherIdentity.  
 
 ### Computer object takeover
-- Privescs on target machine
 - Requires the following:
   - An owned system
   - Write privileges on another computerobject
-  - Being able to join computers to the domain 
+  - Being able to join computers to the domain
 - https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/resource-based-constrained-delegation-ad-computer-object-take-over-and-privilged-code-execution
 
 #### Check who can add computers to the domain
