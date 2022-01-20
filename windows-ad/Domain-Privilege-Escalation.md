@@ -290,6 +290,7 @@ setspn.exe -d <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
 ### Add user to a group
 ```
 Add-DomainGroupMember -Identity "<GROUP>" -Members <DOMAIN>\<USER>
+net group "Domain Admins" analyst1 /domain /add
 ```
 
 #### Add preauthnotreq flag
