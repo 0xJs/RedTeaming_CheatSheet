@@ -549,7 +549,7 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
     - (like admin access to a domain joined machine or ability to join a machine to domain - ms-DS-MachineAccountQuota is 10 for all domain users)
   − Two, Write permissions over the target service or object to configure msDS-AllowedToActOnBehalfOfOtherIdentity.  
 
-### Computer Object Takeover
+### Computer object takeover
 - Privescs on target machine
 - Requires the following:
   - An owned system
