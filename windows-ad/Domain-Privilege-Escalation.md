@@ -10,8 +10,9 @@
   * [Unconstrained Delegation](#Unconstrained-delegation) 
     * [Printer Bug](#Printer-bug) 
   * [Constrained Delegation](#Constrained-delegation) 
-  * [Constrained Delegation Account Takeover](#Constrained-delegation-account-Takeover) 
-  * [Constrained Delegation Image Change](#Constrained-delegation-image-change) 
+  * [Resource based Constrained Delegation](Resource-based-Constrained-Delegation)
+    * [Computer object takeover](#Computer-object-Takeover) 
+    * [Image Change Privilege Escalation](#Image-change-Privilege-Escalation) 
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
 * [Cross Domain attacks](#Cross-Domain-attacks)
@@ -542,7 +543,13 @@ Invoke-Mimikatz -Command '"Kerberos::ptt <KIRBI FILE>"'
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 ```
 
-### Constrained Delegation Account Takeover
+### Resource based Constrained Delegation
+- Need two privileges:
+  - One, control over an object which has SPN configured 
+    - (like admin access to a domain joined machine or ability to join a machine to domain - ms-DS-MachineAccountQuota is 10 for all domain users)
+  − Two, Write permissions over the target service or object to configure msDS-AllowedToActOnBehalfOfOtherIdentity.  
+
+### Computer Object Takeover
 - Privescs on target machine
 - Requires the following:
   - An owned system
@@ -621,7 +628,7 @@ dir \\<COMPUTER>\C$
 
 If the dir doesn't work read the blogpost! That might tell you why! (Didn't test the attack myself yet)
 
-### Constrained Delegation Image Change
+### Image Change Privilege Escalation
 - Privescs on local machine
 - Requirements:
   - An account with a SPN associated (Can use a computer domain account and set SPN)
