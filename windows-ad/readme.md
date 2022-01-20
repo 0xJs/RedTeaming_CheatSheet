@@ -43,6 +43,7 @@ Get-Childitem -Path C:\ -Force -Include <FILENAME OR WORD TO SEARCH> -Recurse -E
 ```
 $test = get-acl <PATH>
 $test.Access
+```
 
 #### Crackmapexec on windows
 - Download cme https://github.com/byt3bl33d3r/CrackMapExec/releases/tag/v5.1.1dev
