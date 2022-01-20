@@ -168,7 +168,7 @@ $LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table
 #### Read clear-text passwords:
 ```
 Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
-Get-DomainComputer -filter {ms-Mcs-AdmPwdExpirationTime -like '*'}
+Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
 
 #LAPS Powershell cmdlet
 Get-AdmPwdPassword -ComputerName <MACHINE NAME>
