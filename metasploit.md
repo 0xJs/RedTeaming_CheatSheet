@@ -1,4 +1,13 @@
 # MSFConsole
+#### Start metasploit
+- The correct way
+
+```
+systemctl start postgresql
+sudo msfdb init #only the first time!
+sudo msfconsole
+```
+
 #### Start listener
 ```
 use multi/handler
