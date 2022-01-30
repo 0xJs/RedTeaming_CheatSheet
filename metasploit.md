@@ -85,6 +85,14 @@ Portfwd add -l <LOCAL PORT> -p <REMOTE PORT> -r <REMOTE HOST>
 
 #### After setting routes use bind shells
 
+#### Proxychains
+```
+use server/socks_proxy
+set SRVHOST 127.0.0.1
+set SRVPORT 9000
+set VERSION 4a
+```
+
 ## Autorun script
 ### Set solo module as autorunscript
 ```
