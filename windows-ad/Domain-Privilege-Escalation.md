@@ -1255,7 +1255,7 @@ SELECT is_srvrolemember('sysadmin')
 ```
  
 ### Command execution
-![image](https://user-images.githubusercontent.com/43987245/151711415-1bbbdc80-6282-4a66-9dd3-b900616dac8b.png)
+![image](https://user-images.githubusercontent.com/43987245/151711534-6114738f-6c9c-49b2-8c5f-0cb27f5fa6d0.png)
 
 #### Execute commands
 ```
