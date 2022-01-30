@@ -1091,6 +1091,14 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 #### Discovery of SQL instances (SPN scanning)
 ```
 Get-SQLInstanceDomain
+ 
+$data = Get-DomainComputer -Domain <DOMAIN> | Where-Object serviceprincipalname -Match MSSQL | Select-Object -ExpandProperty serviceprincipalname | Select-String MSSQL
+$data = $data -replace 'MSSQLSvc/', ''
+```
+
+#### UDP Scan
+```
+Get-SQLInstanceScanUDP -Computername <COMPUTER LIST> 
 ```
 
 #### Check accessibility to SQL servers
