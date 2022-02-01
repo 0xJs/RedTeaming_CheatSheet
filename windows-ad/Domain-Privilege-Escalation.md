@@ -30,7 +30,7 @@
     * [Image Change Privilege Escalation](#Image-change-Privilege-Escalation) 
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
-* [Attacking WSUS](#Attacking-WSUS)
+* [WSUS](#Attacking-WSUS)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
