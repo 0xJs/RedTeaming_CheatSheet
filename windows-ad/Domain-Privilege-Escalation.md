@@ -1027,12 +1027,12 @@ Sc \\<dns server> start dns
 
 #### Identify usage of WSUS
 ```
-req query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
+reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
 ```
 
 #### Retrieve WSUS URL
 ```
-req query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate /v WUServer
+reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate /v WUServer
 ```
 
 ### Injecting a fake update via straight ARP spoofing
