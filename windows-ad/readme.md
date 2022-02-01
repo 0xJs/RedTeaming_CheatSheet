@@ -50,12 +50,15 @@ $test.Access
 - Download latest version of python3.8 standalone (Windows embeddable package (64-bit)) https://www.python.org/downloads/windows/
 
 ```
-add python to path variable:
+#add python to path variable:
 $env:Path += ";c:\python"
 $env:Path += ";c:\tools\python"
 
-add the register key if error blablah\DemoDLL_RemoteProcess.vcxproj.filters
+#add the register key if error blablah\DemoDLL_RemoteProcess.vcxproj.filters
 REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+
+#add the registery key for colors
+REG ADD HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1
 ```
 
 #### Change tickets .kirbi to .ccache and vice versa
