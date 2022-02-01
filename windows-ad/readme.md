@@ -11,6 +11,9 @@
 
    
 # General
+## Good links
+- https://cybersecuritynews.com/active-directory-checklist/
+
 #### Access C disk of a computer (check local admin)
 ```
 ls \\<COMPUTERNAME>\c$
