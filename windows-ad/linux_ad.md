@@ -30,7 +30,7 @@ ls /tmp/ | grep krb5cc
 - If tickets aren't saved in files they are saved in Linux Kernel Keys
 - Can use https://github.com/TarlogicSecurity/tickey to convert them to files
 
-## Reusing tickets and keytabs etc
+## Reusing and abusing ccache
 ### CCACHE ticket reuse from /tmp
 - When tickets are set to be stored as a file on disk, the standard format and type is a CCACHE file. This is a simple binary file format to store Kerberos credentials. These files are typically stored in ```/tmp``` and scoped with 600 permissions
 
