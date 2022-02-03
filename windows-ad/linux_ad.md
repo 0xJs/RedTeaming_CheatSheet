@@ -1,4 +1,4 @@
-## Linux Active Directory
+# Linux Active Directory
 
 ## Enumeration
 #### Check if Linux host is AD Joined
