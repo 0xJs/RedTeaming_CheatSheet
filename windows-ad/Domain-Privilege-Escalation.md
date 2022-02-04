@@ -594,7 +594,6 @@ $RawBytes = Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoacto
 - Preferably a user that would be admin on the machine (Check BloodHound).
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
-Get-NetLocalGroupMember -ComputerName <TARGET> -GroupName Administrators
 Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
 ```
 
