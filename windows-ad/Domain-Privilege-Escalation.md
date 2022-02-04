@@ -591,9 +591,10 @@ $RawBytes = Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoacto
 ```
 
 #### Check for user to impersonate
-- Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
+- Preferably a user that would be admin on the machine (Check BloodHound).
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
+Get-NetLocalGroupMember -ComputerName <TARGET> -GroupName Administrators
 Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
 ```
 
