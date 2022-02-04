@@ -21,6 +21,7 @@ crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
 ```
 
 #### Poison Requests
+- Poison Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS) requests.
 ```
 Responder -I eth0
 ```
