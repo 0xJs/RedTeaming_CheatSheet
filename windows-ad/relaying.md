@@ -3,8 +3,8 @@
 * [LDAP Relaying](#LDAP-Relaying)
   * [LDAP Relay force HTTP requests](#LDAP-Relay-force-HTTP-requests)
   * [LDAP Relay with Mitm6](#LDAP-Relay-with-Mitm6)
-* [LDAPS Relaying](#LDAPS Relaying)
-  * [Resource Based Constrained Delegation Webclient Attack](#Resource Based Constrained Delegation Webclient Attack)
+* [LDAPS Relaying](#LDAPS-Relaying)
+  * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
 #### Check if LLMNR and NBT-NS is used
