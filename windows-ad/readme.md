@@ -2,6 +2,7 @@
 
 # Index
 * [General](#General)
+* [Initial Access](Initial-Access.md)
 * [Local privilege escalation](Local-Privilege-Escalation.md)
 * [Domain Enumeration](Domain-Enumeration.md) 
 * [Lateral Movement](Lateral-Movement.md)
