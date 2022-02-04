@@ -157,7 +157,7 @@ sudo ntlmrelayx.py -t ldaps://<DC IP> --delegate-access
 - When computer account is created. This account can be used to enumerate the domain!
 
 #### Check for a user to impersonate
-- Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
+- Preferably a user that would be admin on the machine (Check BloodHound).
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
 $creds = Get-Credential
