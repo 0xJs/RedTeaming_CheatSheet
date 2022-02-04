@@ -6,8 +6,8 @@
 * [Relaying Attacks](#Relaying-Attacks)
     * [SMB relaying](#SMB-relaying)
     * [LDAP Relaying](#LDAP-Relaying)
-    * [LDAPS Relaying](#LDAPS Relaying)
-      * [Resource Based Constrained Delegation Webclient Attack](#Resource Based Constrained Delegation Webclient Attack)
+    * [LDAPS Relaying](#LDAPS-Relaying)
+      * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
 
 ## Web Attacks
 - It is possible to get access by abusing a lot of web attacks which might give you access to the system. There are to many to subscribe here, but I might make a list someday.
