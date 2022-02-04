@@ -113,6 +113,7 @@ ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6
 
 ### LDAPS Relaying
 - Relaying LDAPS can add a new computer account by abusing the fact that, by default, user are allowed to join domain up to 10 new computer objects
+- When possible, use the FQDN instead of the IP address. The IP address works most of the time, but FQDN looks cleaner and avoids SNI certificate conflicts.
 
 #### Enable the LDAPS relay
 - Can wait for mitm6 to poison or force it
