@@ -16,7 +16,7 @@
 ### Enumerate users
 - https://github.com/ropnop/kerbrute
 ```
-sudo ./kerbrute userenum -d <domain> domain_users.txt
+sudo ./kerbrute userenum -d <domain> domain_users.txt -dc <IP>
 ```
 
 #### Spray one password against all users
