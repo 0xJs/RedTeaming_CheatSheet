@@ -3,6 +3,7 @@
 * [Tools](#Tools)
 * [Manual Enumeration](#Manual-Enumeration)
 * [Privilege escalation techniques](#Privilege-escalation-techniques)
+  * [History](#History)
   * [Kernel exploits](#Kernel-exploits)
   * [Service Exploits](#Service-Exploits)
     * [Insecure Service Properties](#Insecure-Service-Properties)
@@ -178,6 +179,13 @@ cd C:\Program Files\<DRIVER>
 
 ## Privilege escalation techniques
 Run winPEAS and if it find something fuzzy use these techniques to exploit it.
+
+## History
+#### Search for powershell history and transcript
+```
+Get-ChildItem -Path C:\* -Force -Include *ConsoleHost_history.txt* -Recurse -ErrorAction SilentlyContinue 
+Get-Childitem -Path C:\* -Force -Include *transcript* -Recurse -ErrorAction SilentlyContinue
+```
 
 ## Kernel exploits
 Kernels are the core of any operating system. Think of it as a layer between application software and the actual computer hardware. The kernel has complete control over the operating system. Exploiting a kernel vulnerability can result in execution as the SYSTEM user.
