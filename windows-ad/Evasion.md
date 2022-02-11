@@ -291,5 +291,5 @@ notepad.exe secpolicy.inf
 secedit /configure /db secedit.sdb /cfg secpolicy.inf /overwrite /areas USER_RIGHTS
 ```
 
-#### Relog
-- Relog and check privileges with ```whoami``` if not having SeDebugPrivilege do ```PsExec.exe -i cmd.exe```
+#### Start cmd again
+- Check privileges with ```whoami``` if not having SeDebugPrivilege do ```PsExec.exe -i cmd.exe```
