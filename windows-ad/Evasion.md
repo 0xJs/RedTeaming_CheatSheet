@@ -11,6 +11,7 @@
 	* [Logging evasion](#Logging-evasion)
 * [Defense evasion](#Defense-evasion)
 * [AV Bypass](#AV-Bypass)
+* [Privileges](#Privileges)
 
 ## General
 #### Get all GPO's applied to a machine
