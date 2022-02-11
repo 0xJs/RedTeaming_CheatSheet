@@ -263,3 +263,33 @@ csc.exe /target:exe /out:C:\tools\defendercheck.exe C:\Tools\DefenderCheck\Defen
 pyinstaller.exe --onefile .\CVE-2021-1675.py
 pyarmor pack --clean -e "--onefile " .\CVE-2021-1675.py
 ```
+
+## Privileges
+
+#### Check current privileges
+```
+whoami /priv
+```
+
+### SeDebugPrivileges
+- http://woshub.com/obtain-sedebugprivilege-debug-program-policy-enabled/
+
+#### Export the current user rights set by the group policies to a text file:
+```
+secedit /export /cfg secpolicy.inf /areas USER_RIGHTS
+```
+
+#### Edit the secpolicy.ing
+- Change the SeDebugPrivileges to ```S-1-5-32-544``` the Local administrator group.
+```
+notepad.exe secpolicy.inf
+```
+- Or converts sids: http://woshub.com/convert-sid-to-username-and-vice-versa/
+
+#### Save the new user rights set
+```
+secedit /configure /db secedit.sdb /cfg secpolicy.inf /overwrite /areas USER_RIGHTS
+```
+
+#### Relog
+- Relog and check privileges with ```whoami``` if not having SeDebugPrivilege do ```PsExec.exe -i cmd.exe```
