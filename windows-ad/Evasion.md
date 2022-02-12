@@ -294,3 +294,9 @@ secedit /configure /db secedit.sdb /cfg secpolicy.inf /overwrite /areas USER_RIG
 
 #### Start cmd again
 - Check privileges with ```whoami``` if not having SeDebugPrivilege do ```PsExec.exe -i cmd.exe```
+
+### Enable SMB shares for local admin users
+```
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d 1 /f
+Get-service LanmanServer | restart-service -verbose
+```
