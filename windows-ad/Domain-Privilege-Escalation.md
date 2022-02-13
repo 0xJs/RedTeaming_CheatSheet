@@ -555,7 +555,7 @@ Get-DomainComputer <COMPUTERNAME> | Select-Object -Property name, msds-allowedto
 ```
 (Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
 
-Get-DomainObject | Where-Object ms-ds-machineaccountquota
+Get-DomainObject | Where-Object ms-ds-machineaccountquota | select-object ms-ds-machineaccountquota
 ```
 
 #### Create a new computer object
