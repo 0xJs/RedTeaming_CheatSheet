@@ -8,7 +8,7 @@
     * [Permissions on a User](#Permissions-on-a-user)
     * [Permissions on a Group](#Permissions-on-a-group)
     * [Permissions on a ComputerObject](#Permissions-on-a-ComputerObject)
-    * [Permissions on Domain Object]([Permissions-on-Domain-Object)
+    * [Permissions on Domain Object](Permissions-on-Domain-Object)
     * [Permissions on a OU](#Permissions-on-OU)
     * [Writeowner of an object](#Writeowner-of-an-object---Change-the-owner)
     * [Owner of an object](#Owner-of-an-object---Add-GenericAll)
