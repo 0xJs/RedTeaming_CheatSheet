@@ -14,6 +14,7 @@
     * [Owner of an object](#Owner-of-an-object---Add-GenericAll)
     * [NTLMRelay](#NTLMRelay)
     * [GPO Abuse](#GPO-Abuse)
+    * [Build in groups](#Build-in-groups)
 * [Delegation](#Delegation) 
   * [Unconstrained Delegation](#Unconstrained-delegation) 
     * [Printer Bug](#Printer-bug) 
@@ -360,6 +361,7 @@ python3 aclpwn.py --restore aclpwn.restore
 ```
 
 ### GPO Abuse
+- Members of ```Group Policy Creator Owners``` can create new GPO's. But they cant link it to anything or modify existing GPO’s. The creator will have to modify rights over created GPO.
 - https://github.com/FSecureLABS/SharpGPOAbuse
 
 #### Add local admin
@@ -368,6 +370,9 @@ python3 aclpwn.py --restore aclpwn.restore
 gpupdate /force #On the target machine if you got normal access already
 net localgroup administrators
 ```
+
+### Build in groups
+- https://cube0x0.github.io/Pocing-Beyond-DA/
 
 ## Delegation
 - In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
