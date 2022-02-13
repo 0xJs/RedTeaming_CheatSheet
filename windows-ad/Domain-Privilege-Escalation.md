@@ -627,7 +627,7 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 dir \\<COMPUTER>\C$
 ```
 
-If the dir doesn't work read the blogpost! That might tell you why! (Didn't test the attack myself yet)
+- If dir doesn't work check blogpost
 
 #### It is possible that you impersonated another user which leads to more ACL abuses!
 
