@@ -13,7 +13,7 @@
     * [Writeowner of an object](#Writeowner-of-an-object---Change-the-owner)
     * [Owner of an object](#Owner-of-an-object---Add-GenericAll)
     * [NTLMRelay](#NTLMRelay)
-    * [GPO Abuse](#GPO-Abuse])
+    * [GPO Abuse](#GPO-Abuse)
 * [Delegation](#Delegation) 
   * [Unconstrained Delegation](#Unconstrained-delegation) 
     * [Printer Bug](#Printer-bug) 
@@ -367,7 +367,6 @@ python3 aclpwn.py --restore aclpwn.restore
 gpupdate /force #On the target machine if you got normal access already
 net localgroup administrators
 ```
-
 
 ## Delegation
 - In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
