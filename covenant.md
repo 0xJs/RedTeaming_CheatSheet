@@ -4,6 +4,22 @@
 ### Installation
 - https://github.com/cobbr/Covenant/wiki/Installation-And-Startup
 
+#### Rastamouse version
+```
+wget -q https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
+sudo apt -y update
+sudo apt -y install apt-transport-https
+sudo apt -y update
+sudo apt -y install dotnet-sdk-3.1 dnsutils
+rm packages-microsoft-prod.deb
+
+sudo git clone --recurse-submodules https://github.com/ZeroPointSecurity/Covenant.git /opt/Covenant
+
+dotnet build
+dotnet run
+```
+
 ### General
 #### Start Covenant
 ```
