@@ -628,6 +628,7 @@ Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofoth
 ```
 $RawBytes = Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofotheridentity' | Select-Object -ExpandProperty msds-allowedtoactonbehalfofotheridentity
 (New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList $RawBytes, 0).DiscretionaryAcl
+Get-DomainComputer <SID>
 ```
 
 #### Generate RC4 hash for the made computer object
