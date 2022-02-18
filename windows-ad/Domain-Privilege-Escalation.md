@@ -1274,7 +1274,7 @@ Get-DomainTrust | ?{$_.TrustAttributes -eq 'FILTER_SIDS'} | %{Get-DomainUser -SP
 See [Kerberoast](#Kerberoast) 
 
 ### Printer bug2
--  It also works across a Two-way forest trust with TGT Delegation enabled!
+-  It also works across a Two-way forest trust if TGT Delegation is enabled!
 
 #### Check if TGTDelegation is enabled (run on DC)
 ```
