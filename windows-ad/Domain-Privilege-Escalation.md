@@ -1336,7 +1336,7 @@ Get-ADTrust -Filter *
 
 #### Enumerate groups of the target forest with SID higher then 1000
 ```
-Get-ADGroup -Filter 'SID -ge "S-1-5-21-<DOMAIN SID PART>-1000"' -Server <TARGET FOREST>
+Get-ADGroup -Filter 'SID -ge "<TARGET FOREST SID>-1000"' -Server <TARGET FOREST>
 ```
 
 #### Create a intern-forest TGT
