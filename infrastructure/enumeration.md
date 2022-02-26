@@ -11,7 +11,13 @@
      * [Directory fuzzing](#Directory-fuzzing)
 
 ## Host Discovery
-#### NMAP ping sweep
+#### Nmap No ping top 50
+```
+sudo nmap --top-ports 50 <RANGE> --open -Pn -oA nmap_top50_hostdicovery
+cat nmap_top50_hostdicovery | grep open | cut -d " " -f 2 | sort u > hosts.txt
+```
+
+#### NMap ping sweep
 ```
 sudo nmap -sn <RANGE>
 ```
@@ -58,20 +64,14 @@ nmap <TARGET> -sV -sC -O -p- -vv -oA fulltcp_<TARGET>
 nmap <TARGET> -sU -sV -sC -p- -vv -oA fulludp_<TARGET> 
 ```
 
-#### Nmap scan most common ports wiht no host discovery
-```
-nmap <TARGET> -p 20,21,22,25,80,443,111,135,139,443,8080 -oA portsweep_<TARGET> 
-nmap <TARGET> --top-ports 25 -oA portsweep_top25_<TARGET> 
-```
-
-#### Nmap scan all vulnerabilities
+#### Nmap scan for vulnerabilities
 ```
 nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET> 
 ```
 
 #### Usefull flags
 - ```-Pn``` No ping #use if host says down but you know its up)
-- ```-sn``` No port scan #use if you just want to scan a range to check if hosts are up.
+- ```-sn``` No port scan
 
 #### HTTP Openproxy
 If there is an open HTTP proxy, connect to it by configuring a proxy in your browser.
