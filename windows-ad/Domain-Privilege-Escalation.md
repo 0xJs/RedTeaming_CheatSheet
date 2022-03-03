@@ -1,5 +1,6 @@
 # Domain Privilege escalation
 * [Password not required](#Password-not-required)
+* [Password in description](#Password-in-description)
 * [Kerberoast](#Kerberoast) 
   * [Set SPN](#Set-SPN)
 * [AS-REP Roasting](#AS-REP-Roasting)
@@ -75,6 +76,11 @@ Get-DomainUser -Credential $creds -Server 172.16.2.6 -Domain dev.admin.offshore.
 crackmapexec smb <DC IP> -u <USER> -p ''
 ```
 
+## Password in description
+#### Check for passwords in the description
+```
+Get-DomainUser | Where-Object -Property Description | Select-Object samaccountname, description
+```
 
 ## Kerberoast
 - https://github.com/GhostPack/Rubeus
