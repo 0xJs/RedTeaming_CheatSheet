@@ -3,6 +3,7 @@
 * [Services](#Services)
      * [Most common ports](#Most-common-ports)
      * [Port Scanning Nmap](#port-scanning-Nmap)
+     * [Vulnerability scanning](#Vulnerability-scanning)
      * [SMTP](#SMTP)
      * [SMB](#SMB)
      * [RPC](#RPC)
@@ -82,6 +83,12 @@ https://github.com/Tib3rius/AutoRecon
 autorecon -vv <IP>
 ```
 
+### Vulnerability scanning
+#### Nmap scan for vulnerabilities
+```
+nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET> 
+```
+
 ### SMTP
 #### Enumerate emails accounts
 ```
@@ -112,10 +119,15 @@ Gotta try this: https://github.com/cddmp/enum4linux-ng
 enum4linux <IP>
 ```
 
-#### SMBClient list shares
+#### List shares and check access with null sessions
 ```
-smbclient -L <IP>
-smbclient -L <IP>  -U '<USER>'%'<PASS>'
+crackmapexec smb -u '' -p '' --shares
+```
+
+#### List shares and check access with username and password
+- use ```-d <DOMAIN>``` if the account is a domain account
+```
+crackmapexec smb -u '<uSERNAME>' -p '<PASSWORD>' -d . 
 ```
 
 #### SMBClient connect to share
@@ -127,11 +139,6 @@ smbclient //<IP>/<SHARE>
 ```
 get <FILE NAME>-
 smbget -R smb://<IP>/<SHARE>
-```
-
-#### SMBMap check access
-```
-smbmap -H <IP> -p 445 -u ''
 ```
 
 #### Nbtscan
@@ -157,13 +164,13 @@ curl <WEBPAGE>
 grep -o '[^/]*\.<DOMAIN>\.com' index.html | sort -u > subdomains.txt
 ```
 
-#### Screenshot a lot of http pages
+### Screenshot a lot of http pages
 Collect screenshot from list of ips
 ```
 for ip in $(cat <IP FILE>); do cutycapt --url=$ip --out=$ip.png;done
 ```
 
-Run the following bash script
+#### Run the following bash script
 ```
 #!/bin/bash
 # Bash script to examine the scan results through HTML.
@@ -173,15 +180,16 @@ eb.html
 echo "</BODY></HTML>" >> web.html
 ```
 
+#### eyewitness
+- https://github.com/FortyNorthSecurity/EyeWitness
+```
+./EyeWitness -f urls.txt --web
+```
+
 ### Vulnerability scanning
 #### Nikto
 ```
 nikto -host <URL> -output nikto-URL.txt
-```
-
-#### Nmap scan for vulnerabilities
-```
-nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET> 
 ```
 
 ### Directory fuzzing
