@@ -80,10 +80,6 @@ crackmapexec smb <DC IP> -u <USER> -p ''
 - https://github.com/GhostPack/Rubeus
 #### Find user accounts used as service accounts
 ```
-. ./GetUserSPNs.ps1
-```
-
-```
 Get-DomainUser -SPN
 Get-DomainUser -SPN | select samaccountname,serviceprincipalname
 ```
