@@ -124,7 +124,7 @@ ntlmrelayx.py -tf smb_hosts_nosigning.txt -smb2support
 - Use the ```socks``` option to be able to use the ```socks``` command to get a nice overview of the relayed attempts. It will also keep the SMB connection open indefinitely. 
 
 ```
-ntlmrelayx.py -tf smb_hosts_nosigning.txt --socks -smb2support
+ntlmrelayx.py -tf smb_hosts_nosigning.txt -socks -smb2support
 
 # Get overview of all relay attempts
 ntlmrelayx> socks
