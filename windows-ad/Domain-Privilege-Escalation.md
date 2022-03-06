@@ -1416,8 +1416,10 @@ Get-SQLInstanceLocal
 - Unauthenticated / Local user / Domain user --> SQL Login
 #### Check for weak passwords or default credentials
 - Might want to check for default applications with backend SQL Server express for default instances/credentials those applications use.
+- Never got it to work as described in the blog: https://h4ms1k.github.io/Red_Team_MSSQL_Server/#
 ```
-Get-SQLInstanceDomain | Invoke-SQLAuditWeakLoginPw -Verbose
+Get-SQLInstanceScanUDP | Invoke-SQLAuditWeakLoginPw -Verbose
+spray weak credentials against the sa account
 ```
  
 #### Check accessibility to SQL servers with current credentials
@@ -1473,6 +1475,12 @@ SELECT SUSER_SID('<Identified_Domain>\Domain Admins')
 SELECT SUSER_NAME(RID) –> Get the domain object name associated to the RID.
 
 Get-SQLFuzzDomainAccount -Instance <COMPUTERNAME>\<INSTANCENAME>
+```
+
+#### Check for weak passwords or default credentials
+- Enumerate all SQL Logins as least privilege user and test username as password.
+```
+Get-SQLInstanceDomain | Invoke-SQLAuditWeakLoginPw -Verbose
 ```
  
 ### Impersonation attack
