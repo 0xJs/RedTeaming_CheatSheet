@@ -1543,7 +1543,7 @@ Get-SQLServerLinkCrawl -Instance <INSTANCE> -Verbose -Query 'SELECT distinct b.n
 - Prerequisites:
  - db_owner role
  - owner of the database high privileged user
- - Database set to thrustworthy
+ - Database set to thrustworthy (To enable xp_cmdshell)
  
 #### Check the db_owner role
 ```
