@@ -1508,11 +1508,11 @@ SELECT IS_SRVROLEMEMBER('sysadmin')
 #### Enable and run xp_cmdshell
 ```
 -- Enable show options
-EXEC sp_configure 'show advanced options',1
+EXEC sp_configure 'show advanced options', '1'
 RECONFIGURE
 GO
 -- Enable xp_cmdshell
-EXEC sp_configure 'xp_cmdshell',1
+EXEC sp_configure 'xp_cmdshell', '1' 
 RECONFIGURE
 GO
 -- Quickly check what the service account is via xp_cmdshell
