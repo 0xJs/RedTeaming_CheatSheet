@@ -24,7 +24,7 @@
   * [Resource Based Constrained Delegation](Resource-Based-Constrained-Delegation)
     * [Webclient Attack](#Webclient-Attack)
     * [Computer object takeover](#Computer-object-Takeover) 
-    * [Image Change Privilege Escalation](#Image-change-Privilege-Escalation)
+    * [Change-Lockscreen](#Change-Lockscreen)
 * [Relaying attacks](#Relaying-attacks)
   * [SMB Relaying](#SMB-Relaying) 
 * [MS Exchange](#MS-Exchange) 
@@ -766,7 +766,7 @@ python3 Psexec.py -k -no-pass <TARGET FQDN>
 python3 Secretsdump.py -k <TARGET FQDN>
 ```
 
-### Image Change Privilege Escalation
+### Change lockscreen
 - Requirements:
   - Low priv shell on a machine
   - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
