@@ -14,7 +14,7 @@ sudo apt -y update
 sudo apt -y install dotnet-sdk-3.1 dnsutils
 rm packages-microsoft-prod.deb
 
-sudo git clone --recurse-submodules https://github.com/ZeroPointSecurity/Covenant.git /opt/Covenant
+git clone --recurse-submodules https://github.com/ZeroPointSecurity/Covenant.git /opt/Covenant
 
 dotnet build
 dotnet run
