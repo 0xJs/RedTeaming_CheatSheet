@@ -17,7 +17,7 @@
 #### Get all GPO's applied to a machine
 - Run with elevated prompt
 ```
-gpresult -h gpos.html
+gpresult /H gpos.html
 ```
 
 #### Powershell detections
