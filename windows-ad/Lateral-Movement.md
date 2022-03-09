@@ -1,13 +1,5 @@
 # Lateral Movement
 * [General](#General)
-* [Gathering Credentials](#Gathering-credentials)
-  * [Find credentials in files](#Find-credentials-in-files)
-  * [Dumping LSASS](#Dumping-LSASS)
-  * [Dumping SAM](#Dumping-SAM)
-  * [Mimikatz](#Mimikatz) 
-  * [DC-Sync](#DC-Sync)
-  * [Token manipulation](#Token-manipulation)
-  * [DPAPI](#DPAPI)
 * [Pass The Hash](#Pass-The-Hash)
   * [Overpass The Hash](#Overpass-The-Hash)
 * [Check Local Admin Access](#Check-Local-Admin-Access)  
