@@ -8,7 +8,7 @@
 * [Post-Exploitation](Post-Exploitation.md)
 * [Lateral Movement](Lateral-Movement.md)
 * [Domain Enumeration](Domain-Enumeration.md) 
-* [Domain privilege escalation](Domain-Privilege-Escalation.md)
+* [Domain Privilege Escalation](Domain-Privilege-Escalation.md)
 * [Domain Persistence](Domain-Persistence.md)
    
 # General
