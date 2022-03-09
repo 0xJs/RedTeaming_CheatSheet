@@ -217,6 +217,16 @@ Get-MpComputerStatus
 Get-MpComputerStatus | Select RealTimeProtectionEnabled
 ```
 
+#### Get info about Windows Defender
+```
+Get-MpPreference
+```
+
+#### Find excluded folder from Windows Defender
+```
+(Get-MpPreference).Exclusionpath
+```
+
 #### Disable AV monitoring
 ```
 Set-MpPreference -DisableRealtimeMonitoring $true
