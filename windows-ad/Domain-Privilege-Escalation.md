@@ -1,6 +1,7 @@
 # Domain Privilege escalation
 * [Password not required](#Password-not-required)
 * [Password in description](#Password-in-description)
+* [Reuse local admin password](#Reuse-local-admin-password)
 * [Kerberoast](#Kerberoast) 
   * [Set SPN](#Set-SPN)
 * [AS-REP Roasting](#AS-REP-Roasting)
