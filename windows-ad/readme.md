@@ -4,13 +4,12 @@
 * [General](#General)
 * [Initial Access](Initial-Access.md)
 * [Local privilege escalation](Local-Privilege-Escalation.md)
-* [Domain Enumeration](Domain-Enumeration.md) 
-* [Lateral Movement](Lateral-Movement.md)
 * [Evasion](Evasion.md)
+* [Post-Exploitation](Post-Exploitation.md)
+* [Lateral Movement](Lateral-Movement.md)
+* [Domain Enumeration](Domain-Enumeration.md) 
 * [Domain privilege escalation](Domain-Privilege-Escalation.md)
 * [Domain Persistence](Domain-Persistence.md)
-* [Post-Exploitation](Post-Exploitation.md)
-
    
 # General
 ## Good links
