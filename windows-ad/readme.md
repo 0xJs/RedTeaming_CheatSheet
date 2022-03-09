@@ -9,6 +9,7 @@
 * [Evasion](Evasion.md)
 * [Domain privilege escalation](Domain-Privilege-Escalation.md)
 * [Domain Persistence](Domain-Persistence.md)
+* [Post-Exploitation](Post-Exploitation.md)
 
    
 # General
