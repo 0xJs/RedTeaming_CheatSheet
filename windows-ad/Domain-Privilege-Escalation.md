@@ -58,7 +58,7 @@
 * [Cross Forest attacks](#Crossforest-attacks)
   * [Kerberoast](#Kerberoast2)
   * [Printer Bug](#Printer-bug2) 
-  * [Trust key](#Trust-key) 
+  * [Trust key](#Trust-key2) 
   * [Trust abuse SQL](#Trust-abuse-SQL)
   * [Foreign Security Principals](#Foreign-Security-Principals)
   * [ACLs](#ACLs)
@@ -1289,7 +1289,7 @@ netdom trust <CURRENT FOREST> /domain:<TRUSTED FOREST> /EnableTgtDelegation
 
 See [Printer Bug](#Printer-bug) for exploitation
 
-### Trust key
+### Trust key2
 -  By abusing the trust flow between forests in a two way trust, it is possible to access resources across the forest boundary which are explicity shared with a specific forest.
 -  There is no way to enumerate which resources are shared.
 
