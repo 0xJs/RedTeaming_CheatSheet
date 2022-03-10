@@ -198,7 +198,7 @@ Get-DomainGPOUserLocalGroupMapping -Identity <SAMACCOUNTNAME> -Verbose
 ```
 
 #### Get GPO applied on an OU.
-- Read GPOname from gplink attribute from ```Get-DomainOU```
+- Read name from gplink attribute from ```Get-DomainOU```
 ```
 Get-DomainGPO -Identity '{<ID>}'
 ```
