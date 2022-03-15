@@ -15,3 +15,8 @@ cd /opt/cobaltstrike
 - OPSEC: Staged payloads are good if your delivery method limits the amount of data you can send. However, they tend to have more indicators compared to stageless. Given the choice, go stageless.
 - OPSEC: The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
 - Attacks --> Packages --> Windows Executable (S).
+
+#### Execute assembly in memory
+```
+execute-assembly <PATH TO EXE> -group=system
+```
