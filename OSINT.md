@@ -4,7 +4,7 @@
 ## DNS
 #### Get IP Adresses of a domain name
 ```
-dig cyberbotic.io +short
+dig <DOMAIN> +short
 ```
 
 #### Check whois op each IP
@@ -13,9 +13,19 @@ dig cyberbotic.io +short
 whois <IP>
 ```
 
+### Check for subdomains
+#### Dnscan
+- https://github.com/rbsec/dnscan
+```
+dnscan.py <DOMAIN>
+```
+
+#### Dnsdumpster
+- Gui tool: https://dnsdumpster.com/
+
 ## Mail
 #### Check spf, dkim, dmarc etc
 - https://github.com/BishopFox/spoofcheck
 ```
-./spoofcheck.py cyberbotic.io
+./spoofcheck.py <DOMAIN>
 ```
