@@ -1,18 +1,48 @@
 # Initial Access attacks
-* [Web Attacks](#Web-Attacks) 
-* [Password Attacks](#Password-Attacks)
-  * [Enumerate users](#Enumerate-users)
-  * [AS-REP Roasting](#AS-REP-Roasting)
-* [Relaying Attacks](#Relaying-Attacks)
-    * [SMB relaying](#SMB-relaying)
-    * [LDAP Relaying](#LDAP-Relaying)
-    * [LDAPS Relaying](#LDAPS-Relaying)
-      * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
+* [From the outside](#From-the-outside)
+  * [Web Attacks](#Web-Attacks)  
+  * [Password Attacks](#Password-Attacks)
+* [From the inside](#From-the-inside)
+  * [Web Attacks](#Web-Attacks2) 
+  * [Password Attacks](#Password-Attacks2)
+    * [Enumerate users](#Enumerate-users)
+    * [AS-REP Roasting](#AS-REP-Roasting)
+  * [Relaying Attacks](#Relaying-Attacks)
+      * [SMB relaying](#SMB-relaying)
+      * [LDAP Relaying](#LDAP-Relaying)
+      * [LDAPS Relaying](#LDAPS-Relaying)
+        * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
 
+# From the outside
 ## Web Attacks
 - It is possible to get access by abusing a lot of web attacks which might give you access to the system. There are to many to subscribe here, but I might make a list someday.
 
 ## Password Attacks
+### Spray against OWA
+- https://github.com/dafthack/MailSniper
+
+#### Get NETBIOS name
+```
+Invoke-DomainHarvestOWA -ExchHostname <IP>
+```
+
+#### Generate list of usernames
+- https://gist.github.com/superkojiman/11076951
+- Needs list of possible names and lastnames from recon. Example: John Doe
+```
+/opt/namemash.py names.txt >> possible-usernames.txt
+```
+
+#### Spray with MailSniper
+```
+Invoke-UsernameHarvestOWA -ExchHostname <IP> -Domain <DOMAIN> -UserList .\possible-usernames.txt -OutFile valid.txt
+```
+
+# From the inside
+## Web Attacks2
+- It is possible to get access by abusing a lot of web attacks which might give you access to the system. There are to many to subscribe here, but I might make a list someday.
+
+## Password Attacks2
 ### Enumerate users
 - https://github.com/ropnop/kerbrute
 ```
