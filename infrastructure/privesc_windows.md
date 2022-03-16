@@ -20,6 +20,7 @@
   * [Hot potato](#Hot-potato)
   * [Token impersonation](#Token-impersonation)
   * [Always Install Elevated](#Always-Install-Elevated)
+* [UAC bypass](#UAC-bypass) 
 
 ## General tips
 - https://lolbas-project.github.io/
@@ -665,7 +666,7 @@ whoami /priv
 - SeTakeOwnershipPrivilege
   - The SeTakeOwnershipPrivilege lets the user take ownership over an object (the WRITE_OWNER permission). Once you own an object, you can modify its ACL and grant yourself write access. The same methods used with SeRestorePrivilege then apply.
  
- ## Always Install Elevated
+ ### Always Install Elevated
  - This policy allows standard users to install applications that require access to directories and registry keys that they may not usually have permission to change. This is equivalent to granting full administrative rights and even though Microsoft strongly discourages its use, it can still be found.
 
 - To exploit this, we need to package a payload into an MSI installer that will be installed and executed with SYSTEM privileges.
@@ -680,3 +681,13 @@ whoami /priv
   - Under the Custom Action Properties, change Run64Bit to True.
   - Now build the project, which should produce an MSI at ```C:\Payloads\BeaconInstaller\Debug\BeaconInstaller.msi```.
   - To remove the MSI afterwards, you can use ```msiexec /q /n /uninstall BeaconInstaller.msi``` before removing the file.
+
+## UAC bypass
+- A UAC bypass is a technique by which an application can go from Medium to High Integrity without prompting for consent.
+- https://github.com/hfiref0x/UACME
+ 
+#### Check current UAC configuration
+- The default configuration for UAC is Prompt for consent for non-Windows binaries, but can also have different settings such as Prompt for credentials, Prompt for consent and Elevate without prompting.
+```
+Seatbelt.exe uac
+```
