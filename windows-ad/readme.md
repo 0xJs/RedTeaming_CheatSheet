@@ -3,7 +3,7 @@
 # Index
 * [General](#General)
 * [Initial Access](Initial-Access.md)
-* [Local privilege escalation](Local-Privilege-Escalation.md)
+* [Local privilege escalation](../infrastructure/privesc_windows.md)
 * [Evasion](Evasion.md)
 * [Post-Exploitation](Post-Exploitation.md)
 * [Lateral Movement](Lateral-Movement.md)
