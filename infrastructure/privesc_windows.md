@@ -252,6 +252,12 @@ If our user has permission to change the configuration of a service which runs w
 .\accesschk.exe /accepteula -uwcqv <USER> <SERVICE NAME>
 ```
 
+#### Check the permissions on modifieable service
+- https://rohnspowershellblog.wordpress.com/2013/03/19/viewing-service-acls/
+```
+Get-ServiceAcl -Name <NAME> | select -expandproperty Access
+```
+
 #### Check the current configuration of the service:
 ```
 sc qc daclsvc
