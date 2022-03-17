@@ -11,10 +11,11 @@
 * [Bloodhound](#Bloodhound)
 
 ## General
-- https://github.com/ropnop/kerbrute
+- C# version of powerview https://github.com/tevora-threat/SharpView
+- https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1
 
 ## Powerview Domain
-https://github.com/PowerShellMafia/PowerSploit/tree/master/Recon
+- https://github.com/PowerShellMafia/PowerSploit/tree/master/Recon
 ```
 . ./PowerView.ps1
 ```
