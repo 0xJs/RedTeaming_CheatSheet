@@ -52,9 +52,19 @@ keylogger
 execute-assembly <PATH TO EXE> -group=system
 ```
 
-#### Load PowerShell scrip
+#### Load PowerShell script
 ```
 powershell-import <FILE>
+```
+
+#### Execute cmd command
+```
+run <COMMAND>
+```
+
+#### Execute powershell command
+```
+powershell <COMMAND>
 ```
 
 #### Create service binary
