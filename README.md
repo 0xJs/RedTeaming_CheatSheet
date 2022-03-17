@@ -24,3 +24,8 @@ Pentesting cheatsheet with all the commands and techniques I learned during my l
     * [Azure](cloud/azure/readme.md)
     * [Amazon Web Services](cloud/aws/readme.md)
     * [Google Cloud Platform](cloud/gcb/readme.md)
+
+# Sources
+- Cloud: CARTP from Pentester Academy and breaching the cloud from antisyphon.
+- Windows: CRTP, CRTE from Pentester Academy and ECPTX from eLearnSecurity.
+- Infra: Tiberius privesc courses
