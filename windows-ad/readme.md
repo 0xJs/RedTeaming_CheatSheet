@@ -3,8 +3,10 @@
 # Index
 * [General](#General)
 * [Initial Access](Initial-Access.md)
-* [Local privilege escalation](../infrastructure/privesc_windows.md)
+* [Host Reconnaissance](Host-Reconnaissance.md)
+* [Host Persistence](#Host-Persistence.md)
 * [Evasion](Evasion.md)
+* [Local privilege escalation](../infrastructure/privesc_windows.md)
 * [Post-Exploitation](Post-Exploitation.md)
 * [Lateral Movement](Lateral-Movement.md)
 * [Domain Enumeration](Domain-Enumeration.md) 
