@@ -16,6 +16,12 @@ cd /opt/cobaltstrike
 - OPSEC: The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
 - Attacks --> Packages --> Windows Executable (S).
 
+#### Upload and download files
+```
+upload <FILE>
+download <FILE>
+```
+
 #### Execute assembly in memory
 ```
 execute-assembly <PATH TO EXE> -group=system
