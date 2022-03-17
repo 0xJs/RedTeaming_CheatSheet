@@ -22,6 +22,13 @@ upload <FILE>
 download <FILE>
 ```
 
+#### Take screenshots
+```
+printscreen               Take a single screenshot via PrintScr method
+screenshot                Take a single screenshot
+screenwatch               Take periodic screenshots of desktop
+```
+
 #### Execute assembly in memory
 ```
 execute-assembly <PATH TO EXE> -group=system
