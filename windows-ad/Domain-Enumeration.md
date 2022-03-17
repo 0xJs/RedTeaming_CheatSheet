@@ -280,6 +280,18 @@ Get-ForestTrust -Forest <FOREST NAME>
 Get-ForestDomain -Verbose | Get-DomainTrust
 ```
 
+## Powerview session
+#### Enumerate domain admin sessions
+- Enumerates all machines and queries the domain for users of a specified group (default Domain Admins). Then finds domain machines where those users are logged into.
+```
+Find-DomainUserLocation | select UserName, SessionFromName
+```
+
+### Get-NetSession
+```
+Get-NetSession
+```
+
 ## BloodHound
 https://github.com/BloodHoundAD/BloodHound
 ```
