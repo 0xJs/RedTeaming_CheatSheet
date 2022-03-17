@@ -11,15 +11,6 @@
 
 ## General
 - https://github.com/ropnop/kerbrute
-#### Enumerate usernames
-```
-./kerbrute_linux_amd64 userenum -d <DOMAIN.LOCAL> --dc <IP> usernames.txt
-```
-
-#### Bruteforce users
-```
-/kerbrute_linux_amd64 bruteuser -d <DOMAIN.LOCAL> --dc <IP> rockyou.txt username
-```
 
 ## Powerview Domain
 https://github.com/PowerShellMafia/PowerSploit/tree/master/Recon
