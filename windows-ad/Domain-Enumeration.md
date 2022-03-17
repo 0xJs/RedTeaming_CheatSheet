@@ -7,6 +7,7 @@
 * [Powerview OU](#Powerview-OU)
 * [Powerview ACL](#Powerview-ACL)
 * [Powerview Domain Trust](#Powerview-Domain-Trust)
+* [Powerview Nession](#Powerview-sessions)
 * [Bloodhound](#Bloodhound)
 
 ## General
