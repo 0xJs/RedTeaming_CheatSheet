@@ -16,6 +16,19 @@ cd /opt/cobaltstrike
 - OPSEC: The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
 - Attacks --> Packages --> Windows Executable (S).
 
+#### Create peer-to-peer listener
+- Creating P2P listeners can be done in the Listeners menu, by selecting the TCP or SMB Beacon payload type.
+- Then create payload for the new listener!
+
+#### Connect to beacon
+- Works like a bind shell. Most used are SMB or TCP.
+- Run the payload on the target
+- Connect to the beacon with ```link``` for smb and ```connect``` for tcp.
+```
+connect <IP> <PORT>
+link <IP>
+```
+
 #### Upload and download files
 ```
 upload <FILE>
