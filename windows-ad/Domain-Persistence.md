@@ -12,9 +12,6 @@
   * [SecurityDescriptor - Remote Registry](#SecurityDescriptor---Remote-Registry)
   * [msDS-AllowedToDelegateTo](#msDS-AllowedToDelegateTo)
 * [Computer Account](#Computer-Account)
-* [System Persistence](#System-persistence)
-  * [User land](#User-land)
-  * [Elevated](#Elevated)
 
 ## Golden ticket
 - https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/kerberos-golden-tickets
