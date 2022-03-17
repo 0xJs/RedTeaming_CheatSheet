@@ -43,3 +43,30 @@ connect localhost 4444
 ```
 elevate svc-exe
 ```
+
+### Lateral movement
+#### Jump
+```
+jump [method] [target] [listener]
+
+    Exploit                   Arch  Description
+    -------                   ----  -----------
+    psexec                    x86   Use a service to run a Service EXE artifact
+    psexec64                  x64   Use a service to run a Service EXE artifact
+    psexec_psh                x86   Use a service to run a PowerShell one-liner
+    winrm                     x86   Run a PowerShell script via WinRM
+    winrm64                   x64   Run a PowerShell script via WinRM
+```
+
+#### Remote-exec
+```
+remote-exec [method] [target] [command]
+
+    psexec                          Remote execute via Service Control Manager
+    winrm                           Remote execute via WinRM (PowerShell)
+    wmi                             Remote execute via WMI
+```
+
+#### Using credentials
+Each of these strategies are compatible with the various credential and impersonation methods described in the next section, Credentials & User Impersonation. For instance, if you have plaintext credentials of a domain user who is a local administrator on a target, use ```make_token``` and then ```jump``` to use that user's credentials to move laterally to the target.
+
