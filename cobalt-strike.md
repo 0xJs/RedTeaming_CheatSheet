@@ -52,6 +52,11 @@ keylogger
 execute-assembly <PATH TO EXE> -group=system
 ```
 
+#### Load PowerShell scrip
+```
+powershell-import <FILE>
+```
+
 #### Create service binary
 - Used for privilege escalation with services
 - Attacks --> Packages --> Windows Executable (S) and selecting the Service Binary output type.
