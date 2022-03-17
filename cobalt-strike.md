@@ -29,6 +29,11 @@ screenshot                Take a single screenshot
 screenwatch               Take periodic screenshots of desktop
 ```
 
+#### Keylogger
+```
+keylogger
+```
+
 #### Execute assembly in memory
 ```
 execute-assembly <PATH TO EXE> -group=system
