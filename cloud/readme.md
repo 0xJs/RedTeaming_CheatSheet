@@ -1,5 +1,4 @@
 # Pentesting the cloud cheatsheet
-- Sources: CARTP from penster academy and breaching the cloud from antisyphon.
 
 ## Index
 * [General](#General)
