@@ -4,7 +4,7 @@
 * [General](#General)
 * [Initial Access](Initial-Access.md)
 * [Host Reconnaissance](Host-Reconnaissance.md)
-* [Host Persistence](#Host-Persistence.md)
+* [Host Persistence](Host-Persistence.md)
 * [Evasion](Evasion.md)
 * [Local privilege escalation](../infrastructure/privesc_windows.md)
 * [Post-Exploitation](Post-Exploitation.md)
