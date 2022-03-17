@@ -1,5 +1,4 @@
 # Windows-Domain-Cheatsheet
-- Sources: CRTP, CRTE bootcamp, ECPTX and CRTO.
 
 # Index
 * [General](#General)
