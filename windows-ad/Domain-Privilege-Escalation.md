@@ -22,7 +22,7 @@
   * [Unconstrained Delegation](#Unconstrained-delegation) 
     * [Printer Bug](#Printer-bug) 
   * [Constrained Delegation](#Constrained-delegation) 
-  * [Resource Based Constrained Delegation](Resource-Based-Constrained-Delegation)
+  * [Resource Based Constrained Delegation](#Resource-Based-Constrained-Delegation)
     * [Webclient Attack](#Webclient-Attack)
     * [Computer object takeover](#Computer-object-Takeover) 
     * [Change-Lockscreen](#Change-Lockscreen)
