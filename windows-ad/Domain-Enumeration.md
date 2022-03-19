@@ -176,6 +176,7 @@ Get-DomainGPO -Computername <COMPUTERNAME>
 ```
 
 #### Get GPO's which uses restricteds groups or groups.xml for interesting users
+- Returns all GPOs that modify local group memberships through Restricted Groups or Group Policy Preferences.
 ```
 Get-DomainGPOLocalGroup
 ```
@@ -186,8 +187,10 @@ Get-DomainGPOComputerLocalGroupMapping -ComputerIdentity <COMPUTERNAME>
 ```
 
 #### Get machines where the given user is member of a specific group
+- Enumerates the machines where a specific domain user/group is a member of a specific local group.
 ```
 Get-DomainGPOUserLocalGroupMapping -Identity <SAMACCOUNTNAME> -Verbose 
+Get-DomainGPOUserLocalGroupMapping -LocalGroup Administrators | select ObjectName, GPODisplayName, ContainerName, ComputerName
 ```
 
 #### Get GPO applied on an OU.
