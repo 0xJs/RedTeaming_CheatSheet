@@ -59,6 +59,12 @@ socat.exe tcp-listen:<LISTENING PORT>,fork tcp-connect:<TARGET IP SECOND HOP>:<T
 socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TARGET PORT>
 ```
 
+### Remote port forward netsh
+- List all forwards ```netsh interface portproxy show v4tov4```
+```
+netsh interface portproxy add v4tov4 listenaddress= listenport= connectaddress= connectport= protocol=tcp
+```
+
 ### Proxychains
 #### Proxychains over hop
 ```
