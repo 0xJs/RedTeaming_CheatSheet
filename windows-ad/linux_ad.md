@@ -44,6 +44,11 @@ env | grep KRB5CCNAME
 export KRB5CCNAME=/tmp/ticket.ccache
 ```
 
+### Convert ccache to kirbi
+```
+impacket-ticketConverter krb5cc_<ID> <KIRBI FILE>
+```
+
 ### CCACHE ticket reuse from Kernel Keys
 - Tool to extract Kerberos tickets from Linux kernel keys : https://github.com/TarlogicSecurity/tickey
 ```
