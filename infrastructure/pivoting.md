@@ -60,9 +60,18 @@ socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TAR
 ```
 
 ### Remote port forward netsh
-- List all forwards ```netsh interface portproxy show v4tov4```
 ```
 netsh interface portproxy add v4tov4 listenaddress= listenport= connectaddress= connectport= protocol=tcp
+```
+
+#### List forwards
+```
+netsh interface portproxy show v4tov4
+```
+
+#### Remove port forward
+```
+netsh interface portproxy delete v4tov4 listenaddress=<IP> listenport=<PORT>
 ```
 
 ### Proxychains
