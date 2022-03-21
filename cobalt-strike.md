@@ -210,6 +210,11 @@ inject <PID> <ARCH> <BEACON>
 spawnas <DOMAIN>\<USER> <PASSWORD> <BEACON>
 ```
 
+#### Dcsync
+```
+dcsync
+```
+
 #### Pass the hash
 ```
 pth <DOMAIN>\<USER> <NTLM HASH>
