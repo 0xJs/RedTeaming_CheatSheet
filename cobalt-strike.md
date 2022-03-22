@@ -29,6 +29,9 @@ connect <IP> <PORT>
 link <IP>
 ```
 
+#### Create pivot listener
+- To start a Pivot Listener on an existing Beacon, right-click it and select Pivoting --> Listener.
+
 #### Upload and download files
 ```
 upload <FILE>
