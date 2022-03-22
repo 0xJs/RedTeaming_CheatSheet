@@ -242,6 +242,11 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 powershell.exe -c 'Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False'
 ```
 
+#### Open port on firewall
+```
+netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protocol=TCP localport=<PORT>
+```
+
 ## AV Bypass
 - Can also use https://github.com/rasta-mouse/ThreatCheck
 ### Method one
