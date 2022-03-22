@@ -311,6 +311,7 @@ proxychains <COMMAND>
 - Open Proxifier, go to Profile > Proxy Servers and Add a new proxy entry, which will point at the IP address and Port of your Cobalt Strike SOCKS proxy.
 - Next, go to Profile > Proxification Rules. This is where you can add rules that tell Proxifier when and where to proxy specific applications. Multiple applications can be added to the same rule, but in this example, I'm creating a single rule for adexplorer64.exe (part of the Sysinternals Suite).
 - Target hosts fill in the target internal network range with the action ```proxy socks <TARGET>```
+- NOTE: You will also need to add a static host entry in your C:\Windows\System32\drivers\etc\hosts file: <DC IP> <DOMAIN>. You can enable DNS lookups through Proxifier, but that will cause DNS leaks from your computer into the target environment.
 
 #### Proxychains netonly or overpass the hash
 ```
