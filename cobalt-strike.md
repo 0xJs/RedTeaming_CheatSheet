@@ -31,6 +31,7 @@ link <IP>
 
 #### Create pivot listener
 - To start a Pivot Listener on an existing Beacon, right-click it and select Pivoting --> Listener.
+- Might need to open port on the firewall
 
 #### Upload and download files
 ```
