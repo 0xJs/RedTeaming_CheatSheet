@@ -341,23 +341,28 @@ netsh interface portproxy show v4tov4
 netsh interface portproxy delete v4tov4 listenaddress=<IP> listenport=<PORT>
 ```
 
-#### Create port forward
+#### Create port forward rportfwd
 - Beacon's reverse port forward always tunnels the traffic to the Team Server and the Team Server sends the traffic to its intended destination, so shouldn't be used to relay traffic between individual machines.
 - Does not require administrator privs
 ```
 rportfwd <PORT> <IP> <PORT>
 ```
 
-#### Stop port forward
+#### Stop port forward rportfwd
 ```
 rportfwd stop <PORT>
 ```
 
-#### Create port forward local
+#### Create port forward rportfwd_local
 - Beacon also has a rportfwd_local command.  Whereas rportfwd will tunnel traffic to the Team Server, rportfwd_local will tunnel the traffic to the machine running the Cobalt Strike client.
 - Does not require administrator privs
 ```
 rportfwd_local <PORT> <IP> <PORT>
+```
+    
+#### Stop port forward local
+```
+rportfwd_local stop <PORT>
 ```
 
 ### NTLMRelaying with cobalt strike
