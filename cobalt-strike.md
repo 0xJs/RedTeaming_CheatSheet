@@ -356,6 +356,7 @@ rportfwd stop <PORT>
 #### Create port forward rportfwd_local
 - Beacon also has a rportfwd_local command.  Whereas rportfwd will tunnel traffic to the Team Server, rportfwd_local will tunnel the traffic to the machine running the Cobalt Strike client.
 - Does not require administrator privs
+- If 127.0.0.1 doesn't work use teamserver IP
 ```
 rportfwd_local <PORT> <IP> <PORT>
 ```
