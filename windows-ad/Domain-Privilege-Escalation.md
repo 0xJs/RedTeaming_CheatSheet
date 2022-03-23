@@ -47,6 +47,7 @@
   * [Data exfiltration](#Data-exfiltration)
   * [SQL Queries](#SQL-Queries)
 * [WSUS](#Attacking-WSUS)
+* [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
@@ -1208,6 +1209,8 @@ req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Conn
 - After comprimising the WSUS server it might be possible to acces networks you weren't able before.
 - Inject a fake update directory to the WSUS server
   - https://github.com/AlsidOfficial/WSUSpendu 
+
+## Active Directory Certificate Services
 
 ## Cross Domain attacks
 ## Azure AD
