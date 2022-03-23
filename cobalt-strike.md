@@ -264,6 +264,11 @@ steal_token <PID>
 kerberos_ticket_use <FILE TO TICKET>
 ```
 
+#### Use ccache file
+```
+kerberos_ccache_use
+```
+
 ## Session passing
 ### Cobalt strike --> Metasploit
 ```
