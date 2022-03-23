@@ -259,6 +259,11 @@ execute-assembly Rubeus.exe ptt /luid:<LUID> /ticket:[...base64-ticket...]
 steal_token <PID>
 ```
 
+#### Load ticket
+```
+kerberos_ticket_use <FILE TO TICKET>
+```
+
 ## Session passing
 ### Cobalt strike --> Metasploit
 ```
