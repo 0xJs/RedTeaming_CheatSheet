@@ -47,6 +47,7 @@
   * [Data exfiltration](#Data-exfiltration)
   * [SQL Queries](#SQL-Queries)
 * [WSUS](#Attacking-WSUS)
+* [S4U2self](#S4U2self)
 * [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
