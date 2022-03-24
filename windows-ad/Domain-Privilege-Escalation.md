@@ -49,6 +49,8 @@
 * [WSUS](#Attacking-WSUS)
 * [S4U2self](#S4U2self)
 * [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
+  * [Misconfigured Certificate Templates](#Misconfigured-Certificate-Templates)
+  * [Relaying to ADCS HTTP Endpoints](#Relaying-to-ADCS-HTTP-Endpoints)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
