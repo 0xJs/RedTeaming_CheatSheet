@@ -1550,6 +1550,12 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 . .\PowerUpSQL.ps1
 ```
  
+#### Find possible SQL admins or groups that have access to SQL
+```
+Get-DomainGroup | Where-Object -Property samaccountname -Match SQL
+MATCH p=(u:User)-[:SQLAdmin]->(c:Computer) RETURN p
+```
+ 
 ### Locating and accessing SQL Servers
 #### Discovery of SQL instances (SPN scanning)
 ```
