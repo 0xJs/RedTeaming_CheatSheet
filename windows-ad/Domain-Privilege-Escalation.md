@@ -1310,6 +1310,7 @@ ls \\<COMPOTERNAME FQDN>\C$
 ```
 .\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
 ```
+- Save cert + key in a cert.pem file
 
 #### Transform cert to pfx
 ```
