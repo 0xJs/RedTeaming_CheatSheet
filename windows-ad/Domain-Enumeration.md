@@ -218,6 +218,7 @@ Get-DomainOu -Fulldata
 #### Get machines that are part of an OU
 ```
 Get-DomainOu <OU> | %{Get-DomainComputer -ADSPath $_}
+Get-DomainComputer | ? { $_.DistinguishedName -match "OU=<OU>" } | select DnsHostName
 ```
 
 ## Powerview ACL
