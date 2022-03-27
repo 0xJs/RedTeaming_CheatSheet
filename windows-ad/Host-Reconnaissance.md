@@ -15,3 +15,13 @@ net logons
 ```
 ps
 ```
+
+#### Check if RSAT tools is installed
+```
+Get-Module -List -Name GroupPolicy | select -expand ExportedCommands
+```
+
+#### Install RSAT Tools
+```
+Install-WindowsFeature –Name GPMC
+```
