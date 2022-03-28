@@ -150,18 +150,17 @@ Get-LastLoggedOn -ComputerName <COMPUTERNAME>
 ## Powerview shares
 #### Find shared on hosts in the current domain
 ```
-Invoke-ShareFinder -Verbose
-Invoke-ShareFinder -ExcludeStandard -ExcludePrint -ExcludeIPC
+Find-DomainShare -ComputerDomain <DOMAIN> -CheckShareAccess
 ```
 
 #### Find sensitive files on computers in the domain
 ```
-Invoke-FileFinder -Verbose
+Find-InterestingDomainShareFile -Verbose
 ```
 
 #### Get all fileservers of the domain
 ```
-Get-NetFileServer
+Get-DomainFileServer
 ```
 
 ## Powerview GPO
