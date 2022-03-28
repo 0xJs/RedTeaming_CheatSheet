@@ -151,6 +151,11 @@ remote-exec wmi <HOSTNAME> C:\Windows\beacon-smb.exe
 link <HOSTNAME>
 ```
 
+### WMI exec commands
+```
+remote-exec winrm <HOSTNAME> whoami; hostname
+```
+
 #### CoInitializeSecurity
 - Beacon's internal implementation of WMI uses a Beacon Object File, executed using the beacon_inline_execute Aggressor function. When a BOF is executed the CoInitializeSecurity COM object can be called, which is used to set the security context for the current process. According to Microsoft's documentation, this can only be called once per process. The unfortunate consequence is that if you have CoInitializeSecurity get called in the context of, say "User A", then future BOFs may not be able to inherit a different security context ("User B") for the lifetime of the Beacon process.
 - if CoInitializeSecurity has already been called, WMI fails with access denied.
