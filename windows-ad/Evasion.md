@@ -143,6 +143,15 @@ certutil -urlcache -split -f <URL>
 - If applocker is there enumerate it to find a directory that lets you execute scripts in
 
 ### Applocker
+- AppLocker rules are split into 5 categories - Executable, Windows Installer, Script, Packaged App and DLLs, and each category can have its own enforcement (enforced, audit only, none).
+- AppLocker has a set of default allow rules such as, "allow everyone to execute anything within C:\Windows\*" - the theory being that everything in C:\Windows is trusted and safe to execute.
+- The difficulty of bypassing AppLocker depends on the robustness of the rules that have been implemented. The default rule sets are quite trivial to bypass in a number of ways:
+  - Executing untrusted code via trusts LOLBAS's.
+  - Finding writeable directories within "trusted" paths.
+  - By default, AppLocker is not even applied to Administrators.
+- Uploading into ```C:\Windows``` requires elevated privileges, but there are places like ```C:\Windows\Tasks``` that are writeable by standard users. 
+- DLL enforcement very rarely enabled due to the additional load it can put on a system, and the amount of testing required to ensure nothing will break.
+
 #### Check if applocker policy is running
 ```
 Get-AppLockerPolicy -Effective
@@ -156,6 +165,13 @@ Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections
 #### Check applocker policy in registery
 ```
 reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2
+```
+
+#### Parse GPO applocker
+- https://github.com/PowerShell/GPRegistryPolicy
+```
+Get-DomainGPO -Identity *applocker*
+Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
 ```
 
 #### Check for WDAC
@@ -233,9 +249,11 @@ Get-MpPreference | select Exclusion*
 Set-MpPreference -ExclusionPath "<path>"
 ```
 
-#### Parse GPO exclusion
+#### Parse GPO applocker
+- https://github.com/PowerShell/GPRegistryPolicy
 ```
-Parse-PolFile .\Registry.pol
+Get-DomainGPO -Identity *defender*
+Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
 ```
 
 #### Disable AV monitoring
