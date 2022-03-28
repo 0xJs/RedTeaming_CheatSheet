@@ -78,6 +78,12 @@ run <COMMAND>
 powershell <COMMAND>
 ```
 
+#### Execute powershell command through powerpick
+- Bypasses Constrained Language Mode
+```
+powerpick $ExecutionContext.SessionState.LanguageMode
+```
+
 #### Create service binary
 - Used for privilege escalation with services
 - Attacks --> Packages --> Windows Executable (S) and selecting the Service Binary output type.
