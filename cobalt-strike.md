@@ -424,3 +424,8 @@ $shortcut = $wsh.CreateShortcut("\\<IP>\test.lnk")
 $shortcut.IconLocation = "\\<IP>\test.ico"
 $shortcut.Save()
 ```
+
+#### Portscan
+```
+portscan <CIDR> 139,445,3389,5985 none 1024
+```
