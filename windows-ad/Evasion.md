@@ -224,7 +224,18 @@ Get-MpPreference
 
 #### Find excluded folder from Windows Defender
 ```
+Get-MpPreference | select Exclusion*
 (Get-MpPreference).Exclusionpath
+```
+
+#### Create exclusion
+```
+Set-MpPreference -ExclusionPath "<path>"
+```
+
+#### Parse GPO exclusion
+```
+Parse-PolFile .\Registry.pol
 ```
 
 #### Disable AV monitoring
