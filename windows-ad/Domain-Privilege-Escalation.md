@@ -2091,6 +2091,7 @@ Get-DomainForeignGroupMember -Domain <DOMAIN>
 ```
  
 #### Check local groups on machines
+- Run as DA!
 ```
 Get-DomainGPOUserLocalGroupMapping -Identity "<GROUP>" -LocalGroup "Remote Desktop Users" | select -expand ComputerName
 Find-DomainLocalGroupMember -GroupName "Remote Desktop Users" | select -expand ComputerName
