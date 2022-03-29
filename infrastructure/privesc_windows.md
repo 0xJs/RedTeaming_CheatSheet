@@ -39,6 +39,9 @@
     - https://docs.microsoft.com/en-us/sysinternals/downloads/psexec
 
 ## Tools
+#### Priveschk
+- https://github.com/itm4n/PrivescCheck
+
 #### Powerup & SharpUp
 - https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
 - https://github.com/GhostPack/SharpUp
