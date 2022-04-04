@@ -74,7 +74,7 @@
 #### Check for users with password not required attribute
 - These users are able to have an empty password
 ```
-Get-DomainUser -Credential $creds -Server 172.16.2.6 -Domain dev.admin.offshore.com | Where-Object useraccountcontrol -Match PASSWD_NOTREQD | Select-Object samaccountname, PASSWD_NOTREQD
+Get-DomainUser | Where-Object useraccountcontrol -Match PASSWD_NOTREQD | Select-Object samaccountname, useraccountcontrol
 ```
 
 #### Check if user has empty password
