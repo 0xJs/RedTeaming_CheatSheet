@@ -13,7 +13,14 @@ dig <DOMAIN> +short
 whois <IP>
 ```
 
-## Email adresses
+## Mail
+#### Check spf, dkim, dmarc etc
+- https://github.com/BishopFox/spoofcheck
+```
+./spoofcheck.py <DOMAIN>
+```
+
+### Email adresses
 #### Discovering email adresses or pattern
 - https://hunter.io
 - https://phonebook.cz
@@ -61,9 +68,12 @@ dnscan.py <DOMAIN>
 whatweb <URL>
 ```
 
-## Mail
-#### Check spf, dkim, dmarc etc
-- https://github.com/BishopFox/spoofcheck
+## Google fu / dorks
+- https://gist.github.com/sundowndev/283efaddbcf896ab405488330d1bbc06
+
+#### Example
 ```
-./spoofcheck.py <DOMAIN>
+site:hackdefense.com filetype:pdf
 ```
+
+
