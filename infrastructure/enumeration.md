@@ -29,6 +29,11 @@ sudo netdiscover -r <RANGE>
 sudo netdisover -i <INTERFACE>
 ```
 
+#### Arpscan
+```
+arp-scan -l
+```
+
 ## Services
 ### Most common ports
 ```
@@ -57,17 +62,17 @@ sudo netdisover -i <INTERFACE>
 ### Port scanning Nmap
 #### Full TCP port scan
 ```
-nmap <TARGET> -sV -sC -O -p- -vv -oA fulltcp_<TARGET> 
+sudo nmap <TARGET> -sV -sC -O -p- -vv -oA fulltcp_<TARGET> 
 ```
 
 #### Full UDP port scan
 ```
-nmap <TARGET> -sU -sV -sC -p- -vv -oA fulludp_<TARGET> 
+sudo nmap <TARGET> -sU -sV -sC -p- -vv -oA fulludp_<TARGET> 
 ```
 
 #### Nmap scan for vulnerabilities
 ```
-nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET> 
+sudo nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET> 
 ```
 
 #### Usefull flags
@@ -77,8 +82,8 @@ nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET>
 #### HTTP Openproxy
 If there is an open HTTP proxy, connect to it by configuring a proxy in your browser.
 
-## Autorecon
-https://github.com/Tib3rius/AutoRecon
+#### Autorecon
+- https://github.com/Tib3rius/AutoRecon
 ```
 autorecon -vv <IP>
 ```
@@ -99,10 +104,10 @@ Check output
 ```
 
 ### SMB 
-https://book.hacktricks.xyz/pentesting/pentesting-smb
+- https://book.hacktricks.xyz/pentesting/pentesting-smb
 
 #### Get version script
-https://github.com/unkn-0wn/SmbVersion
+- https://github.com/unkn-0wn/SmbVersion
 ```
 sudo python3 smbver.py <IP> <PORT>
 ```
@@ -114,7 +119,7 @@ nmap -p 139,445 --script=/usr/share/nmap/scripts/smb* <IP>
 ```
 
 #### Enum4linux
-Gotta try this: https://github.com/cddmp/enum4linux-ng
+- https://github.com/cddmp/enum4linux-ng
 ```
 enum4linux <IP>
 ```
@@ -150,6 +155,14 @@ nbtscan <IP>
 #### Nmap enumerate RPC shares
 ```
 nmap -p 111 --script=nfs-ls,nfs-statfs,nfs-showmount <IP>
+```
+
+### SSH
+#### Connect with other algoritms
+```
+ssh <IP>
+ssh <IP> -oKexAlgorithms=+<alg from error>
+ssh <IP> -oKexAlgorithms=+<alg from error> -c <cipher from error>
 ```
 
 ## Web-applications
