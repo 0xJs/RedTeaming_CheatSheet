@@ -13,15 +13,53 @@ dig <DOMAIN> +short
 whois <IP>
 ```
 
-### Check for subdomains
+## Email adresses
+#### Discovering email adresses or pattern
+- https://hunter.io
+- https://phonebook.cz
+
+#### Verify email-adres
+- https://tools.emailhippo.com/
+- https://email-checker.net/validate
+
+## Breached credentials
+- https://www.dehashed.com/
+
+#### Check for hashes
+- https://hashes.org
+
+## Hunting subdomains
+#### Amass - Best tool
+- https://github.com/OWASP/Amass
+```
+
+```
+
+#### Dnsdumpster
+- Gui tool: https://dnsdumpster.com/
+
+#### Sublister
+```
+sublister -domain <DOMAIN>
+```
+
+#### crt.sh
+- https://crt.sh
+
 #### Dnscan
 - https://github.com/rbsec/dnscan
 ```
 dnscan.py <DOMAIN>
 ```
 
-#### Dnsdumpster
-- Gui tool: https://dnsdumpster.com/
+## Discover Website Technologies
+- https://builtwith.com/
+- https://addons.mozilla.org/nl/firefox/addon/wappalyzer/
+
+#### Whatwheb
+```
+whatweb <URL>
+```
 
 ## Mail
 #### Check spf, dkim, dmarc etc
