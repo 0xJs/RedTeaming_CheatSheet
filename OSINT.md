@@ -36,6 +36,7 @@ whois <IP>
 - https://hashes.org
 
 ## Hunting subdomains
+- Script that uses multiple tools to enumerate subdomains: https://github.com/Gr1mmie/sumrecon
 #### Amass - Best tool
 - https://github.com/OWASP/Amass
 ```
