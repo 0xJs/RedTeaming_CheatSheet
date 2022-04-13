@@ -151,6 +151,16 @@ echo quit >> ftp.txt
 ftp -v -n -s:ftp.txt
 ```
 
+#### Setup FTP server
+```
+python -m pyftpdlib 21
+```
+
+#### Connect to ftp server
+```
+ftp <IP>
+```
+
 #### VBS download files for Windows XP
 Create vbs script
 ```
