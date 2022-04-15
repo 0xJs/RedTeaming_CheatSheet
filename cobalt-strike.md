@@ -474,7 +474,7 @@ pscp -r root@kali:/opt/cobaltstrike/artifact-kit/dist-pipe .
 
 ### Resource-kit
 ```
-vim /opt/cobalstrike/ResourceKit/template.x64.ps1
+notepad C:\tools\cobaltstrike\ResourceKit\template.x64.ps1
 ```
     
 #### Changed all variables in the file from this part --> to
