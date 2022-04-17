@@ -109,3 +109,6 @@ searchterm site:example.com
 - Location data is already way more secure, but might still get something.
 - http://exif.regex.info/exif.cgi
 
+#### Identifying Geographical Locations
+- https://www.geoguessr.com/
+- https://somerandomstuff1.wordpress.com/2019/02/08/geoguessr-the-top-tips-tricks-and-techniques/
