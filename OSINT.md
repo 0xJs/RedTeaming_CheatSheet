@@ -1,6 +1,14 @@
 # OSINT
 - The page is bare, really need to do a OSINT course ;)
 
+## OSINT Frameworks
+- https://github.com/lanmaster53/recon-ng
+- https://www.maltego.com/
+- https://www.spiderfoot.net/
+
+#### Other tools
+- https://hunch.ly/
+
 ## Search engines
 - https://www.google.com/
 - https://www.bing.com/
@@ -58,10 +66,27 @@ whois <IP>
 - https://tools.emailhippo.com/
 - https://email-checker.net/validate
 
+#### theHarvester
+```
+theHarvester -d <DOMAIN> -b google -l 500
+```
+
 ## Hunting usernames
 - https://namechk.com/
 - https://whatsmyname.app/
 - https://namecheckup.com/
+
+#### WhatsMyName
+- https://github.com/WebBreacher/WhatsMyName
+```
+whatsmyname -u <USERNAME>
+```
+
+#### Sherlock
+- https://github.com/sherlock-project/sherlock
+```
+sherlock <USERNAME>
+```
 
 ## Hunting passwords
 - https://www.dehashed.com/
@@ -70,6 +95,23 @@ whois <IP>
 - https://snusbase.com/
 - https://scylla.sh/
 - https://haveibeenpwned.com/
+
+#### Breachparse
+- https://github.com/hmaverickadams/breach-parse
+```
+./breach-parse.sh @<DOMAIN> password.txt
+```
+
+### H8mail
+- https://github.com/khast3x/h8mail
+```
+h8mail -t <EMAIL>
+```
+
+#### Query without API keys against local breachcompilation
+```
+h8mail -t <EMAIL> -bc "/opt/breach-parse/BreachCompilation/" -sk
+```
 
 #### Check for hashes
 - https://hashes.org
@@ -91,7 +133,30 @@ whois <IP>
 - https://infobel.com/
 - Can also check out logins, forget password and check for phone number!
 
+#### phoneinfoga
+- https://github.com/sundowndev/phoneinfoga
+```
+phoneinfoga scan -n <COUNTRYCODE><PHONENUMBER>
+```
+
 ## Web OSINT
+### General Info
+- whois / dns etc
+- https://centralops.net/co/
+- https://spyonweb.com/
+- https://dnslytics.com/reverse-ip
+- https://viewdns.info/
+- https://spyonweb.com/
+- https://www.virustotal.com/
+- Alert on changes on website: https://visualping.io/
+- Look for backlinks: http://backlinkwatch.com/index.php
+
+#### Shodan.io
+- https://shodan.io/
+
+#### Check old versions of the website / files
+- https://web.archive.org/
+
 ### Hunting subdomains
 - Script that uses multiple tools to enumerate subdomains: https://github.com/Gr1mmie/sumrecon
 #### Amass - Best tool
@@ -117,7 +182,11 @@ sublister -domain <DOMAIN>
 dnscan.py <DOMAIN>
 ```
 
-## Discover Website Technologies
+#### Other tools
+- https://pentest-tools.com/information-gathering/find-subdomains-of-domain#
+- https://spyse.com/
+
+### Discover Website Technologies
 - https://builtwith.com/
 - https://addons.mozilla.org/nl/firefox/addon/wappalyzer/
 
@@ -133,9 +202,15 @@ whatweb <URL>
 - https://tineye.com/
 - Drag the image in
 
-#### EXIF Data
+### EXIF Data
+#### Online
 - Location data is already way more secure, but might still get something.
 - http://exif.regex.info/exif.cgi
+
+#### Exiftool
+```
+exiftool <img>
+```
 
 #### Identifying Geographical Locations
 - https://www.geoguessr.com/
@@ -152,6 +227,12 @@ whatweb <URL>
 - http://spoonbill.io/
 - https://tinfoleak.com/
 - https://tweetdeck.com/
+
+#### Twint
+- https://github.com/twintproject/twint
+```
+twint -u <USER> -s <STRING>
+```
 
 ### Facebook
 - https://sowdust.github.io/fb-search/
@@ -171,3 +252,58 @@ whatweb <URL>
 
 ### Linkedin
 - https://www.linkedin.com/
+
+## Business OSINT
+- Check them out on LinkedIn / Twitter / Social media etc.
+- https://opencorporates.com/
+- https://www.aihitdata.com/
+
+## Wireless OSINT
+- https://wigle.net/
+
+## Automating OSINT Example
+```
+#!/bin/bash
+
+domain=$1
+RED="\033[1;31m"
+RESET="\033[0m"
+
+info_path=$domain/info
+subdomain_path=$domain/subdomains
+screenshot_path=$domain/screenshots
+
+if [ ! -d "$domain" ];then
+    mkdir $domain
+fi
+
+if [ ! -d "$info_path" ];then
+    mkdir $info_path
+fi
+
+if [ ! -d "$subdomain_path" ];then
+    mkdir $subdomain_path
+fi
+
+if [ ! -d "$screenshot_path" ];then
+    mkdir $screenshot_path
+fi
+
+echo -e "${RED} [+] Checkin' who it is...${RESET}"
+whois $1 > $info_path/whois.txt
+
+echo -e "${RED} [+] Launching subfinder...${RESET}"
+subfinder -d $domain > $subdomain_path/found.txt
+
+echo -e "${RED} [+] Running assetfinder...${RESET}"
+assetfinder $domain | grep $domain >> $subdomain_path/found.txt
+
+#echo -e "${RED} [+] Running Amass. This could take a while...${RESET}"
+#amass enum -d $domain >> $subdomain_path/found.txt
+
+echo -e "${RED} [+] Checking what's alive...${RESET}"
+cat $subdomain_path/found.txt | grep $domain | sort -u | httprobe -prefer-https | grep https | sed 's/https\?:\/\///' | tee -a $subdomain_path/alive.txt
+
+echo -e "${RED} [+] Taking dem screenshotz...${RESET}"
+gowitness file -f $subdomain_path/alive.txt -P $screenshot_path/ --no-http
+```
