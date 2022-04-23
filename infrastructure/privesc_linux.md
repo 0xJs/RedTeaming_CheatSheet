@@ -86,6 +86,7 @@ hostname
 #### Check operatingsystem and architecture
 ```
 cat /etc/*release*; cat /etc/*issue*; uname -a; arch
+lscpu
 ```
 
 #### Check Running processes
