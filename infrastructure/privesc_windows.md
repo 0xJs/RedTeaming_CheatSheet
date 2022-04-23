@@ -37,6 +37,7 @@
   - Admin --> System
     - ```.\PsExec64.exe -accepteula -i -s C:\temp\reverse.exe```
     - https://docs.microsoft.com/en-us/sysinternals/downloads/psexec
+- Can also use ```icacls.exe``` or ```Get-acl``` to check permissions on directories/files instead of ```accesschk.exe```
 
 #### Other great sources
 - https://www.fuzzysecurity.com/tutorials/16.html
