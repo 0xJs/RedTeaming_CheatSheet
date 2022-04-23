@@ -466,6 +466,11 @@ reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 .\accesschk.exe /accepteula -wvu "<PATH TO EXE>"
 ```
 
+#### Check all autoruns
+```
+.\accesschk.exe /accepteula -wvu "C:\Program Files\Autorun Program"
+```
+ 
 #### If an autorun executable is found, make a copy
 ```
 copy "C:\Program Files\Autorun Program\program.exe" C:\Temp
