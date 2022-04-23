@@ -436,9 +436,23 @@ net stop <SERVICE>
 net start <SERVICE>
 ```
  
- ### Always Install Elevated
+### Always Install Elevated
  - This policy allows standard users to install applications that require access to directories and registry keys that they may not usually have permission to change. This is equivalent to granting full administrative rights and even though Microsoft strongly discourages its use, it can still be found.
 
+#### Binaries that auto elevate
+Check status of AlwaysInstalledElevated registery setting (if yes then craft a MSI)
+```
+reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
+reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Installer
+```
+
+#### Create msi
+- https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
+```
+Write-UserAddMSI
+```
+ 
+#### Create msi from cobalstrike beacon
 - To exploit this, we need to package a payload into an MSI installer that will be installed and executed with SYSTEM privileges.
   - Generate a new Windows EXE TCP payload and save it to C:\Payloads\beacon-tcp.exe.
   - Open Visual Studio, select Create a new project and type "installer" into the search box. Select the Setup Wizard project and click Next.
