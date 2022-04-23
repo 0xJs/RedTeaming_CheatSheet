@@ -353,9 +353,9 @@ net start <SERVICE>
 The Windows registry stores entries for each service. Since registry entries can have ACLs, if the ACL is misconfigured, it may be possible to modify a service’s configuration even if we cannot modify the service directly.
 
 #### We can confirm a weak registery entry with:
-a. Powershell
+- Powershell
    - ```Get-Acl <REG PATH> | Format-List```
-B. accesschk.exe
+- accesschk.exe
    - ```.\accesschk.exe /accepteula -uvwqk <REG PATH>```
 
 #### Overwrite the <VALUE> of registry key to point to our reverse shell executable:
