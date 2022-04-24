@@ -2,6 +2,7 @@
 
 * [Password and crentials attacks](#Password--and-credentials-attacks)
   * [Password spraying](#Password-spraying)
+  * [Bypass MFA](#Bypass-MFA)
   * [Key disclosure in public repositories](#Key-disclosure-in-public-repositories)
   * [Reused access](#Reused-access)
   * [AWS Instance Metadata](#AWS-Instance-Metadata)
@@ -33,6 +34,14 @@ C:\Python27\python.exe o365creeper.py -f emails.txt -o validemails.txt
 
 #### Trevorspray
 - https://github.com/blacklanternsecurity/TREVORspray
+
+### Bypass mfa
+#### MFAsweep
+- Checks for portals which doesn't enforce mfa
+- https://github.com/dafthack/MFASweep
+```
+Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
+```
 
 ## Key disclosure in public repositories
 - Scavange repos for keys
