@@ -31,6 +31,9 @@ Invoke-MSOLSpray -UserList validemails.txt -Password <PASSWORD> -Verbose
 C:\Python27\python.exe o365creeper.py -f emails.txt -o validemails.txt
 ```
 
+#### Trevorspray
+- https://github.com/blacklanternsecurity/TREVORspray
+
 ## Key disclosure in public repositories
 - Scavange repos for keys
 - Find keys in realtime: https://github.com/eth0izzle/shhgit
