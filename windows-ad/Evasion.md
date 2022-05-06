@@ -151,6 +151,7 @@ certutil -urlcache -split -f <URL>
   - By default, AppLocker is not even applied to Administrators.
 - Uploading into ```C:\Windows``` requires elevated privileges, but there are places like ```C:\Windows\Tasks``` that are writeable by standard users. 
 - DLL enforcement very rarely enabled due to the additional load it can put on a system, and the amount of testing required to ensure nothing will break.
+- Good repo for bypasses: https://github.com/api0cradle/UltimateAppLockerByPassList
 
 #### Check if applocker policy is running
 ```
