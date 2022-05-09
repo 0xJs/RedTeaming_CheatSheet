@@ -25,3 +25,9 @@ Get-Module -List -Name GroupPolicy | select -expand ExportedCommands
 ```
 Install-WindowsFeature –Name GPMC
 ```
+
+#### Get all GPO's applied to a machine
+- Run with elevated prompt
+```
+gpresult /H gpos.html
+```
