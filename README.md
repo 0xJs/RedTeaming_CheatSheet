@@ -1,5 +1,5 @@
 # RedTeaming_CheatSheet
-Pentesting / RedTeaming cheatsheet with all the commands and techniques I learned during my learning journey. Will keep it up to date. If you have any recommendations for courses or links or have any questions feel free to dm me on discord. Kadeeli#9027
+Pentesting / RedTeaming cheatsheet with all the commands and techniques I learned during my learning journey. Will keep it up to date. If you have any recommendations for courses or links or have any questions feel free to dm me on discord. 0xjs#9027
 
 ## Index
 * [General](#General)
