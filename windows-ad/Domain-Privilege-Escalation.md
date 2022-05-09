@@ -1923,6 +1923,11 @@ EXECUTE('exec master..xp_cmdshell ''whoami''') AT "<SERVER>\<DB>"
 ### Privilege escalation Service Accounts
 #### Shared service account
 - If multiple SQL Servers share the same service account. Comprimising one server comprimises them all!
+ 
+#### Check as what the server is running
+```
+Get-SQLInstanceDomain | Get-SQLServerInfo | Select-object Instance, ServiceAccount
+```
 
 #### UNC PATH INJECTION
 - Public role has access to xp_dirtree and xp_fileexists to abuse UNC PATH INJECTION
