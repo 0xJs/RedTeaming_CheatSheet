@@ -670,7 +670,7 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 
 ### Computer object takeover
 - Requirements:
-  - An account with a SPN associated (Can use a computer domain account and set SPN)
+  - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
   - A user with write privileges over the target computer which doesn't have msds-AllowedToActOnBehalfOfOtherIdentity
 - https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/resource-based-constrained-delegation-ad-computer-object-take-over-and-privilged-code-execution
 
