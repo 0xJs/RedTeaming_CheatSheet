@@ -2030,13 +2030,6 @@ SELECT   name,type_desc,is_disabled FROM     master.sys.server_principals  WHERE
 ## Foreign Security Principals
 - A Foreign Security Principal (FSP) represents a Security Principal in a external forest trust or special identities (like Authenticated Users, Enterprise DCs etc.).
 
-#### Enumerate FSP's
-```
-Find-ForeignGroup -Verbose
-Find-ForeignUser -Verbose
-ConvertFrom-SID <SID>
-```
-
 #### Enumerate users who are in groups outside of the user’s current domain
 ```
 Get-DomainForeignUser 
