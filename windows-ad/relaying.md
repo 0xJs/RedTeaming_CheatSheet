@@ -12,7 +12,8 @@
   * [LDAPS Relaying](#LDAPS-Relaying)
     * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
 * [Crack with Hashcat](#Crack-with-Hashcat)
-- https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
+
+- Credits to an amazing post: https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
 ## Poisoning
 - Poisoning is possible with Responder, which will try to poison Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
