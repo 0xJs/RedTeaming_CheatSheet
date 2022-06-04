@@ -1705,6 +1705,17 @@ Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose -Username <USER
 ```
 Get-SQLInstanceDomain | Get-SQLServerInfo -Verbose
 ```
+ 
+### Initial Recon
+#### Check if sysadmin query
+```
+SELECT IS_SRVROLEMEMBER('sysadmin')
+```
+
+#### Check for xp_cmdshell
+```
+SELECT * FROM sys.configurations WHERE name = 'xp_cmdshell';
+```
 
 ### Privilege Escalation to sysadmin
 #### Audit for issues
