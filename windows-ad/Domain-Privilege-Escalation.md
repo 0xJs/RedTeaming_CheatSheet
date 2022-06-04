@@ -477,10 +477,12 @@ Get-DomainGPO -Name "{<OBJECT DN SID>}" -Properties DisplayName
 ```
 
 #### Create GPO and link to OU
-- Uses RSAT tools
-- OPSEC: The GPO will be visible in the Group Policy Management Console and other RSAT GPO tools, so make sure the name is "convincing".
+- Uses RSAT tools or https://github.com/Dliv3/SharpGPO
 ```
-New-GPO -Name "Testing GPO SMB security" | New-GPLink -Target "OU=<OU>,DC=<DOMAIN>,DC=<DOMAIN>"
+New-GPO -Name "SMB security" | New-GPLink -Target "OU=<OU>,DC=<DOMAIN>,DC=<DOMAIN>"
+
+SharpGpo.exe --Action NewGPO --GPOName SMB security
+SharpGpo.exe --Action NewGPLink --DN "OU=<OU>,DC=<DOMAIN>,DC=<DOMAIN>" --GPOName SMB security
 ```
 
 #### Set autorun value
