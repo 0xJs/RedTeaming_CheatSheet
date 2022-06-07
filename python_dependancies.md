@@ -1,0 +1,26 @@
+# Best way to handle python dependancies
+## Pipx
+#### Install pipx
+```
+python3 -m pip install pipx 
+python3 -m pipx ensurepath
+```
+
+#### Install tools/packages with pipx
+```
+pipx install package
+```
+
+## Virtual env
+#### Create virtual env
+```
+mkdir my_awesome_project
+cd my_awesome_project
+python3 -m venv .my_awesome_project_venv
+```
+
+#### Use virtual env
+```
+source .my_awesome_project_venv/bin/activate
+(.my_awesome_project_venv) # pip install requests
+```
