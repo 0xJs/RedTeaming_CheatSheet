@@ -53,11 +53,11 @@ self.close
 
 #### Go back to listener and upload the HTA file
 
-### Run executables on target
+### Run c# executables on target
 - Interact with the grunt.
 - Go to tasks, select Assembly, select executable and run!
-- Which works: Watson, Sharphound,
-- 
+- Works with DotNet executables
+
 ### Escalate to system
 - Run the task processlist and look for a process running as ```NT AUTHORITY\SYSTEM```
 - Then run ImpersonateProcess ```ImpersonateProcess /processid:"<PROCESS ID>"```
