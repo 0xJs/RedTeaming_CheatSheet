@@ -128,6 +128,7 @@ generate -f raw -o /tmp/sc.bin
 - Go to covenant, select grun --> task --> Shellcode and choose the file
 
 ### Covenant pivoting Example
+- **Got a shell but it didn't work? Just here for noting it down and looking at it later!**
 - If need to pivot over a HOP but got a restricted amount of allowed ports. Example following setup:
   - Hop ip = 10.10.121.108 and got comprimised
   - Allowed ports 443, 8080 and 80.
