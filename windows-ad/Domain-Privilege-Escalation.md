@@ -815,7 +815,7 @@ dir \\<COMPUTER>\C$
 
 Get-DomainObject | Where-Object ms-ds-machineaccountquota
 
-cme ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
+crackmapexec ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
 ```
 
 #### Check LDAP Signing and LDAPS Binding
@@ -828,6 +828,8 @@ python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
 - https://github.com/Hackndo/WebclientServiceScanner
 ```
 webclientservicescanner <DOMAIN>/<USER>:<PASSWORD>@<IP RANGE> -dc-ip <DC IP>
+
+crackmapexec smb <HOST> -d <DOMAIN> -u <USER> -p <PASSWORD> -M webdav
 ```
 
 #### If no targets, place file on share to activate webclients
