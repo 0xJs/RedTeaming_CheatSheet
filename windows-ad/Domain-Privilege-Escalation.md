@@ -452,7 +452,7 @@ Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -Princi
 Add-ObjectAcl -PrincipalIdentity exch_adm -Rights DCSync
 ```
 
-### GenericAll - Dcsync
+#### GenericAll - Dcsync
 - Execute DC Sync
 
 ### Permissions on OU
