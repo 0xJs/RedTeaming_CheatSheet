@@ -326,7 +326,7 @@ Sc \\<dns server> start dns
 - `ObjectDN` = The object the permissions apply to
 - `ActiveDirectoryRight` == Permissions
 - `IdentityReferenceName` == Object who has the permissions
-- Edge cases
+- Edge cases https://bloodhound.readthedocs.io/en/latest/data-analysis/edges.html
 
 #### Scan for ACL permissions
 ```
@@ -409,7 +409,7 @@ Get-DomainObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.Security
 ```
 
 ### Permissions on a group
-- GenericAll permission on a Group, Write permission, Write-Owner permission or Self permission
+- GenericAll permission on a Group, Write permission, Write-Owner permission GenericWrite or Self permission
 
 #### Add user to a group 
 ```
