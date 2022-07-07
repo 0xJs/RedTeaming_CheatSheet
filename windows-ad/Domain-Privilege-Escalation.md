@@ -298,7 +298,9 @@ secretsdump.py '<DOMAIN>/<DC COMPUTERACCONT NAME>$'@<DC FQDN> -hashes <LM HASH>:
 ```
 
 ### Account Operators
+The group grants limited account creation privileges to a user. Members of this group can create and modify most types of accounts, including those of users, local groups, and global groups, and members can log in locally to domain controllers. By default it has no direct path to Domain Admin, but these groups might be able to add members to other groups which have other ACL's etc. In this lab (as far as I know) you cant become DA with these privileges.
 
+Paths to domain admins can be created if Exchange is installed for example since the Account Operator group can manage Exchange groups which have high privileges to the domain object. If they are created high privileged groups within the domain, there is a big chance that there is a path to gain access to other machines or domain admins using this group!
 
 ### DNS Admins
 #### Enumerate member of the DNS admin group
