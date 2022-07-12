@@ -39,7 +39,7 @@
   * [MS Exchange escalating privileges](#MS-Exchange-escalating-privileges)
   * [NTLM Relay MS Exchange abuse](#NTLM-Relay-MS-Exchange-abuse)
 * [Local Administrator Password Solution(LAPS)](#LAPS)
-* [Trust abuse SQL](#Trust-abuse-SQL)
+* [SQL Server](#SQL-Server)
   * [Locating and accessing SQL Servers](#Locating-and-accessing-SQL-Servers)
   * [Initial foothold](#Initial-foothold)
   * [Privilege Escalation to sysadmin](#Privilege-Escalation-to-sysadmin)
@@ -60,7 +60,7 @@
   * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
   * [Azure AD](#Azure-AD)
-  * [Trust abuse SQL](#Trust-abuse-SQL)
+  * [SQL Server](#SQL-Server)
   * [Child to Forest Root](#Child-to-Forest-Root)
     * [Trust key](#Trust-key)
     * [Krbtgt hash](#Krbtgt-hash)
@@ -68,7 +68,7 @@
   * [Kerberoast](#Kerberoast2)
   * [Printer Bug](#Printer-bug2) 
   * [Trust key](#Trust-key2) 
-  * [Trust abuse SQL](#Trust-abuse-SQL)
+  * [SQL Server](#SQL-Server)
   * [Foreign Security Principals](#Foreign-Security-Principals)
   * [ACLs](#ACLs)
   * [Pam Trust](#Pam-Trust)
@@ -1695,7 +1695,7 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 
 #### Use the TGS and execute DCsync or psremoting etc!
 
-## Trust abuse SQL
+## SQL Server
 - Could be possible cross domain or cross forest!
 ```
 . .\PowerUpSQL.ps1
