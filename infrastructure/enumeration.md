@@ -70,11 +70,6 @@ sudo nmap <TARGET> -sV -sC -O -p- -vv -oA fulltcp_<TARGET>
 sudo nmap <TARGET> -sU -sV -sC -p- -vv -oA fulludp_<TARGET> 
 ```
 
-#### Nmap scan for vulnerabilities
-```
-sudo nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET> 
-```
-
 #### Usefull flags
 - ```-Pn``` No ping #use if host says down but you know its up)
 - ```-sn``` No port scan
