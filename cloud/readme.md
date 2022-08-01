@@ -14,7 +14,7 @@
 ## General
 - Google Cloud Platform != Google Workspace
 - Azure != Microsoft 365
-- Google Workspace and Mirosoft 365 are productivity suites
+- Google Workspace and Microsoft 365 are productivity suites
 - Rules of engagement 
   - Azure https://www.microsoft.com/en-us/msrc/pentest-rules-of-engagement
   - AWS: https://aws.amazon.com/security/penetration-testing/
