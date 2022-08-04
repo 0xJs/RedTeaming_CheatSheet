@@ -722,6 +722,7 @@ C:\PrintSpoofer.exe -i -c cmd.exe
  
 ### Sweet potato
 - https://github.com/CCob/SweetPotato
+- Also copy over the PowerShx.exe
  
 #### Example execution to get revshell
 ```
