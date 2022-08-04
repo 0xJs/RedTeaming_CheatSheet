@@ -141,7 +141,7 @@ Invoke-EnumerateAzureSubDomains -Base <SHORT DOMAIN NAME> -Verbose
 ```
 
 #### Enumerate Azureblobs
-- add permutations to permutations.txt like common, backup, code in the misc directory.
+- Add permutations to permutations.txt like common, backup, code in the misc directory.
 ```
 Import-Module ./Microburst.psm1
 Invoke-EnumerateAzureBlobs -Base <SHORT DOMAIN> -OutputFile azureblobs.txt
