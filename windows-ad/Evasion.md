@@ -125,6 +125,13 @@ Write-Host $ExecutionContext.SessionState.LanguageMode
 Start-Sleep -s 10
 ```
 
+### PowerShx
+- https://github.com/iomoath/PowerShx
+```
+rundll32 PowerShx.dll,main -i 
+PowerShx.exe -i  
+```
+
 ### PowerShdll Run PowerShell with dlls only.
 - https://github.com/p3nt4/PowerShdll
 - Does not require access to powershell.exe as it uses powershell automation dlls.
