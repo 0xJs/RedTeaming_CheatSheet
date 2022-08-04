@@ -105,9 +105,15 @@ https://login.microsoftonline.com/defcorphq.onmicrosoft.com/.well-known/openid-c
 ### AADinternals
 https://github.com/Gerenios/AADInternals
 https://o365blog.com/aadinternals/
+
 #### Import the AADinternals module
 ```
 import-module .\AADInternals.psd1
+```
+
+#### Get all the information of the tenant
+```
+Invoke-AADIntReconAsOutsider -DomainName <DOMAIN>
 ```
 
 ####  Get tenant name, authentication, brand name (usually same as directory name) and domain name
@@ -123,11 +129,6 @@ Get-AADIntTenantID -Domain <DOMAIN>
 #### Get tenant domains
 ```
 Get-AADIntTenantDomains -Domain <DOMAIN>
-```
-
-#### Get all the information
-```
-Invoke-AADIntReconAsOutsider -DomainName <DOMAIN>
 ```
 
 ## Microburst
