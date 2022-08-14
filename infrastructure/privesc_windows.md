@@ -94,6 +94,7 @@ whoami
 ```
 
 #### Check the current privs
+- https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment
 ```
 whoami /priv
 ```
@@ -139,6 +140,7 @@ wmic service get name,displayname,pathname,startmode
 ```
 
 #### Check current privileges
+- https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment
 ```
 whoami /priv & whoami /groups
 ```
@@ -733,6 +735,7 @@ C:\PrintSpoofer.exe -i -c cmd.exe
 ### User privileges
 - https://github.com/hatRiot/token-priv
 - https://github.com/gtworek/Priv2Admin
+- https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment
 In Windows, user accounts and groups can be assigned specific “privileges”. These privileges grant access to certain abilities. Some of these abilities can be used to escalate our overall privileges to that of SYSTEM.
 
 #### Check privileges
