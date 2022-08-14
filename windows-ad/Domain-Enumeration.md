@@ -9,13 +9,16 @@
 * [Powerview Domain Trust](#Powerview-Domain-Trust)
 * [Powerview Sessions](#Powerview-sessions)
 * [Bloodhound](#Bloodhound)
+* [LDAP Anonymous Bind](#LDAP-Anonymous-Bind)
 
 ## General
 #### Enumeration tools
-- PowerView https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1
+- PowerView https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1 ```Get-DomainUser```
 - SharpView https://github.com/tevora-threat/SharpView
-- DS Tools
-- PowerShell Active Directory module
+- DS Tools ```dsquery user "DC=<DOMAIN>,DC=local" -name * -scope subtree -limit 0 | dsget user -samid -fn -ln -display```
+- PowerShell Active Directory module ```Get-ADUser -Filter * -Properties *```
+- Windows Management Instrumentation (WMI) ```Get-WmiObject -Class win32_group -Filter "Domain='<DOMAIN>'" | Select Caption,Name```
+- AD Service Interfaces (ADSI) ```([adsisearcher]"(&(objectClass=Computer))").FindAll() | select Path```
 
 #### LDAP Queries
 - RSAT Tools + LDAP queries
@@ -333,3 +336,27 @@ Run BloodHound.exe
 #### Custom queries
 - https://github.com/SadProcessor/Cheats/blob/master/DogWhispererV2.md#v--rest-api
 - https://ernw.de/download/BloodHoundWorkshop/ERNW_DogWhispererHandbook.pdf
+
+## LDAP Anonymous Bind
+- Linux hosts running open-source versions of LDAP and Linux vCenter appliances are often configured to allow anonymous binds.
+
+#### Scan for ldap ports
+```
+sudo nmap -p 389,636 <RANGE>
+```
+
+#### Check if connecting without credentials is allowed
+- Python
+```
+from ldap3 import *
+s = Server('<IP>',get_info = ALL)
+c =  Connection(s, '', '')
+c.bind()
+True
+s.info
+```
+
+#### Confirm anonymous bind and retrieve all AD Objects
+```
+ldapsearch -h <IP> -p 389 -x -b "dc=<DOMAIN>,dc=local"
+```
