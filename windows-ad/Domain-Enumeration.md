@@ -7,12 +7,15 @@
 * [Powerview OU](#Powerview-OU)
 * [Powerview ACL](#Powerview-ACL)
 * [Powerview Domain Trust](#Powerview-Domain-Trust)
-* [Powerview Nession](#Powerview-sessions)
+* [Powerview Sessions](#Powerview-sessions)
 * [Bloodhound](#Bloodhound)
 
 ## General
-- C# version of powerview https://github.com/tevora-threat/SharpView
-- https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1
+#### Enumeration tools
+- PowerView https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1
+- SharpView https://github.com/tevora-threat/SharpView
+- DS Tools
+- PowerShell Active Directory module
 
 #### LDAP Queries
 - RSAT Tools + LDAP queries
@@ -20,6 +23,7 @@
 - https://ldapwiki.com/wiki/Active%20Directory%20User%20Related%20Searches
 - https://ldapwiki.com/wiki/Active%20Directory%20Group%20Related%20Searches
 - https://social.technet.microsoft.com/wiki/contents/articles/5392.active-directory-ldap-syntax-filters.aspx
+
 ```
 #Example
 Get-ADObject -LDAPFilter '(&(objectCategory=person)(objectClass=user))' -Properties *
