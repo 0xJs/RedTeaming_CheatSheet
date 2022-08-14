@@ -14,6 +14,16 @@
 - C# version of powerview https://github.com/tevora-threat/SharpView
 - https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1
 
+#### LDAP Queries
+- RSAT Tools + LDAP queries
+- https://ldapwiki.com/wiki/Active%20Directory%20Computer%20Related%20LDAP%20Query
+- https://ldapwiki.com/wiki/Active%20Directory%20User%20Related%20Searches
+- https://ldapwiki.com/wiki/Active%20Directory%20Group%20Related%20Searches
+```
+#Example
+Get-ADObject -LDAPFilter '(&(objectCategory=person)(objectClass=user))' -Properties *
+```
+
 ## Powerview Domain
 - https://github.com/PowerShellMafia/PowerSploit/tree/master/Recon
 ```
