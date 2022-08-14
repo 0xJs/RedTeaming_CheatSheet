@@ -1,15 +1,19 @@
 # Domain Enumeration
 * [General](#General)
-* [Powerview Domain](#Powerview-Domain)
-* [Powerview Users, groups and computers](#Powerview-users-groups-and-computers) 
-* [Powerview Shares](#Powerview-shares)
-* [Powerview GPO](#Powerview-GPO)
-* [Powerview OU](#Powerview-OU)
-* [Powerview ACL](#Powerview-ACL)
-* [Powerview Domain Trust](#Powerview-Domain-Trust)
-* [Powerview Sessions](#Powerview-sessions)
-* [Bloodhound](#Bloodhound)
-* [LDAP Anonymous Bind](#LDAP-Anonymous-Bind)
+* [Unauthenticated Enumeration](#Unauthenticated-Enumeration)
+  * [LDAP Anonymous Bind](#LDAP-Anonymous-Bind)
+* [Authenticated Enumeration](#Authenticated-Enumeration)
+  * [Powerview Domain](#Powerview-Domain)
+  * [Powerview Users, groups and computers](#Powerview-users-groups-and-computers) 
+  * [Powerview Shares](#Powerview-shares)
+  * [Powerview GPO](#Powerview-GPO)
+  * [Powerview OU](#Powerview-OU)
+  * [Powerview ACL](#Powerview-ACL)
+  * [Powerview Domain Trust](#Powerview-Domain-Trust)
+  * [Powerview Sessions](#Powerview-sessions)
+  * [Bloodhound](#Bloodhound)
+  * [Ldapsearch](#Ldapsearch)
+
 
 ## General
 #### Enumeration tools
@@ -19,6 +23,7 @@
 - PowerShell Active Directory module ```Get-ADUser -Filter * -Properties *```
 - Windows Management Instrumentation (WMI) ```Get-WmiObject -Class win32_group -Filter "Domain='<DOMAIN>'" | Select Caption,Name```
 - AD Service Interfaces (ADSI) ```([adsisearcher]"(&(objectClass=Computer))").FindAll() | select Path```
+- https://github.com/yaap7/ldapsearch-ad
 
 #### LDAP Queries
 - RSAT Tools + LDAP queries
@@ -32,7 +37,51 @@
 Get-ADObject -LDAPFilter '(&(objectCategory=person)(objectClass=user))' -Properties *
 ```
 
-## Powerview Domain
+## Unauthenticated Enumeration
+### LDAP Anonymous Bind
+- Linux hosts running open-source versions of LDAP and Linux vCenter appliances are often configured to allow anonymous binds.
+
+#### Scan for ldap ports
+```
+sudo nmap -p 389,636 <RANGE>
+```
+
+#### Check if connecting without credentials is allowed
+- Python
+```
+from ldap3 import *
+s = Server('<IP>',get_info = ALL)
+c =  Connection(s, '', '')
+c.bind()
+True
+s.info
+```
+
+#### Confirm anonymous bind
+- https://github.com/ropnop/windapsearch
+```
+ldapsearch -h <IP> -p 389 -x -b "dc=<DOMAIN>,dc=local"
+
+python windapsearch.py --dc-ip <IP>
+```
+
+#### Get domain functional level
+```
+python3 windapsearch.py --dc-ip 10.129.1.207 -u "" --functionality
+```
+
+#### Get all domain users
+```
+python3 windapsearch.py --dc-ip 10.129.1.207 -u "" -U
+```
+
+#### Get all computers
+```
+python3 windapsearch.py --dc-ip 10.129.1.207 -u "" -C
+```
+
+## Authenticated Enumeration
+### Powerview Domain
 - https://github.com/PowerShellMafia/PowerSploit/tree/master/Recon
 ```
 . ./PowerView.ps1
@@ -61,7 +110,7 @@ Get-DomainPolicyData
 net accounts /domain
 ```
 
-## Powerview users groups and computers
+### Powerview users groups and computers
 #### Get Information of domain controller
 ```
 Get-DomainController
@@ -165,7 +214,7 @@ Get-LoggedonLocal -Computername <COMPUTERNAME>
 Get-LastLoggedOn -ComputerName <COMPUTERNAME>
 ```
 
-## Powerview shares
+### Powerview shares
 #### Find shared on hosts in the current domain
 ```
 Find-DomainShare -ComputerDomain <DOMAIN> -CheckShareAccess
@@ -181,7 +230,7 @@ Find-InterestingDomainShareFile -Verbose
 Get-DomainFileServer
 ```
 
-## Powerview GPO
+### Powerview GPO
 #### Get list of GPO's in the current domain
 ```
 Get-DomainGPO
@@ -226,7 +275,7 @@ Get-DomainGPO -Identity '{<ID>}'
 (Get-DomainOU -Identity 'OU=Mgmt,DC=us,DC=techcorp,DC=local').distinguishedname | %{GetDomainComputer -SearchBase $_} | GetDomainGPOComputerLocalGroupMapping
 ```
 
-## Powerview OU
+### Powerview OU
 #### Get OU's in a domain
 ```
 Get-DomainOu -Fulldata
@@ -273,7 +322,7 @@ Find-InterestingDomainAcl -ResolveGUIDs | select IdentityReferenceName, ObjectDN
 Find-InterestingDomainAcl | Where-Object {$_.IdentityReference –eq [System.Security.Principal.WindowsIdentity]::GetCurrent().Name}
 ```
 
-## Powerview Domain trust
+### Powerview Domain trust
 #### Get a list of all the domain trusts for the current domain
 ```
 Get-DomainTrust
@@ -303,7 +352,7 @@ Get-ForestTrust -Forest <FOREST NAME>
 Get-ForestDomain -Verbose | Get-DomainTrust
 ```
 
-## Powerview session
+### Powerview session
 #### Enumerate domain admin sessions
 - Enumerates all machines and queries the domain for users of a specified group (default Domain Admins). Then finds domain machines where those users are logged into.
 ```
@@ -315,7 +364,7 @@ Find-DomainUserLocation | select UserName, SessionFromName
 Get-NetSession
 ```
 
-## BloodHound
+### BloodHound
 https://github.com/BloodHoundAD/BloodHound
 ```
 cd Ingestors
@@ -337,26 +386,11 @@ Run BloodHound.exe
 - https://github.com/SadProcessor/Cheats/blob/master/DogWhispererV2.md#v--rest-api
 - https://ernw.de/download/BloodHoundWorkshop/ERNW_DogWhispererHandbook.pdf
 
-## LDAP Anonymous Bind
-- Linux hosts running open-source versions of LDAP and Linux vCenter appliances are often configured to allow anonymous binds.
+### Ldapsearch
+- https://github.com/yaap7/ldapsearch-ad
+- https://github.com/ropnop/windapsearch
 
-#### Scan for ldap ports
 ```
-sudo nmap -p 389,636 <RANGE>
-```
-
-#### Check if connecting without credentials is allowed
-- Python
-```
-from ldap3 import *
-s = Server('<IP>',get_info = ALL)
-c =  Connection(s, '', '')
-c.bind()
-True
-s.info
-```
-
-#### Confirm anonymous bind and retrieve all AD Objects
-```
-ldapsearch -h <IP> -p 389 -x -b "dc=<DOMAIN>,dc=local"
+python3 windapsearch.py --dc-ip <DC IP> -u '<DOMAIN>\<USER>'
+python3 ldapsearch-ad.py -l <DC IP> -d <DOMAIN> -u <USER> -p <PASSWORD>
 ```
