@@ -19,6 +19,7 @@
 - https://ldapwiki.com/wiki/Active%20Directory%20Computer%20Related%20LDAP%20Query
 - https://ldapwiki.com/wiki/Active%20Directory%20User%20Related%20Searches
 - https://ldapwiki.com/wiki/Active%20Directory%20Group%20Related%20Searches
+- https://social.technet.microsoft.com/wiki/contents/articles/5392.active-directory-ldap-syntax-filters.aspx
 ```
 #Example
 Get-ADObject -LDAPFilter '(&(objectCategory=person)(objectClass=user))' -Properties *
