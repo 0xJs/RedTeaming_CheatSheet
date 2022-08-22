@@ -13,6 +13,7 @@
    * [Passwords & Keys](#Passwords-&-Keys)
    * [NFS](#NFS)
    * [Capabilities](#Capabilities)
+   * [Monitor new processes](#Monitor-new-processes)
 * [Tips and tricks](#Tips-and-tricks)
 
 ## General tips
@@ -584,7 +585,7 @@ chmod +s pwn
 getcap -r / 2>/dev/null
 ```
   
-## Monitor processes
+## Monitor new processes
 - https://github.com/DominicBreuker/pspy
 - Checks if any process is running from another user. May be a privesc vector.
 ```
