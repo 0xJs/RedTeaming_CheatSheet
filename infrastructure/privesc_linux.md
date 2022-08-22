@@ -583,6 +583,13 @@ chmod +s pwn
 ```
 getcap -r / 2>/dev/null
 ```
+  
+## Monitor processes
+- https://github.com/DominicBreuker/pspy
+- Checks if any process is running from another user. May be a privesc vector.
+```
+./pspy64 -pf -i 1000 
+```
 
 ## Tips and tricks
 #### Exploiting path on binary
