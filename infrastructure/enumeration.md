@@ -233,6 +233,11 @@ gobuster dir -w /opt/SecLists/Discovery/Web-Content/directory-list-2.3-medium.tx
 wpscan -url <URL>
 ```
 
+#### Enumerate users
+```
+wpscan –url <URL> -–enumerate u
+```
+
 #### Bruteforce login
 ```
 wpscan --url <URL> --usernames <USERNAME> --passwords /usr/share/wordlists/rockyou.txt --max-threads 50
