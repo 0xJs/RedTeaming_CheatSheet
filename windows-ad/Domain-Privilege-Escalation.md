@@ -1293,11 +1293,25 @@ Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
 Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions #DOESNT WORK? GOTTA CHECK ECPPTX MATERIAL AGAIN
 ```
 
-#### Check existence of LAPS in the domain
+### Check existence of LAPS in the domain
+#### Check for existence of the ms-mcs-admpwd attribute
 ```
 Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
+```
+
+#### Check for computers with LAPS installed
+```
 Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
+```
+
+#### Check for GPO's with LAPS in its name
+```
 Get-DomainGPO -Identity *LAPS*
+```
+
+### Check for OU's with LAPS
+```
+Get-DomainOU -FullData | Get-ObjectAcl -ResolveGUIDs | Where-Object { ($_.ObjectType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty') } | ForEach-Object { $_ | Add-Member NoteProperty 'IdentitySID' $(Convert-NameToSid $_.IdentityReference).SID; $_ }
 ```
 
 #### Check to which computers the LAPS GPO is applied to
