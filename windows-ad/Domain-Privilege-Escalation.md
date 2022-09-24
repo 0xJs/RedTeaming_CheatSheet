@@ -2218,7 +2218,7 @@ Find-InterestingDomainAcl -Domain <TRUST FOREST>
 ## Pam Trust
 - PAM trust is usually enabled between a Bastion or Red forest and a production/user forest which it manages. 
 - PAM trust provides the ability to access a forest with high privileges without using credentials of the current forest. Thus, better security for the bastion forest which is much desired.
--  To achieve the above, Shadow Principals are created in the bastion domain which are then mapped to DA or EA groups SIDs in the production forest.
+- To achieve the above, Shadow Principals are created in the bastion domain which are then mapped to DA or EA groups SIDs in the production forest.
 
 ### Check if current domain is Bastion forest
 #### Enumerate if the current domain is a bastion forest
@@ -2240,11 +2240,21 @@ Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Ge
 ```
 Get-ADTrust -Filter {(ForestTransitive -eq $True)}
 ```
+ 
+### Abuse PAM trusts
+- To abuse the PAM trust we must compromise users or groups who are part of the shadow security principals
 
-### Lateral movement with bastion trusts
-#### Pssession to the other forest machine
+### Enumerate shadow principals
+- Name = name of the shadow principals, member = members of the bastion forest which are mapped to the shadow principals, msDS-ShadowPrincipalSid = SID of the principal (user or group) in the user/production forest whose privileges are assigned to the shadow security principal.
 ```
-Enter-PSSession <IP> -Authentication NegotiateWithImplicitCredential
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
+```
+
+#### Pssession to the other forest machine
+- Note if Kerberos AES encryption is not enabled for the trust, we need to modify the WSMan TrustedHosts property and use Negotiate authentication for PSRemoting. ```-Authentication NegotiateWithImplicitCredential```
+```
+Enter-PSSession <FQDN> 
+Enter-PSSession <FQDN> -Authentication NegotiateWithImplicitCredential
 ```
  
 ## RDPInception
