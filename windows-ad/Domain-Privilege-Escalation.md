@@ -2220,8 +2220,10 @@ Find-InterestingDomainAcl -Domain <TRUST FOREST>
 - PAM trust provides the ability to access a forest with high privileges without using credentials of the current forest. Thus, better security for the bastion forest which is much desired.
 -  To achieve the above, Shadow Principals are created in the bastion domain which are then mapped to DA or EA groups SIDs in the production forest.
 
-#### Enumerate if there is a PAM trust
+### Check if current domain is Bastion forest
+#### Enumerate if the current domain is a bastion forest
 - Run on the DC
+- If there are trusts with the attributes ```ForestTransitive -eq $True``` and ```SIDFilteringQuarantined -eq $False``` check for Shadowprincipals. If there are then its a Bastion forest.
 ```
 Get-ADTrust -Filter {(ForestTransitive -eq $True) and (SIDFilteringQuarantined -eq $False)}
 ```
@@ -2232,14 +2234,18 @@ Get-ADTrust -Filter {(ForestTransitive -eq $True) and (SIDFilteringQuarantined -
 Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
 ```
 
+### Check if current domain is managed by bastion forest
+- Now, TrustAttributes is a very good indicator. ```TAPT (TRUST_ATTRIBUTE_PIM_TRUST)``` is ```0x00000400``` (1024 in decimal) for PAM/PIM trust. If this bit and 
+TRUST_ATTRIBUTE_TREAT_AS_EXTERNAL (0x00000040) are set, the trust is a PAM trust. 
+• A trust attribute of ```1096``` is for PAM ```(0x00000400)``` + External Trust ```(0x00000040)``` + Forest Transitive ```(0x00000008)```.
+```
+Get-ADTrust -Filter {(ForestTransitive -eq $True)}
+```
+
+### Lateral movement with bastion trusts
 #### Pssession to the other forest machine
 ```
 Enter-PSSession <IP> -Authentication NegotiateWithImplicitCredential
-```
-
-#### Check if the current forest is managed by another one
-```
-Get-DomainTrust -Filter {(ForestTransitive -eq $True)}
 ```
  
 ## RDPInception
