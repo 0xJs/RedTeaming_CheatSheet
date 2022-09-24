@@ -2235,9 +2235,8 @@ Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Ge
 ```
 
 ### Check if current domain is managed by bastion forest
-- Now, TrustAttributes is a very good indicator. ```TAPT (TRUST_ATTRIBUTE_PIM_TRUST)``` is ```0x00000400``` (1024 in decimal) for PAM/PIM trust. If this bit and 
-TRUST_ATTRIBUTE_TREAT_AS_EXTERNAL (0x00000040) are set, the trust is a PAM trust. 
-• A trust attribute of ```1096``` is for PAM ```(0x00000400)``` + External Trust ```(0x00000040)``` + Forest Transitive ```(0x00000008)```.
+- Now, TrustAttributes is a very good indicator. ```TAPT (TRUST_ATTRIBUTE_PIM_TRUST)``` is ```0x00000400``` (1024 in decimal) for PAM/PIM trust. If this bit and ```TRUST_ATTRIBUTE_TREAT_AS_EXTERNAL (0x00000040)``` are set, the trust is a PAM trust. 
+- A trust attribute of ```1096``` is for PAM ```(0x00000400)``` + External Trust ```(0x00000040)``` + Forest Transitive ```(0x00000008)```.
 ```
 Get-ADTrust -Filter {(ForestTransitive -eq $True)}
 ```
