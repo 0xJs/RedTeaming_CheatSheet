@@ -1309,9 +1309,14 @@ Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select
 Get-DomainGPO -Identity *LAPS*
 ```
 
-### Check for OU's with LAPS
+#### Check for OU's with LAPS
 ```
 Get-DomainOU -FullData | Get-ObjectAcl -ResolveGUIDs | Where-Object { ($_.ObjectType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty') } | ForEach-Object { $_ | Add-Member NoteProperty 'IdentitySID' $(Convert-NameToSid $_.IdentityReference).SID; $_ }
+```
+
+#### Check which computers is part of the OU
+```
+Get-DomainOU -OUName <NAME> | %{Get-DomainComputer -ADSpath $_}
 ```
 
 #### Check to which computers the LAPS GPO is applied to
@@ -1320,7 +1325,7 @@ Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, dis
 Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
 ```
 
-#### Check all computers without labs
+#### Check all computers without LAPS
 ```
 Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
 ```
