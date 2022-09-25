@@ -336,6 +336,9 @@ Invoke-Pbing -Target <TARGET> -Domain <DOMAIN> -User <USER> -Password <PASSWORD>
 Install-WindowsFeature -Name WindowsPowerShellWebAccess
 Instal-PswaWebApplication -useTestCertificate
 Add-PswaAuthorizationRule -Username <USERNAME> -Computername <COMPUTER> -ConfigurationName <CONFIG NAME>
+
+# Allow everyone (Still requires localadmin on target server)
+Add-PswaAuthorizationRule -Username * -Computername * -ConfigurationName *
 ```
 
 #### Access PSWA
