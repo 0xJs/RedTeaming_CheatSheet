@@ -329,6 +329,8 @@ Invoke-Pbing -Target <TARGET> -Domain <DOMAIN> -User <USER> -Password <PASSWORD>
 ```
 
 ### Powershell Web access
+- PSWA runs on port 443 on ```/pswa```
+
 #### Install Powershel web access on target
 ```
 Install-WindowsFeature -Name WindowsPowerShellWebAccess
@@ -336,8 +338,8 @@ Instal-PswaWebApplication -useTestCertificate
 Add-PswaAuthorizationRule -Username <USERNAME> -Computername <COMPUTER> -ConfigurationName <CONFIG NAME>
 ```
 
-#### Browse to
-- https://<MACHINE NAME>/pswa
+#### Access PSWA
+- Go to ```https://<IP>/pswa``` and then login using ```<DOMAIN>/<USER>```
 
 ### NTLM Relaying
 - https://github.com/lgandx/Responder
