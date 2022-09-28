@@ -32,8 +32,6 @@
     * [Computer object takeover](#Computer-object-Takeover) 
     * [Change-Lockscreen](#Change-Lockscreen)
 * [Relaying attacks](#Relaying-attacks)
-  * [SMB Relaying](#SMB-Relaying) 
-  * [LDAP Relaying](#LDAP-Relaying) 
 * [MS Exchange](#MS-Exchange) 
   * [Attacking externally](#Attacking-externally)
   * [Attacking from the inside](#Attacking-from-the-inside)
