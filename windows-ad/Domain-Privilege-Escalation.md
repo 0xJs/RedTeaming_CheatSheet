@@ -1034,7 +1034,7 @@ Psexec.py -k -no-pass <TARGET FQDN>
 ## Relaying attacks
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
-[Relaying section](../relaying.md)
+[Relaying section](relaying.md)
 
 ## MS Exchange
 - Outlook rules and Outlook Forms are synced to all clients with the mailbox active.
