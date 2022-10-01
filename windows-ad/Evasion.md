@@ -9,7 +9,7 @@
 	* [Applocker](#Applocker)
 		* [LOLBAS](#LOLBAS)
 	* [Logging evasion](#Logging-evasion)
-	* [Just Enough Admin](#Just-Enough-Admin-(JEA))
+	* [Just Enough Admin](#Just-Enough-Admin)
 * [Windows Defender](#Windows-Defender)
 * [AV Bypass](#AV-Bypass)
 * [Privileges](#Privileges)
@@ -236,13 +236,14 @@ winrs -remote:server1 -u:<COMPUTERNAME>\<USER> -p:<PASS> hostname
 ##### Com objects
 - https://github.com/bohops/WSMan-WinRM
 
-### Just Enough Admin (JEA)
+### Just Enough Admin
 - Defines allowed cmdledt and commands that are allowed by defining role capabilities.
 
 #### Implementing JEA
-- Create a capabilityfile
+- First create a capability file and add commands to it.
 ```
 New-PSRoleCapabilityFile -Path .\JEA.psrc
+
 New-PSSessionConfigurationFile -SessionType RestrictedRemoteServer -Path .\JEA.pssc
 Register-PSSessionConfiguration -Path .\JEA.pssc -Name 'Persist' -Force 
 ```
