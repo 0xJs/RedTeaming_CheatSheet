@@ -9,7 +9,8 @@
 	* [Applocker](#Applocker)
 		* [LOLBAS](#LOLBAS)
 	* [Logging evasion](#Logging-evasion)
-* [Defense evasion](#Defense-evasion)
+	* [Just Enough Admin](#Just-Enough-Admin-(JEA))
+* [Windows Defender](#Windows-Defender)
 * [AV Bypass](#AV-Bypass)
 * [Privileges](#Privileges)
 * [Windows Subsystem for Linux WSL](#Windows-Subsystem-for-Linux-WSL)
@@ -235,7 +236,39 @@ winrs -remote:server1 -u:<COMPUTERNAME>\<USER> -p:<PASS> hostname
 ##### Com objects
 - https://github.com/bohops/WSMan-WinRM
 
-## Defense evasion
+### Just Enough Admin (JEA)
+- Defines allowed cmdledt and commands that are allowed by defining role capabilities.
+
+#### Implementing JEA
+- Create a capabilityfile
+```
+New-PSRoleCapabilityFile -Path .\JEA.psrc
+New-PSSessionConfigurationFile -SessionType RestrictedRemoteServer -Path .\JEA.pssc
+Register-PSSessionConfiguration -Path .\JEA.pssc -Name 'Persist' -Force 
+```
+
+#### Abuse JEA
+- Only when its misconfigured and allows dangerous commands like net.exe or cmdlets like Start-Process or Start-Service.
+- Allows the use of wildcard.
+- Check which commands are allowed to run and google for abuses
+```
+Get-Command
+
+# Abuse example
+Start-Process cmd.exe calc.exe
+```
+
+#### Get the PSSession configurations (and JEA)
+```
+Get-PSSessionconfiguration
+```
+
+#### Get PSSession capabilities
+```
+Get-PSSessionCapability -ConfigurationName <NAME> -Username <DOMAIN>\<USERNAME>
+```
+
+## Windows Defender
 #### Check if windows defender is running
 ```
 Get-MpComputerStatus
