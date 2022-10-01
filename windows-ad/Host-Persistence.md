@@ -1,6 +1,6 @@
 * [User land](#User-land)
   * [Startup](#Startup)
-  * [Registery keys](#Registery keys)
+  * [Registery keys](#Registery-keys)
   * [LNK](#LNK)
   * [Schtask](#sSchtasks)
 * [Elevated](#Elevated)
