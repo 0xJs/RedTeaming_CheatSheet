@@ -53,8 +53,8 @@ $test.Access
 ```
 
 #### Crackmapexec on windows
-- Download cme https://github.com/byt3bl33d3r/CrackMapExec/releases/tag/v5.1.1dev
-- Download latest version of python3.8 standalone (Windows embeddable package (64-bit)) https://www.python.org/downloads/windows/
+- Download cme https://github.com/byt3bl33d3r/CrackMapExec/releases/
+- Download latest version of python which is required my cme (currently 3.10) (Windows embeddable package (64-bit)) https://www.python.org/downloads/windows/
 
 ```
 #add python to path variable:
