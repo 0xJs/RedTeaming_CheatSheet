@@ -8,7 +8,7 @@
 * [Exploitation](exploitation.md)
 * [Privilege Escalation Windows](privesc_windows.md)
 * [Privilege Escalation Linux](privesc_linux.md)
-* [Post Exploitation](post_exploitation.md)
+* [Pivoting](pivoting.md)
 
 # General
 ## Other great cheatsheets
