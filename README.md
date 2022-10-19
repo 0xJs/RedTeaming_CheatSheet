@@ -3,6 +3,13 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
 
 ## Index
 * [General](#General)
+  [Payloads](payloads.md)
+  [Open Source Intelligence](OSINT.md)
+  [Python Dependancies](python_dependancies.md)
+* [C2 Frameworks]()
+  * [Cobalt Strike](cobalt-strike.md)
+  * [Covenant](covenant.md)
+  * [Metasploit](metasploit.md)
 * [Infrastructure](infrastructure/readme.md)
   * [Buffer overflow](infrastructure/bufferoverflow.md)
   * [Enumeration](infrastructure/enumeration.md)
