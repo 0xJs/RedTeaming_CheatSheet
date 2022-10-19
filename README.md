@@ -28,4 +28,5 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
 # Sources
 - Cloud: CARTP from Pentester Academy and breaching the cloud from antisyphon.
 - Windows: CRTP, CRTE from Pentester Academy and ECPTX from eLearnSecurity.
-- Infra: Tiberius privesc courses
+- Infra: PNPT and Tiberius privesc courses
+- OSINT: PNPT Course
