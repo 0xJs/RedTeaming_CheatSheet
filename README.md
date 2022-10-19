@@ -6,10 +6,6 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
   * [Payloads](payloads.md)
   * [Open Source Intelligence](OSINT.md)
   * [Python Dependancies](python_dependancies.md)
-* [C2 Frameworks]()
-  * [Cobalt Strike](cobalt-strike.md)
-  * [Covenant](covenant.md)
-  * [Metasploit](metasploit.md)
 * [Infrastructure](infrastructure/readme.md)
   * [Buffer overflow](infrastructure/bufferoverflow.md)
   * [Enumeration](infrastructure/enumeration.md)
@@ -31,9 +27,13 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
     * [Azure](cloud/azure/readme.md)
     * [Amazon Web Services](cloud/aws/readme.md)
     * [Google Cloud Platform](cloud/gcb/readme.md)
+* [C2 Frameworks]()
+  * [Cobalt Strike](cobalt-strike.md)
+  * [Covenant](covenant.md)
+  * [Metasploit](metasploit.md)
 
 # Sources
 - Cloud: CARTP from Pentester Academy and breaching the cloud from antisyphon.
-- Windows: CRTP, CRTE from Pentester Academy and ECPTX from eLearnSecurity.
+- Windows: CRTP, CRTE from Pentester Academy, ECPTX from eLearnSecurity and CRTO from RastaMouse.
 - Infra: PNPT and Tiberius privesc courses
 - OSINT: PNPT Course
