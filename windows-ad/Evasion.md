@@ -320,25 +320,32 @@ netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protoc
 ```
 
 ## AV Bypass
-- Can also use https://github.com/rasta-mouse/ThreatCheck
-### Method one
-- Defendercheck to check for signatures https://github.com/matterpreter/DefenderCheck
-- Run Defendercheck ```DefenderCheck.exe <PATH TO BINARY>```
-- Replace string which gets detected.
-- Recompile and check again!
 
-#### Method two
-- Obfuscate binary with https://github.com/mkaring/ConfuserEx
-- Launch ConfuserEx
-- In Project tab select the Base Directory where the binary file is located.
-- In Project tab Select the Binary File that we want to obfuscate.
-- In Settings tab add the rules.
-- In Settings tab edit the rule and select the preset as `Normal`.
-- In Protect tab click on the protect button.
-- We will find the new obfuscated binary in the Confused folder under the Base Directory.
+### Bypassing Microsoft Defender
+- Use https://github.com/rasta-mouse/ThreatCheck or https://github.com/matterpreter/DefenderCheck
+1. Run Defendercheck ```DefenderCheck.exe <PATH TO BINARY>```
+2. Replace string which gets detected.
+3. Recompile and check again!
 
-#### If script gets detected use:
-- https://github.com/yoda66/PowerStrip
+### Bypassing AV C# binaries
+- Obfuscate C# binary with https://github.com/mkaring/ConfuserEx
+1. Launch ConfuserEx
+2. In Project tab select the Base Directory where the binary file is located.
+3. In Project tab Select the Binary File that we want to obfuscate.
+4. In Settings tab add the rules.
+5. In Settings tab edit the rule and select the preset as `Normal`.
+6. In Protect tab click on the protect button.
+7. We will find the new obfuscated binary in the Confused folder under the Base Directory.
+
+### Bypassing AV Go binaries
+- https://github.com/burrowers/garble
+
+### Obfuscate scripts
+- Remove comments https://github.com/yoda66/PowerStrip
+- Remove all comments + whitespaces http://www.powertheshell.com/
+- Check for amsi strings https://github.com/RythmStick/AMSITrigger
+- Obfuscate strings https://github.com/danielbohannon/Invoke-Obfuscation
+- https://github.com/JoelGMSec/Invoke-Stealth
 
 #### Compile defendercheck
 - Using visual studio code
