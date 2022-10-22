@@ -87,6 +87,14 @@ python3 windapsearch.py --dc-ip 10.129.1.207 -u "" -C
 . ./PowerView.ps1
 ```
 
+### AD Module
+- https://github.com/samratashok/ADModule
+```
+Expand-Archive ADModule-master.zip
+Import-Module .\ADModule-master\ADModule-master\Microsoft.ActiveDirectory.Management.dll
+Import-Module .\ADModule-master\ADModule-master\ActiveDirectory\ActiveDirectory.psd1
+```
+
 #### Get current domain
 ```
 Get-Domain
