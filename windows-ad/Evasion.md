@@ -244,6 +244,13 @@ winrs -remote:server1 -u:<COMPUTERNAME>\<USER> -p:<PASS> hostname
 ### Just Enough Admin
 - Defines allowed cmdledt and commands that are allowed by defining role capabilities.
 
+#### Connect with JEA endpoint
+- Use DOMAIN\USER format
+```
+$creds = get-credential
+$sess = New-PSSession -ComputerName <FQDN> -ConfigurationName <JEA ENDPOINT CONF NAME> -Credential $creds
+```
+
 #### Implementing JEA
 - First create a capability file and add commands to it.
 ```
