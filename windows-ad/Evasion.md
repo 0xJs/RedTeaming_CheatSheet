@@ -264,6 +264,7 @@ Register-PSSessionConfiguration -Path .\JEA.pssc -Name 'Persist' -Force
 - Only when its misconfigured and allows dangerous commands like net.exe or cmdlets like Start-Process or Start-Service.
 - Allows the use of wildcard.
 - Check which commands are allowed to run and google for abuses
+- https://www.triplesec.info/slides/3c567aac7cf04f8646bf126423393434.pdf
 ```
 Get-Command
 
