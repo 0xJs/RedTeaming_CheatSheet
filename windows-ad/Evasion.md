@@ -29,6 +29,11 @@ gpresult /H gpos.html
 - Constrained Language Mode (CLM) - Integrated with Applocker and WDAC (Device Guard)
 
 ## PowerShell
+### Start 64 bit powershell
+```
+%SystemRoot%\sysnative\WindowsPowerShell\v1.0\powershell.exe
+```
+
 ### Execution-policy
 #### Get Execution policy
 ```
