@@ -260,6 +260,16 @@ New-PSSessionConfigurationFile -SessionType RestrictedRemoteServer -Path .\JEA.p
 Register-PSSessionConfiguration -Path .\JEA.pssc -Name 'Persist' -Force 
 ```
 
+#### Get the PSSession configurations (and JEA)
+```
+Get-PSSessionconfiguration
+```
+
+#### Get PSSession capabilities
+```
+Get-PSSessionCapability -ConfigurationName <NAME> -Username <DOMAIN>\<USERNAME>
+```
+
 #### Abuse JEA
 - Only when its misconfigured and allows dangerous commands like net.exe or cmdlets like Start-Process or Start-Service.
 - Allows the use of wildcard.
@@ -272,15 +282,18 @@ Get-Command
 Start-Process cmd.exe calc.exe
 ```
 
-#### Get the PSSession configurations (and JEA)
+#### Abuse - Grant a user to admin
 ```
-Get-PSSessionconfiguration
+Add-ADGroupMember, Add-LocalGroupMember, net.exe, dsadd.exe
 ```
 
-#### Get PSSession capabilities
+#### Abuse - Running arbritary code
 ```
-Get-PSSessionCapability -ConfigurationName <NAME> -Username <DOMAIN>\<USERNAME>
+Start-Process, New-Service, Invoke-Item, Invoke-WmiMethod, Invoke-Command,
+New-ScheduledTask, Register-ScheduledJob
 ```
+
+
 
 ## Windows Defender
 #### Check if windows defender is running
