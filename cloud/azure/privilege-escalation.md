@@ -22,7 +22,7 @@
 * [Function apps continuous deployment](#Function-apps-continuous-deployment)
 * [Break glass accounts](#Break-glass-accounts)
 * [Azure Container Registry dump](#Azure-Container-Registry-dump)
-* [Azure ARC}(#Azure-ARC)
+* [Azure ARC](#Azure-ARC)
 
 ## Privesc enumeration
 ### When on a new machine
