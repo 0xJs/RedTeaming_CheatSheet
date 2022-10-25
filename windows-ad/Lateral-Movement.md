@@ -34,7 +34,7 @@ Enter-PSSession $sess
 
 #### PSremoting NTLM authetication (after overpass the hash)
 ```
-Enter-PSSession -ComputerName <COMPUTERNAME> -Authentication Negotiate 
+Enter-PSSession -ComputerName <COMPUTERNAME> -Authentication NegotiateWithImplicitCredential
 ```
 
 #### Execute commands on a machine
