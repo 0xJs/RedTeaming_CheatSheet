@@ -52,6 +52,14 @@ $test = get-acl <PATH>
 $test.Access
 ```
 
+#### Transfer files base64
+```
+$Content = Get-Content -Encoding Byte -Path 20221025020336_BloodHound.zip
+[System.Convert]::ToBase64String($Content)
+$Base64 = "<PASTE BASE64>"
+Set-Content -Value $([System.Convert]::FromBase64String($Base64)) -Encoding Byte -Path bloodhound.zip
+```
+
 #### Crackmapexec on windows
 - Download cme https://github.com/byt3bl33d3r/CrackMapExec/releases/
 - Download latest version of python which is required my cme (currently 3.10) (Windows embeddable package (64-bit)) https://www.python.org/downloads/windows/
