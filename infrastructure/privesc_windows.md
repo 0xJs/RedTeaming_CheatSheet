@@ -791,21 +791,5 @@ where /R C:\windows wsl.exe
 <PATH TO .EXE>\bash.exe
 ```
 
- 
 ## UAC bypass
-- A UAC bypass is a technique by which an application can go from Medium to High Integrity without prompting for consent.
-- https://github.com/hfiref0x/UACME
-- Guide on how to build: https://ad-lab.gitbook.io/building-a-windows-ad-lab/vulnerabilities-and-misconfigurations-and-attacks/misc/page-3-4
-
- ```
- .\Akagi64.exe <METHOD> <EXECUTABLE>
- .\Akagi64.exe 34 cmd.exe
- ```
- 
- 
- 
-#### Check current UAC configuration
-- The default configuration for UAC is Prompt for consent for non-Windows binaries, but can also have different settings such as Prompt for credentials, Prompt for consent and Elevate without prompting.
-```
-Seatbelt.exe uac
-```
+[../windows-ad/Evasion.md#UAC-bypass]
