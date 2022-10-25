@@ -110,27 +110,11 @@ Powershell.exe -Version 2
 ```
 
 #### Set lockdown policy to 8 and check language mode
+- https://github.com/Metoraf007/Public_PowerShell/blob/master/Bypass_ConstrainedLang.ps1
 ```
 Set-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' -name "__PSLockdownPolicy" -Value 8
 powershell.exe
 $ExecutionContext.SessionState.LanguageMode
-```
-
-#### Script to disable it
-- https://github.com/Metoraf007/Public_PowerShell/blob/master/Bypass_ConstrainedLang.ps1
-```
-#Requires -RunAsAdministrator
-
-If ( $ExecutionContext.SessionState.LanguageMode -eq "ConstrainedLanguage") {
-    Set-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' -name "__PSLockdownPolicy" -Value 8
-
-    Start-Process -File PowerShell.exe -Argument "-file $($myinvocation.mycommand.definition)"
-    Break
-}
-
-Write-Host $ExecutionContext.SessionState.LanguageMode
-
-Start-Sleep -s 10
 ```
 
 ### PowerShx
@@ -181,6 +165,12 @@ Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections
 #### Check applocker policy in registery
 ```
 reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2
+```
+
+#### Check policy with GPOresult
+- Open the HTLM file locally
+```
+gpresult /H gpos.html
 ```
 
 #### Parse GPO applocker
