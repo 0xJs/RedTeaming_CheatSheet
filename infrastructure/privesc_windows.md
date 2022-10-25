@@ -792,4 +792,4 @@ where /R C:\windows wsl.exe
 ```
 
 ## UAC bypass
-[../windows-ad/Evasion.md#UAC-bypass]
+- [Link to evasion page](../windows-ad/Evasion.md#UAC-bypass)
