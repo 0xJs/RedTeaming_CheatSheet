@@ -2172,9 +2172,10 @@ Get-ADTrust -Filter {(ForestTransitive -eq $True)}
 - To abuse the PAM trust we must compromise users or groups who are part of the shadow security principals
 
 ### Enumerate shadow principals
-- Name = name of the shadow principals, member = members of the bastion forest which are mapped to the shadow principals, msDS-ShadowPrincipalSid = SID of the principal (user or group) in the user/production forest whose privileges are assigned to the shadow security principal.
+- ```Name``` = name of the shadow principals, ```member``` = members of the bastion forest which are mapped to the shadow principals, ```msDS-ShadowPrincipalSid``` = SID of the principal (user or group) in the user/production forest whose privileges are assigned to the shadow security principal.
 ```
-Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) 
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) | select Name,member,msDS-ShadowPrincipalSid | fl
 ```
 
 #### Pssession to the other forest machine
