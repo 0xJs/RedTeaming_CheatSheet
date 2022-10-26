@@ -2151,13 +2151,14 @@ Find-InterestingDomainAcl -Domain <TRUST FOREST>
 - Run on the DC
 - If there are trusts with the attributes ```ForestTransitive -eq $True``` and ```SIDFilteringQuarantined -eq $False``` check for Shadowprincipals. If there are then its a Bastion forest.
 ```
-Get-ADTrust -Filter {(ForestTransitive -eq $True) and (SIDFilteringQuarantined -eq $False)}
+Get-ADTrust -Filter {(ForestTransitive -eq $True) -and (SIDFilteringQuarantined -eq $False)}
 ```
 
 #### Check which users are members of the shadow principals
 - Run on the DC
 ```
-Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) -Filter * -Properties * | select Name,member,msDS-ShadowPrincipalSid | fl
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) 
+Get-ADObject -SearchBase ("CN=Shadow Principal Configuration,CN=Services," + (Get-ADRootDSE).configurationNamingContext) | select Name,member,msDS-ShadowPrincipalSid | fl
 ```
 
 ### Check if current domain is managed by bastion forest
