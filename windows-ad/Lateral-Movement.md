@@ -168,15 +168,6 @@ $sess = new-pssession -credential $creds -computername <TARGET FQDN>
 enter-pssession $sess
 ```
 
-#### Winrs then pssession
-```
-winrs -r:<TARGET FQDN> -u:<DOMAIN>\<USER> -p:<PASSWORD> powershell.exe
-$password = ConvertTo-SecureString "<PASSWORD>" -AsPlainText -Force
-$creds = New-Object System.Management.Automation.PSCredential('<DOMAIN>\<USER>', $password)
-$sess = new-pssession -credential $creds -computername <TARGET FQDN>
-enter-pssession $sess
-```
-
 ## Check Local Admin Access
 #### Crackmapexec
 ```
