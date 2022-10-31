@@ -244,15 +244,6 @@ $creds = get-credential
 $sess = New-PSSession -ComputerName <FQDN> -ConfigurationName <JEA ENDPOINT CONF NAME> -Credential $creds
 ```
 
-#### Implementing JEA
-- First create a capability file and add commands to it.
-```
-New-PSRoleCapabilityFile -Path .\JEA.psrc
-
-New-PSSessionConfigurationFile -SessionType RestrictedRemoteServer -Path .\JEA.pssc
-Register-PSSessionConfiguration -Path .\JEA.pssc -Name 'Persist' -Force 
-```
-
 #### Get the PSSession configurations (and JEA)
 ```
 Get-PSSessionconfiguration
