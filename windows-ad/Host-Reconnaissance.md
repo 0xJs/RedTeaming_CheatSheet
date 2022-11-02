@@ -8,7 +8,7 @@ Seatbelt.exe -group=all
 
 #### Get loggged on sessions
 ```
-net logons
+query user
 ```
 
 #### Get list of running processes
