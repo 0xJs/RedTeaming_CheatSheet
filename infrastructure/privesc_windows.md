@@ -690,6 +690,7 @@ The original Rotten Potato exploit was identified in 2016. Service accounts coul
 Service accounts are generally configured with these two privileges. They allow the account to impersonate the access tokens of other users (including the SYSTEM user). Any user with these privileges can run the token impersonation exploits in this lecture.
 
 ### Juicy potato
+- https://github.com/antonioCoco/JuicyPotatoNG (New one)
 - https://github.com/ohpe/juicy-potato
 - https://github.com/TsukiCTF/Lovely-Potato
 Rotten Potato was quite a limited exploit. Juicy Potato works in the same way as Rotten Potato, but the authors did extensive research and found many more ways to exploit.
