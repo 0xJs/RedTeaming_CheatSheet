@@ -102,9 +102,9 @@ Get-AzureADUser -All $true |?{$_.Displayname -match "admin"}
 
 #### List all the attributes for a user
 ```
-Get-AzureADUser -ObjectId test@defcorphq.onmicrosoft.com | fl * 
+Get-AzureADUser -ObjectId <ID> | fl * 
 
-Get-AzureADUser -ObjectId test@defcorphq.onmicrosoft.com | %{$_.PSObject.Properties.Name} 
+Get-AzureADUser -ObjectId <ID> | %{$_.PSObject.Properties.Name} 
 ```
 
 #### Search attributes for all users that contain the string "password" 
@@ -130,6 +130,12 @@ Get-AzureADUser | Get-AzureADUserCreatedObject
 #### Objects owned by a specific user
 ```
 Get-AzureADUserOwnedObject -ObjectId <ID>
+```
+
+#### List MFA status of user
+- https://github.com/0xJs/AzurePowerCommands
+```
+Get-AzureADUser | Get-AzureADUserMFAConfiguration
 ```
 
 ### Group enumeration
@@ -180,6 +186,12 @@ Get-AzureADUser -SearchString 'test' | Get-AzureADUserMembership
 Get-AzureADUserMembership -ObjectId test@defcorphq.onmicrosoft.com
 ```
 
+#### Recursivly search through group
+- https://github.com/0xJs/AzurePowerCommands
+```
+Get-AzureADGroup -ObjectId <ID> | Get-AzureADGroupMemberRecursive
+```
+
 #### Usefull group + member script
 ```
 $roleUsers = @() 
@@ -227,6 +239,17 @@ $creds = Get-Credential
 Connect-AzureAD -Credential $creds
 
 Get-AzureADMSRoleDefinition | ?{$_.IsBuiltin -eq $False} | select DisplayName
+```
+
+#### List members of role
+```
+Get-AzureADDirectoryRoleMember -ObjectId <ID>
+```
+
+#### Recursivly list members of role
+- https://github.com/0xJs/AzurePowerCommands
+```
+Get-AzureADDirectoryRole -ObjectId <ID> | Get-AzureADDirectoryRoleMemberRecursive
 ```
 
 ### Devices enumeration
