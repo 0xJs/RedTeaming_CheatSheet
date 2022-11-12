@@ -2097,6 +2097,7 @@ dir \\<SERVER NAME>\<SHARE>\
 
 #### Enumerate if SIDFilteringForestAware is enabled
 - Run on the DC.
+- `SIDFilteringForestAware` is set to True, it means SIDHistory is enabled across the forest trust.
 ```
 Get-ADTrust -Filter *
 ```
