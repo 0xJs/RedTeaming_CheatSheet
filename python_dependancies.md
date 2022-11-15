@@ -1,4 +1,7 @@
 # Best way to handle python dependancies
+- https://www.youtube.com/watch?v=ieyRV9zQd2U&t=2915s
+
+
 ## Pipx
 #### Install pipx
 ```
