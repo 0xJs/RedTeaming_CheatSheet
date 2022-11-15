@@ -130,17 +130,6 @@ Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 - https://aadinternals.com/post/on-prem_admin/
 
 ## Azure AD Connect
-- Azure AD connect features available for each authenticaton method:
-	 -   **Synchronization**. Responsible for creating users, groups, and other objects. As well as, making sure identity information for your on-premises users and groups is matching the cloud. This synchronization also includes password hashes.
-	 -   **Health Monitoring**. Azure AD Connect Health can provide robust monitoring and provide a central location in the Azure portal to view this activity.
-- Authentication methods:
-	 - **Cloud authentication**. Azure AD handles users' sign-in process. Coupled with seamless single sign-on (SSO), users can sign in to cloud apps without having to reenter their credentials. With cloud authentication, you can choose from two options:
-		 - **Azure AD password hash synchronization**. The simplest way to enable authentication for on-premises directory objects in Azure AD. Users can use the same username and password that they use on-premises without having to deploy any additional infrastructure. Some premium features of Azure AD, like Identity Protection and Azure AD Domain Services, require password hash synchronization, no matter which authentication method you choose.
-		 - **Azure AD Pass-through authentication**. Provides a simple password validation for Azure AD authentication services by using a software agent that runs on one or more on-premises servers. The servers validate the users directly with your on-premises Active Directory, which ensures that the password validation doesn't happen in the cloud. Companies with a security requirement to immediately enforce on-premises user account states, password policies, and sign-in hours might use this authentication method.
-	 - **Federated authentication**. When you choose the Federated authentication method, Azure AD hands off the authentication process to a separate trusted authentication system, such as on-premises Active Directory Federation Services (AD FS), to validate the user’s password. The authentication system can provide additional advanced authentication requirements. Examples are smartcard-based authentication or third-party multifactor authentication.
-- Azure AD Identity Protection requires Password Hash Sync regardless of which sign-in method you choose, to provide the Users with leaked credentials report.
-
-
 - When Azure AD Connect is configured. The `SYNC_` account and `MSOL_` account are created. (or `AAD_` if installed on a DC)
 - The `SYNC_` account has the role `Directory Synchronization Accounts` and can reset any password within the cloud and the `MSOL_` and `AAD_` account have DCSync rights.
 - The role is now shown in the Azure portal [Documentation](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference#roles-not-shown-in-the-portal)
