@@ -127,6 +127,7 @@ Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 ```
 
 # On-Prem --> Azure AD
+- https://aadinternals.com/post/on-prem_admin/
 ## Azure AD Connect
 - Check if there is an account name with `MSOL_<INSTALLATION ID>`. This user has DCSYNC rights. (or `AAD_` if installed on a DC)
 - Command to check if AD connect is installed on the server `Get-ADSyncConnector`
