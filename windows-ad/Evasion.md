@@ -242,9 +242,6 @@ RunWithRegistryNonAdmin.bat
 winrs -remote:server1 -u:<COMPUTERNAME>\<USER> -p:<PASS> hostname
 ```
 
-##### Com objects
-- https://github.com/bohops/WSMan-WinRM
-
 ### Just Enough Admin
 - Defines allowed cmdledt and commands that are allowed by defining role capabilities.
 
