@@ -60,6 +60,9 @@ python \AzureADJoinedMachinePTC\Main.py --usercert <PATH TO .pfx FILE> --certpas
   - If we compromise an Azure AD joined (or Hybrid joined) machine, it is possible to extract PRT and other keys for a user.
   - For Azure AD Registered machine, PRT is issued if a user has added a secondary work account to the device.
   - Before a fix in August 2021, PRT always had MFA claims. After fixes in August 2021, PRT can currently be extracted only for the current Azure AD user (not as a local admin or any other user).
+  - If we have access to a PRT, it is possible to request access tokens for any application.
+  - Chrome uses BrowserCore.exe to use PRT and request PRT cookie for SSO experience.
+  - This PRT cookie - x-ms-RefreshTokenCredential – can be used in a browser to access any application as the user whose PRT we have.
 
 #### Request a nonce
 ```
