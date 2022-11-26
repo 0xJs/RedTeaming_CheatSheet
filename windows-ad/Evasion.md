@@ -429,8 +429,10 @@ netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protoc
 
 ### Obfuscation techniques
 - Examples are in PowerShell but techniques can be implemented in every coding language
+
+#### Powershell
 - The code is evaluated when its readable by the scripting engine
-- This is what allows us to still be able ot obfuscate our code
+- This is what allows us to still be able to obfuscate our code
 ```
 # This
 powershell -enc VwByAGkAdABlAC0ASABvAHMAdAAoACIASABlAGwAbABvACAAVwBvAHIAbABkACIAKQA=
@@ -445,7 +447,7 @@ Write-Host("He" + "llo" + "World")
 Write-Host("Hello World")
 ```
 
-### Change the following:
+### Changing the code:
 #### Hash of file/code
  - Capitalization 
 	 - PowerShell ignores capitalization, AMSI ignored capitalization, but chaning your hash is best practice.
