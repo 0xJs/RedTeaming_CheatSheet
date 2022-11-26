@@ -471,7 +471,7 @@ Write-Host("Hello World")
 - Change variable names
 	- `$variablename = "amsicontext"` to `$LoremIpsum = "amsicontext"`
 - Concatenation
-	- `"amsicontext"` to ``"am" + "si" + "con" + "te" + "xt"`
+	- `"amsicontext"` to `"am" + "si" + "con" + "te" + "xt"`
 - Variable insertion
 	- `$variablename = 'context'` into `$variablename2 = "Amsi$variablename"`
 	- C# `string variablename = "context"; string variablename2 = $"amsi{variablename}";`
