@@ -450,7 +450,7 @@ Write-Host("Hello World")
 ### Changing the code:
 #### Hash of file/code
  - Capitalization 
-	 - PowerShell ignores capitalization, AMSI ignored capitalization, but chaning your hash is best practice.
+	 - PowerShell ignores capitalization, AMSI ignored capitalization, but changing your hash is best practice.
 		 -   `$variablename = "amsicontext"` to `$VaRiAbLeNaMe = "amsicontext"`
 	- C# is case sensitive, but changing the capitalization changes the hash. (Must change every entry of the variable!)
 - Remove comments
