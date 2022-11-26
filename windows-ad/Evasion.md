@@ -55,7 +55,7 @@ powershell.exe -executionpolicy bypass
 
 ### AMSI
 - https://amsi.fail/
-- Then obfuscate with https://github.com/danielbohannon/Invoke-Obfuscation
+- Get an AMSI bypass string and then obfuscate [manually](#Obfuscation-techniques)
 
 ### Method 1
 #### Amsi bypass string obfuscated
@@ -456,7 +456,7 @@ Write-Host("He" + "llo" + "World")
 Write-Host("Hello World")
 ```
 
-### Changing the code:
+### Changing the code
 #### Hash of file/code
  - Capitalization 
 	 - PowerShell ignores capitalization, AMSI ignored capitalization, but changing your hash is best practice.
