@@ -473,7 +473,7 @@ Write-Host("Hello World")
 - Concatenation
 	- `"amsicontext"` to ``"am" + "si" + "con" + "te" + "xt"`
 - Variable insertion
-	- `$variablename = 'context'` into ``$variablename2 = "Amsi$variablename"`
+	- `$variablename = 'context'` into `$variablename2 = "Amsi$variablename"`
 	- C# `string variablename = "context"; string variablename2 = $"amsi{variablename}";`
 	- Format string
 		- `$variablename = "amsi{0}text -f "con"`
