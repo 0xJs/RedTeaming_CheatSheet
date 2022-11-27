@@ -13,7 +13,7 @@
 * [Windows Defender](#Windows-Defender)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
-  * [Obfuscation techniques](#Obfuscation-techniques)
+  * [Evasion techniques](#Evasion-techniques)
   * [Defeating Microsoft Defender](#Defeating-Microsoft-Defender)
   * [Windows Subsystem for Linux WSL](#Windows-Subsystem-for-Linux-WSL)
 * [Privileges](#Privileges)
