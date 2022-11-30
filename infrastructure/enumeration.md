@@ -127,12 +127,20 @@ crackmapexec smb -u '' -p '' --shares
 #### List shares and check access with username and password
 - use ```-d <DOMAIN>``` if the account is a domain account
 ```
-crackmapexec smb -u '<uSERNAME>' -p '<PASSWORD>' -d . 
+crackmapexec smb -u '<USERNAME>' -p '<PASSWORD>' -d . 
 ```
 
-#### SMBClient connect to share
+#### SMBClient list shares
+- If username and password fill in the `""%""` part
 ```
-smbclient //<IP>/<SHARE>
+smbclient -L <IP> -U ""%""
+```
+
+
+#### SMBClient connect to share
+- If username and password fill in the `""%""` part
+```
+smbclient //<IP>/<SHARE> -U ""%""
 ```
 
 #### Download smb files recursively
