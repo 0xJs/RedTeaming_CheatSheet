@@ -651,6 +651,13 @@ Get-service LanmanServer | restart-service -verbose
  .\Akagi64.exe 34 cmd.exe
  ```
  
+#### Automatec UAC bypass PowerShell script 
+- https://github.com/x0xr00t/Automated-MUlti-UAC-Bypass
+
+```
+.\Win-Multi-UAC-Bypass.ps1
+```
+ 
 ### Manual UAC bypass
 - https://atomicredteam.io/defense-evasion/T1548.002/
  
