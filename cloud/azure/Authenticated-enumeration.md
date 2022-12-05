@@ -40,6 +40,12 @@
   - Azure CLI. Syntax used is ```*az *``` (Az space)
     - **Create and manage Azure Resources.**
 
+#### Check MFA configuration of user
+- https://github.com/dafthack/MFASweep
+```
+Import-Module MFASweep.ps1
+Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
+```
 
 ## Enumeration through Azure portal
 #### Login azure portal
