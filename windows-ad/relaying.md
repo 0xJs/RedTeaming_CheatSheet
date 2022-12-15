@@ -70,7 +70,7 @@ IconIndex=1
 
 #### SearchConnector
 - Explorer automaticly connects if folder where the SearchConnector is, is opened.
-- Actives the Windows Webclient service which can be used to authenticate a host again to the attacking IP with petitpotam. See #REFERENCE
+- Actives the Windows Webclient service which can be used to authenticate a host again to the attacking IP with petitpotam.
 - Creates a ```[WebDAV] NTLMv2 Hash``` in responder, ```HTTPD: received``` in ntlmrelayx. Can be used against relaying to ldap, ldaps and SMB
 - https://www.bussink.net/webclient_activation/
 - Filename ```Documents.searchConnector-ms```
