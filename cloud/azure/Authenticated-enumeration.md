@@ -924,11 +924,15 @@ az storage account list
 - Users can save tokens using Save-AzContext, look out for them! Search for `Save-AzContext` in PowerShell console history!
 - Always use Disconnect-AzAccount!!
 
+#### Stealing tokens with tools
+- https://github.com/thalpius/Microsoft-JSON-Web-Token-Extractor
+
 #### Request tokens from the CLI!
 - Check below for example in using tokens!
 
 ### Stealing token scripts
 #### Python
+- Example: Run following code when compromising an webserver with a service principal for the webapp
 ```
 import os
 import json
@@ -953,6 +957,7 @@ print("ClientID: "+json.loads(val)["client_id"])
 ```
 
 #### PHP
+- Example: Run following code when compromising an webserver with a service principal for the webapp
 ```
 <?php 
 
