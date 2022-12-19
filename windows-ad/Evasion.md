@@ -435,6 +435,7 @@ netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protoc
 #### Powershell
 - [https://github.com/danielbohannon/Invoke-Obfuscation](https://github.com/danielbohannon/Invoke-Obfuscation)
 - [https://github.com/JoelGMSec/Invoke-Stealth](https://github.com/JoelGMSec/Invoke-Stealth)
+- [Remove comments with PowerStrip](https://github.com/yoda66/PowerStrip)
 
 ### Evasion techniques
 - Most examples are in PowerShell but techniques can be implemented in every coding language
