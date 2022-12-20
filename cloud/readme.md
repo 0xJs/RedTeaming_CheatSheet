@@ -1,6 +1,4 @@
 # Pentesting the cloud cheatsheet
-
-# Index
 * [General](#General)
   * [Scaning tools](#Scanning-tools)
 * [Recon \ OSINT](recon.md)
