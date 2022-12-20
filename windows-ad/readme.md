@@ -1,6 +1,4 @@
 # Windows-Domain-Cheatsheet
-
-# Index
 * [General](#General)
 * [Initial Access](Initial-Access.md)
 * [Host Reconnaissance](Host-Reconnaissance.md)
