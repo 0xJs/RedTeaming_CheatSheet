@@ -1,6 +1,6 @@
 # Pentesting the cloud cheatsheet
 
-## Index
+# Index
 * [General](#General)
   * [Scaning tools](#Scanning-tools)
 * [Recon \ OSINT](recon.md)
@@ -9,9 +9,8 @@
   * [Azure](azure/readme.md)
   * [Amazon Web Services](aws/readme.md)
   * [Google Cloud Platform](gcb/readme.md)
-  
 
-## General
+# General
 - Google Cloud Platform != Google Workspace
 - Azure != Microsoft 365
 - Google Workspace and Microsoft 365 are productivity suites
