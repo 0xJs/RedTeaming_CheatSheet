@@ -1,6 +1,6 @@
 # Infrastructure cheatsheet
 
-## Index
+# Index
 * [General](#General)
    * [Buffer overflow](bufferoverflow.md)
    * [Metasploit](metasploit.md)
