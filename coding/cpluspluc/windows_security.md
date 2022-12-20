@@ -94,7 +94,7 @@
 
 ## User Account Control (AUC)
 - Not a security boundary
-	- Can be easily bypassed [Link to bypasses](https://github.com/0xJs/RedTeaming_CheatSheet/blob/main/windows-ad/Evasion.md#uac-bypass)
+	- Can be easily [bypassed](https://github.com/0xJs/RedTeaming_CheatSheet/blob/main/windows-ad/Evasion.md#uac-bypass)
 - Goal was running applications with standard user rights and not as administrator
 - Allows applications to elevate to administrator rights when needed
 - Has different levels which can be changed in "User Account Control Settings"
