@@ -1,5 +1,5 @@
 # Coding
-- This section is new and will be expended during the upcoming year.
+This section is new and will be expended during the upcoming year.
 
 * [General](#General)
 * [C#](csharp/readme.md)
