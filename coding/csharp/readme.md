@@ -1,4 +1,4 @@
-## Index
+# Index
 * [General](#General)
 * [Cheatsheet](csharp/cheatsheet.md)
 
