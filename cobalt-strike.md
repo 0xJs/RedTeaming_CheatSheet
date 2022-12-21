@@ -9,7 +9,7 @@ sudo ./teamserver <IP> <PASSWORD> c2-profiles/normal/webbug.profile
 ```
 
 ### Create a listener
-- Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB).
+- Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB or TCP).
   - `egress` listens on the teamserver IP.
   - `peer-to-peer` listens on a existing beacon.  	
 1. Cobalt Strike --> Listeners -->  Click the Add button and a new listener dialogue will appear.
