@@ -1,20 +1,31 @@
 # Cobalt-Strike cheatsheet.
-
+# General
 #### Start teamserver
 ```
 cd /opt/cobaltstrike
-./teamserver <IP> <PASSWORD>
+sudo ./teamserver <IP> <PASSWORD> <C2 PROFILE>
+
+sudo ./teamserver <IP> <PASSWORD> c2-profiles/normal/webbug.profile
 ```
 
-#### Create a listener
-- Cobalt Strike --> Listeners -->  Click the Add button and a New Listener dialogue will appear.
-- Choose a descriptive name such as ```<protocol>-<port>``` example: ```http-80```.
-- Set the variables and click Save.
+### Create a listener
+- Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB).
+  - `egress` listens on the teamserver IP.
+  - `peer-to-peer` listens on a existing beacon.  	
+1. Cobalt Strike --> Listeners -->  Click the Add button and a new listener dialogue will appear.
+2. Choose a descriptive name such as ```<protocol>-<port>``` example: ```http-80```.
+3. Set the variables and click Save.
 
-#### Create a payload
-- OPSEC: Staged payloads are good if your delivery method limits the amount of data you can send. However, they tend to have more indicators compared to stageless. Given the choice, go stageless.
-- OPSEC: The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
+#### OPSEC listeners
+- DNS: Since 0.0.0.0 is the default response (and also rather nonsensical), Cobalt Strike team servers can be fingerprinted in this way.  This can be changed in the Malleable C2 profile.
+- SMB: The default pipe name(`msagent_XX`) is quite well signatured. A good strategy is to emulate names known to be used by common applications or Windows itself.  Use `PS C:\> ls \\.\pipe\` to list all currently listening pipes for inspiration.  
+
+### Create a payload
 - Attacks --> Packages --> Windows Executable (S).
+
+#### OPSEC paylaods
+- Staged payloads are good if your delivery method limits the amount of data you can send. However, they tend to have more indicators compared to stageless. Given the choice, go stageless.
+- The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
 
 #### Create dll payload
 - Bypasses default applocker configuration
