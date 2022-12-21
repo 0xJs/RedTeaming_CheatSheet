@@ -34,9 +34,7 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
 
 # RedTeaming General
 - Definition of Red Teaming by Joe Vest and James Tubberville:
-```
-Red Teaming is the process of using tactics, techniques and procedures (TTPs) to emulate a real-world threat, with the goal of measuring the effectiveness of the people, processes and technologies used to defend an environment.
-```
+> Red Teaming is the process of using tactics, techniques and procedures (TTPs) to emulate a real-world threat, with the goal of measuring the effectiveness of the people, processes and technologies used to defend an environment.
 
 # Sources
 - Cloud: CARTP from Pentester Academy and breaching the cloud from antisyphon.
