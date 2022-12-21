@@ -23,7 +23,7 @@ sudo ./teamserver <IP> <PASSWORD> c2-profiles/normal/webbug.profile
 ### Create a payload
 - Attacks --> Packages --> Windows Executable (S).
 
-#### OPSEC paylaods
+#### OPSEC payloads
 - Staged payloads are good if your delivery method limits the amount of data you can send. However, they tend to have more indicators compared to stageless. Given the choice, go stageless.
 - The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
 
