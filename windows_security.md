@@ -1,5 +1,5 @@
 # Windows Security
-* [Windows Security Code Samples](../coding/cpluspluc/Windows_Security/)
+* [Windows Security Code Samples](/coding/cpluspluc/Windows_Security/)
 
 ## SIDS
 - SID = Identifiers for identities executing actions (principals)
