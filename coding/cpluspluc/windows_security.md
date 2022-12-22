@@ -47,9 +47,9 @@
 - The command `whoami /priv` lists the privileges of the current user/process.
 - Administrators can use Active Directory or the Local Security Policy Editor to grant or remove privileges. (Local Policies --> User Rights Assignment)
 - Most privileges are disabled by default. Must enable before utilization. This is used as a precaution so privileges are not used by mistake
-	- Certain API's check if a privilege exists and enabled before allowing operations to proceed.
+	- Certain API's check if a privilege exists and enabled before allowin operations to proceed.
 - Commonly abused privileges: [link](https://github.com/hatRiot/token-priv/blob/master/abusing_token_eop_1.0.txt)
-	1.  `SeBackupPrivilege` - This privilege causes the system to grant all read access control to any file, regardless of the [_access control list_](https://msdn.microsoft.com/library/windows/desktop/ms721532#-security-access-control-list-gly) (ACL) specified for the file.  
+	- 1.  `SeBackupPrivilege` - This privilege causes the system to grant all read access control to any file, regardless of the [_access control list_](https://msdn.microsoft.com/library/windows/desktop/ms721532#-security-access-control-list-gly) (ACL) specified for the file.  
 	    Attacker Tradecraft: Collection.
 	2.  `SeCreateTokenPrivilege` - Required to create a primary token.  
 	    Attacker Tradecraft: Privilege Escalation
@@ -66,6 +66,7 @@
 
 ## Security descriptors
 - An Object is created with a Security Descriptor, this determines who can do what with that object.
+- Formats: `Absolute` and `Self Relative`
 - When a caller requests access to an object, the object manager checks with the security system if the caller can obtain a handle to the object
 - Exists out of:
 	- Owner SID
@@ -85,16 +86,45 @@
 		- If an access allowed for that SID is present, access is granted to the object with the relevant access mask
 		- If an access denied for that SID is present, access is denied to the object
 		- if the end of the DACL is reached, access is denied
+
+#### Retrieving security descriptors
+- Retrieving security descriptors by handle
+	- `GetKernelObjectSecurity`
+	- `GetUserObjectSecurity` (Desktops and Window Stations)
+- Retrieving security descriptors by name
+	- `GetFileSecurity`
+	- `GetNameSecurityInfo`
+- The `SECUCURITY_DESCRIPTOR` structure should be treated as opaque. Enforced by the fact that `PSECURITY_DESCRIPTOR` is typed as `PVOID`.
+- API's:
+	- `GetSecurityDescriptorLength`
+	- `GetSecurityDescriptorControl`
+	- `GetSecurityDescriptorOwner`
+	- `GetSecurityDescriptorDacl`
+	- `GetSecurityDescriptorSacl`
 - Security Descriptor Definition Language (SDDL)
+	- Conversion
+		- `ConvertSecurityDescriptorToStringSecurityDescriptor`
+		- `ConvertStringSecurityDescriptorToSecurityDescriptor`
 	- Is formatted like:
 		- `O:owner_sidG:group_sidD:dacl_flags(string_ace1)(string_ace2)…(string_acen)S:sacl_flags(string_ace1)(string_ace2)…(string_acen)`
 	- Example:
 		- `O:S-1-5-21-3800247982-3998391507-3990260446-1001G:S-1-5-21-3800247982-3998391507-3990260446-513D:(A;ID;FA;;;SY)(A;ID;FA;;;BA)(A;ID;FA;;;S-1-5-21-3800247982-3998391507-3990260446-1001)`
 	- Check [Link](https://learn.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-definition-language) for ACE type, ACE Flags, Permissions explanation and syntax!
 
+#### Setting Security Descriptors
+- Setting Security descriptor
+	- `SetKernelObjectSecurity` (Most generic)
+	- `SetSecurityInfo` (Accepts SD components)
+	- `SetFileSecurity` (specific for files, but considered obsolete)
+	- `SettNamedSecurityInfo` (for named objects, including files)
+- Building / modifying a security descriptor
+	- `SetSecurityDescriptorOwner`
+	- `SetSecurityDescriptorDacl`
+	- Can change part of the SD without building from scratch.
+
 ## User Account Control (AUC)
 - Not a security boundary
-	- Can be easily [bypassed](https://github.com/0xJs/RedTeaming_CheatSheet/blob/main/windows-ad/Evasion.md#uac-bypass)
+	- Can be easily bypassed [Link to bypasses](https://github.com/0xJs/RedTeaming_CheatSheet/blob/main/windows-ad/Evasion.md#uac-bypass)
 - Goal was running applications with standard user rights and not as administrator
 - Allows applications to elevate to administrator rights when needed
 - Has different levels which can be changed in "User Account Control Settings"
@@ -121,3 +151,13 @@
 	- `CreateProccessWithLogonW`, requires no special privileges, user must be allowed to log on interactively
 - Launching a process elevated
 	- Call `ShellExecute` or `ShellExecuteEx`
+
+## Impersonation
+- A thread can impersonated by obtaining an impersonation token.
+- `SetThreadToken` API
+- How to get an impersonation token:
+	- `DuplicateTokenEx`
+	- `LogonUser`
+	- `ImpersonateLoggedOnUser`
+- Stop impersonating
+	- `RevertToSelf`
