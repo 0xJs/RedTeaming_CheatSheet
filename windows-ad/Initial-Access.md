@@ -21,7 +21,7 @@
 
 ## Password Attacks
 ### Exchange / OWA
-- Attah path could be: Reconnaissance --> OWA Discovery --> Internal Domain Discovery --> Naming scheme fuzzing --> Username enumeration --> Password discovery --> GAL Extraction --> More Password discovery --> 2fa bypass --> Remote Access through VPN/RDP / Malicious Outlook Rules or Forms / Internal Phishing
+- Attack path could be: Reconnaissance --> OWA Discovery --> Internal Domain Discovery --> Naming scheme fuzzing --> Username enumeration --> Password discovery --> GAL Extraction --> More Password discovery --> 2fa bypass --> Remote Access through VPN/RDP / Malicious Outlook Rules or Forms / Internal Phishing
 
 #### Collection of data (OSINT)
 - Collect e-mail adresses, usernames, passwords, get the email/user account naming scheme with tools such as:
@@ -59,6 +59,8 @@ Invoke-UsernameHarvestOWA -Userlist possible-usernames.txt -ExchHostname <EXCH H
 
 #### Password discovery
 - https://github.com/dafthack/MailSniper
+- https://github.com/byt3bl33d3r/SprayingToolkit
+- OPSEC: Passwordspraying with a lot of attempts and quickly is LOUD and may count towards domain lockout policy!
 ```
 Invoke-PasswordSprayOWA -ExchHostname <EXCH HOSTNAME> -Userlist domain_users.txt -Password <PASSWORD> -Threads 15 -Outfile owa-sprayed-creds.txt
 Invoke-PasswordSprayEWS -ExchHostname <EXCH HOSTNAME> -Userlist domain_users.txt -Password <PASSWORD> -Threads 15 -Outfile ews-sprayed-creds.txt
