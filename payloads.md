@@ -16,6 +16,15 @@
 gc <FILE> -Stream Zone.Identifier
 ```
 
+#### Web categorisation
+- Domain names are categorised by vendors so that they be used for filtering purposes with for example web proxy's or firewalls.
+- Two strategies for tackling this issue include:
+  - Obtaining a domain that is already in a desirable category.
+  - Requesting a change of category for a domain.
+- Tools that may help:
+  - https://sitereview.bluecoat.com/#/ 
+  - https://github.com/mdsecactivebreach/Chameleon
+
 ## Scarecrow dll
 - https://github.com/optiv/ScareCrow
 
