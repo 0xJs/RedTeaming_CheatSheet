@@ -1,3 +1,21 @@
+# General
+### Phishing
+- Any file downloaded via a browser (outside of a trusted zone) will be tainted with the "Mark of the Web" (MOTW).
+- Files with MOTW are handled with additional security scrutiny - you may be familiar with both Windows SmartScreen and Office Protected View.
+- If MS Office "block macros downloaded from the Internet" is enabled, a user cannot run a macro-enabled document even if they wanted to.
+- Files that are emailed "internally" via a compromised Exchange mailbox are not tagged with a Zone Identifier.
+
+#### Check MOTW data stream
+- The possible zones are:
+  - 0 Local computer
+  - 1 Local intranet
+  - 2 Trusted sites
+  - 3 Internet
+  - 4 Restricted sites
+```
+gc <FILE> -Stream Zone.Identifier
+```
+
 ## Scarecrow dll
 - https://github.com/optiv/ScareCrow
 
