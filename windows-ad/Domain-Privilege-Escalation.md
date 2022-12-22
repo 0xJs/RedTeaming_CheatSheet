@@ -124,7 +124,9 @@ crackmapexec smb -u <USER> -p <PASSWORD> --pass-pol
 Get-DomainPolicyData
 ```
 
-#### Spray easy guessable passwords against all these users
+### Spraying
+#### SMB
+- Spray easy guessable passwords against all these users
 - Make sure to keep enough login attempts for the user!
 - https://github.com/Greenwolf/Spray
 ```
