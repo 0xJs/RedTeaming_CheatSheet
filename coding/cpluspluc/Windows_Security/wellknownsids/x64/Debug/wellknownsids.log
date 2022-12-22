@@ -1,2 +1,0 @@
-﻿wellknownsids.obj : error LNK2019: unresolved external symbol "class std::basic_string<wchar_t,struct std::char_traits<wchar_t>,class std::allocator<wchar_t> > __cdecl SidToString(void * const)" (?SidToString@@YA?AV?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@QEAX@Z) referenced in function main
-C:\Users\user\source\repos\Security\x64\Debug\wellknownsids.exe : fatal error LNK1120: 1 unresolved externals
