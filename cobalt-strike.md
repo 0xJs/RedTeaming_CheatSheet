@@ -12,9 +12,11 @@ sudo ./teamserver <IP> <PASSWORD> c2-profiles/normal/webbug.profile
 - Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB or TCP).
   - `egress` listens on the teamserver IP.
   - `peer-to-peer` listens on a existing beacon.  	
-1. Cobalt Strike --> Listeners -->  Click the Add button and a new listener dialogue will appear.
-2. Choose a descriptive name such as ```<protocol>-<port>``` example: ```http-80```.
-3. Set the variables and click Save.
+1. In the menu click the HeadPhones Icon or click Cobalt Strike --> Listeners 
+2. Click the Add button at the bottom and and a new listener dialogue will appear.
+3. Choose a descriptive name such as ```<protocol>-<port>``` example: ```http-80```.
+4. Set the variables/settings and click Save.
+- Creating a TCP local listener is usefull for privescing or spawning new shells
 
 #### OPSEC listeners
 - DNS: Since 0.0.0.0 is the default response (and also rather nonsensical), Cobalt Strike team servers can be fingerprinted in this way.  This can be changed in the Malleable C2 profile.
