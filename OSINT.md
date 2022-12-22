@@ -1,5 +1,6 @@
 # OSINT
 - The page is bare, really need to do a OSINT course ;)
+- Two main facets of recon: Organisational and technical
 
 ## OSINT Frameworks
 - https://github.com/lanmaster53/recon-ng
