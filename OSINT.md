@@ -1,6 +1,7 @@
 # OSINT
 - The page is bare, really need to do a OSINT course ;)
-- Two main facets of recon: Organisational and technical
+- Two main facets of recon: Organisational and technical.
+- Gathering can be done passively or actively.
 
 ## OSINT Frameworks
 - https://github.com/lanmaster53/recon-ng
@@ -19,6 +20,7 @@
 
 ### Google fu / dorks
 - https://gist.github.com/sundowndev/283efaddbcf896ab405488330d1bbc06
+- https://www.exploit-db.com/google-hacking-database
 
 #### Example
 ```
