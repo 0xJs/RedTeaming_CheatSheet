@@ -1,4 +1,6 @@
 # Windows Security
+* [Windows Security Code Samples](../coding/cpluspluc/Windows_Security/)
+
 ## SIDS
 - SID = Identifiers for identities executing actions (principals)
 - Example: `S-1-5-211180699209-877415012-3182924384-1004`
