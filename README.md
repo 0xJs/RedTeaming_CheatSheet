@@ -6,6 +6,7 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
   * [Payloads](payloads.md)
   * [Open Source Intelligence](OSINT.md)
   * [Python Dependancies](python_dependancies.md)
+  * [Windows System Security](windows_security.md)
 * [Infrastructure](infrastructure/readme.md)
   * [Buffer overflow](infrastructure/bufferoverflow.md)
   * [Enumeration](infrastructure/enumeration.md)
