@@ -15,7 +15,6 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
   * [Privilege Escalation Linux](infrastructure/privesc_linux.md)
   * [Post Exploitation](infrastructure/post_exploitation.md)
 * [Windows AD](windows-ad/readme.md)
-  * [Initial Access](Initial-Access.md)
   * [Initial Access](windows-ad/Initial-Access.md)
   * [Host Reconnaissance](windows-ad/Host-Reconnaissance.md)
   * [Host Persistence](windows-ad/Host-Persistence.md)
