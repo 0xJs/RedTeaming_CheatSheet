@@ -23,6 +23,7 @@ download <FILE>
 ```
 
 #### Take screenshots
+- View screenshot. Go to View -> Screenshots
 ```
 printscreen               Take a single screenshot via PrintScr method
 screenshot                Take a single screenshot
