@@ -1,5 +1,6 @@
 # General
 ### Phishing
+- https://github.com/ZeroPointSecurity/PhishingTemplates
 - Any file downloaded via a browser (outside of a trusted zone) will be tainted with the "Mark of the Web" (MOTW).
 - Files with MOTW are handled with additional security scrutiny - you may be familiar with both Windows SmartScreen and Office Protected View.
 - If MS Office "block macros downloaded from the Internet" is enabled, a user cannot run a macro-enabled document even if they wanted to.
