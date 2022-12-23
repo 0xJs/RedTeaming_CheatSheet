@@ -34,9 +34,13 @@ screenwatch               Take periodic screenshots of desktop
 keylogger
 ```
 
+### Webserver
 #### Upload file
-- Go to Site Management > Host File and select your document.
+- Go to Site Management -> Host File and select your document.
 - Set the Location URI, Local Host and click Launch.
+
+#### Check web logs
+- Go to View -> Web log
 
 ## Teamserver
 #### Start teamserver
