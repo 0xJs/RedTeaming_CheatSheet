@@ -34,6 +34,10 @@ screenwatch               Take periodic screenshots of desktop
 keylogger
 ```
 
+#### Upload file
+- Go to Site Management > Host File and select your document.
+- Set the Location URI, Local Host and click Launch.
+
 ## Teamserver
 #### Start teamserver
 ```
