@@ -3,14 +3,14 @@
 * [Unauthenticated Enumeration](#Unauthenticated-Enumeration)
   * [LDAP Anonymous Bind](#LDAP-Anonymous-Bind)
 * [Authenticated Enumeration](#Authenticated-Enumeration)
-  * [Powerview Domain](#Powerview-Domain)
-  * [Powerview Users, groups and computers](#Powerview-users-groups-and-computers) 
-  * [Powerview Shares](#Powerview-shares)
-  * [Powerview GPO](#Powerview-GPO)
-  * [Powerview OU](#Powerview-OU)
-  * [Powerview ACL](#Powerview-ACL)
-  * [Powerview Domain Trust](#Powerview-Domain-Trust)
-  * [Powerview Sessions](#Powerview-sessions)
+  * [Domain](#Domain)
+  * [Users, groups and computers](#Users-groups-and-computers) 
+  * [Shares](#Shares)
+  * [GPO](#GPO)
+  * [OU](#OU)
+  * [ACL](#ACL)
+  * [Domain Trust](#Domain-Trust)
+  * [Sessions](#Sessions)
   * [Bloodhound](#Bloodhound)
   * [Ldapsearch](#Ldapsearch)
 
@@ -81,7 +81,7 @@ python3 windapsearch.py --dc-ip 10.129.1.207 -u "" -C
 ```
 
 ## Authenticated Enumeration
-### Powerview Domain
+### Domain
 - https://github.com/PowerShellMafia/PowerSploit/tree/master/Recon
 ```
 . ./PowerView.ps1
@@ -118,7 +118,7 @@ Get-DomainPolicyData
 net accounts /domain
 ```
 
-### Powerview users groups and computers
+### Users groups and computers
 #### Get Information of domain controller
 ```
 Get-DomainController
@@ -222,7 +222,7 @@ Get-LoggedonLocal -Computername <COMPUTERNAME>
 Get-LastLoggedOn -ComputerName <COMPUTERNAME>
 ```
 
-### Powerview shares
+### Shares
 #### Find shared on hosts in the current domain
 ```
 Find-DomainShare -ComputerDomain <DOMAIN> -CheckShareAccess
@@ -238,7 +238,7 @@ Find-InterestingDomainShareFile -Verbose
 Get-DomainFileServer
 ```
 
-### Powerview GPO
+### GPO
 #### Get list of GPO's in the current domain
 ```
 Get-DomainGPO
@@ -283,7 +283,7 @@ Get-DomainGPO -Identity '{<ID>}'
 (Get-DomainOU -Identity 'OU=Mgmt,DC=us,DC=techcorp,DC=local').distinguishedname | %{GetDomainComputer -SearchBase $_} | GetDomainGPOComputerLocalGroupMapping
 ```
 
-### Powerview OU
+### OU
 #### Get OU's in a domain
 ```
 Get-DomainOu -Fulldata
@@ -295,7 +295,7 @@ Get-DomainOu <OU> | %{Get-DomainComputer -ADSPath $_}
 Get-DomainComputer | ? { $_.DistinguishedName -match "OU=<OU>" } | select DnsHostName
 ```
 
-## Powerview ACL
+## ACL
 #### Get the ACL's associated with the specified object
 ```
 Get-DomainObjectAcl -Identity <SAMACCOUNTNAME> -ResolveGUIDS
@@ -330,7 +330,7 @@ Find-InterestingDomainAcl -ResolveGUIDs | select IdentityReferenceName, ObjectDN
 Find-InterestingDomainAcl | Where-Object {$_.IdentityReference –eq [System.Security.Principal.WindowsIdentity]::GetCurrent().Name}
 ```
 
-### Powerview Domain trust
+### Domain trust
 #### Get a list of all the domain trusts for the current domain
 ```
 Get-DomainTrust
@@ -360,7 +360,7 @@ Get-ForestTrust -Forest <FOREST NAME>
 Get-ForestDomain -Verbose | Get-DomainTrust
 ```
 
-### Powerview session
+### Session
 #### Enumerate domain admin sessions
 - Enumerates all machines and queries the domain for users of a specified group (default Domain Admins). Then finds domain machines where those users are logged into.
 ```
