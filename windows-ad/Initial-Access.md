@@ -2,13 +2,13 @@
 * [From the outside](#From-the-outside)
   * [Web Attacks](#Web-Attacks)  
   * [Password Attacks](#Password-Attacks)
-    * [Exchange / OWA](#Exchange-/-OWA)
+    * [Exchange / OWA](#Exchange-&-OWA)
 * [From the inside](#From-the-inside)
   * [Web Attacks](#Web-Attacks2) 
   * [Password Attacks](#Password-Attacks2)
     * [Enumerate users](#Enumerate-users)
     * [AS-REP Roasting](#AS-REP-Roasting)
-    * [Exchange / OWA](#Exchange-/-OWA2)
+    * [Exchange / OWA](#Exchange-&-OWA2)
   * [Relaying Attacks](#Relaying-Attacks)
       * [SMB relaying](#SMB-relaying)
       * [LDAP Relaying](#LDAP-Relaying)
@@ -20,7 +20,7 @@
 - It is possible to get access by abusing a lot of web attacks which might give you access to the system. There are to many to subscribe here, but I might make a list someday.
 
 ## Password Attacks
-### Exchange / OWA
+### Exchange & OWA
 - Attack path could be: Reconnaissance --> OWA Discovery --> Internal Domain Discovery --> Naming scheme fuzzing --> Username enumeration --> Password discovery --> GAL Extraction --> More Password discovery --> 2fa bypass --> Remote Access through VPN/RDP / Malicious Outlook Rules or Forms / Internal Phishing
 
 #### Collection of data (OSINT)
@@ -138,7 +138,7 @@ python3 GetNPUsers.py <DOMAIN>/ -usersfile domain_users.txt -format hashcat -out
 hashcat -a 0 -m 18200 hash.txt rockyou.txt
 ```
 
-### Exchange / OWA
+### Exchange & OWA
 - All the attacks from the outside works from the inside!
 
 #### Enumerate all mailboxes
