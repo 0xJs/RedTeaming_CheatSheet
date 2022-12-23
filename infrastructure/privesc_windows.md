@@ -331,15 +331,21 @@ Executables in Windows can be run without using their extension (e.g. “whoami.
 
 Consider the following unquoted path: ```C:\Program Files\Some Dir\SomeProgram.exe``` To us, this obviously runs ```SomeProgram.exe```. To Windows, ```C:\Program``` could be the executable, with two arguments: ```Files\Some``` and ```Dir\ SomeProgram.exe``` Windows resolves this ambiguity by checking each of the possibilities in turn. If we can write to a location Windows checks before the actual executable, we can trick the service into executing it instead.
 
+#### Find service with unqoutes service paths
+```
+wmic service get name, pathname
+```
+
 #### Confirm this using sc:
 ```
 sc qc <SERVICE NAME>
 ```
 
-#### Use accesschk.exe to check for write permissions:
+#### Check for write permissions:
 ```
-.\accesschk.exe /accepteula -uwdq "<PATH WITH SPACE>"
-.\accesschk.exe /accepteula -uwdq "C:\Program Files\Unquoted Path Service\"
+.\accesschk.exe /accepteula -uwdq "<PATH>"
+
+Get-Acl -Path <PATH> | fl
 ```
 
 #### Copy the reverse shell executable and rename it appropriately:
@@ -358,7 +364,7 @@ The Windows registry stores entries for each service. Since registry entries can
 
 #### We can confirm a weak registery entry with:
 - Powershell
-   - ```Get-Acl <REG PATH> | Format-List```
+   - ```Get-Acl -Path <REG PATH> | Format-List```
 - accesschk.exe
    - ```.\accesschk.exe /accepteula -uvwqk <REG PATH>```
 
