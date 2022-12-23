@@ -7,8 +7,8 @@
   * [Schtasks](#Schtasks2)
   * [Just Enough Admin](#Just-Enough-Admin)
 
-## Host Persistence
-### Userland
+# Host Persistence
+## Userland
 ### Startup
 - Batch script inside user directory ```$env:APPDATA'\Microsoft\Windows\Start Menu\Programs\Startup\'```
 
