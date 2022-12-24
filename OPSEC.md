@@ -27,6 +27,7 @@ Page is still being built.
 - With Rubeus requesting TGT and TGS
 - Monitoring: Event 4768 with encryption type 0x17 (rc4), NTLM authentication!
 - Alternative: Use `aes256_hmac` keys
+- OPSEC: Mimikatz can also perform overpass the hash, but in a way that writes into LSASS.  Rubeus' method doesn't touch LSASS but it does generate Kerberos traffic from an anomalous process, as this usually only occurs from LSASS. "pick your poison".
 
 #### DCSync
 - Sync replication only occurs between domain controllers
