@@ -1,3 +1,9 @@
+# Host-Reconnaissance.md
+* [Automated](#Automated)
+* [Manual enumeration](#Manual-enumeration)
+* [Misc](#Misc)
+
+## Automated
 #### Seatbelt - Gather generic info of the host
 - https://github.com/GhostPack/Seatbelt
 ```
