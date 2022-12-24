@@ -24,7 +24,7 @@ ssh -N -L <BIND_ADDRESS>:<LOCAL PORT>:<TARGET IP>:<TARGET PORT> <USERNAME>@<HOP 
 ```
 
 ### Netsh Windows
-- Open a port on locap port and IP and send all traffic to target IP and port.
+- Open a port on local port and IP and send all traffic to target IP and port.
 - Usefull for opening a port on the hop for receiving shells backs.
 - Usefull for example when you owned 1 host that can connect to another host that is running mssql and you want to connect from your kali to that mssql service.
 ```
