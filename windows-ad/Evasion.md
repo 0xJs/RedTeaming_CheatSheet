@@ -11,7 +11,7 @@
 * [Applocker](#Applocker)
   * [LOLBAS](#LOLBAS)
 * [Windows Defender](#Windows-Defender)
-* [Windows Firewall(#Windows-Firewall)
+* [Windows Firewall](#Windows-Firewall)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
   * [Evasion techniques](#Evasion-techniques)
