@@ -1,4 +1,4 @@
-## Relaying attacks
+# Relaying
 * [Poisoning](#Poisoning)
   * [Responder](#Responder)
   * [Mitm6](#Mitm6)
