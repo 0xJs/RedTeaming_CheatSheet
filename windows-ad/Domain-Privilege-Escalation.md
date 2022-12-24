@@ -1,6 +1,7 @@
 # Domain Privilege escalation
 * [Password not required](#Password-not-required)
 * [Password in description](#Password-in-description)
+* [Shares](#Shares]
 * [Reuse local admin password](#Reuse-local-admin-password)
 * [Password spraying](#Password-spraying)
 * [Kerberoast](#Kerberoast) 
@@ -91,6 +92,21 @@ crackmapexec smb <DC IP> -u <USER> -p ''
 #### Check for passwords in the description
 ```
 Get-DomainUser | Where-Object -Property Description | Select-Object samaccountname, description
+```
+
+## Shares
+- Mainly looking for credentials, for example Deploymentshare has creds most of the times
+
+#### Enumerate shares with PowerView
+```
+Find-DomainShare -CheckShareAccess
+
+Find-InterestingDomainShareFile -Include *.doc*, *.xls*, *.csv, *.ppt*
+```
+
+#### Crackmapexec
+```
+cme smb <HOST FILE> -u <USER> -p <PASSWORD> --shares
 ```
 
 ## Reuse local admin password
