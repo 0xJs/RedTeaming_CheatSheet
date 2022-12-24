@@ -639,6 +639,9 @@ portscan <CIDR> 139,445,3389,5985 none 1024
 ```
     
 ## Evasion
+### Malleable C2 profile
+- Example: https://github.com/Cobalt-Strike/Malleable-C2-Profiles
+
 ### Artifact-kit
 ```
 vim /opt/cobaltstrike/artifact-kit/src-common/bypass-pipe.c
