@@ -47,3 +47,6 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
 - Windows: CRTP, CRTE, PACES from Pentester Academy, ECPTX from eLearnSecurity and CRTO from RastaMouse.
 - Infra: OSCP, PNPT from TCM Security and Tiberius privesc courses
 - OSINT: PNPT Course
+
+#### Data exfiltration simulation
+- https://github.com/FortyNorthSecurity/Egress-Assess
