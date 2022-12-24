@@ -11,6 +11,7 @@
 * [Applocker](#Applocker)
   * [LOLBAS](#LOLBAS)
 * [Windows Defender](#Windows-Defender)
+* [Windows Firewall(#Windows-Firewall)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
   * [Evasion techniques](#Evasion-techniques)
@@ -390,13 +391,6 @@ Get-MpPreference | select Exclusion*
 Set-MpPreference -ExclusionPath "<path>"
 ```
 
-#### Parse GPO applocker
-- https://github.com/PowerShell/GPRegistryPolicy
-```
-Get-DomainGPO -Identity *defender*
-Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
-```
-
 #### Disable AV monitoring
 ```
 Set-MpPreference -DisableRealtimeMonitoring $true
@@ -405,16 +399,42 @@ Set-MpPReference -DisableIOAVProtection $true
 powershell.exe -c 'Set-MpPreference -DisableRealtimeMonitoring $true; Set-MpPReference -DisableIOAVProtection $true'
 ```
 
+## Windows Firewall
+#### Get state
+```
+Get-NetFirewallProfile -PolicyStore ActiveStore
+```
+
+#### Get rules
+```
+Get-netfirewallrule | format-table name,displaygroup,action,direction,enabled -autosize
+```
+
 #### Disable Firewall
 ```
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False 
+```
 
-powershell.exe -c 'Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False'
+#### Enable firewall
+```
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+```
+
+#### Change default policy
+```
+Set-NetFirewallProfile -DefaultInboundAction Block -DefaultOutboundAction Allow 
 ```
 
 #### Open port on firewall
 ```
 netsh advfirewall firewall add rule name="Allow port" dir=in action=allow protocol=TCP localport=<PORT>
+
+New-NetFirewallRule -DisplayName "Allow port" -Profile Domain -Direction Inbound -Action Allow -Protocol TCP -LocalPort <PORT>
+```
+
+#### Remove firewall rule
+```
+Remove-NetFirewallRule -DisplayName "Allow port"
 ```
 
 ## Defeating AV
