@@ -1,7 +1,7 @@
 # Domain Privilege escalation
 * [Password not required](#Password-not-required)
 * [Password in description](#Password-in-description)
-* [Shares](#Shares]
+* [Shares](#Shares)
 * [Reuse local admin password](#Reuse-local-admin-password)
 * [Password spraying](#Password-spraying)
 * [Kerberoast](#Kerberoast) 
