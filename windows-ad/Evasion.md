@@ -1,5 +1,4 @@
 # Evasion
-## Index
 * [General](#General)
 * [Windows Defender](#Windows-Defender)
 * [Windows Firewall](#Windows-Firewall)
