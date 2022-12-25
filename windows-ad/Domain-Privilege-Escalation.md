@@ -1233,7 +1233,6 @@ python3 aclpwn.py --restore aclpwn.restore
 #### Check if LAPS is installed on local computer
 ```
 Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
-Test-Path HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions #DOESNT WORK? GOTTA CHECK ECPPTX MATERIAL AGAIN
 ```
 
 ### Check existence of LAPS in the domain
