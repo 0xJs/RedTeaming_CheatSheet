@@ -492,7 +492,7 @@ run
 #### Enable Socksproxy no auth
 - OPSEC: This binds the port on all interfaces and since there is no authentication available on SOCKS4, this port can technically be used by anyone
 ```
-socks <PORT>
+socks <PORT> <SOCKS4/SOCKS5>
 ```
 
 #### Enable Socksproxy auth
