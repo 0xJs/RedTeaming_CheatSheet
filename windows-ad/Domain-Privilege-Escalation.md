@@ -390,14 +390,11 @@ Get-DomainObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.Security
   - Set a SPN on behalf of that user and crack it (stealthy method)
   - Change his password and log in as that user (not stealthy but immediate access is given)
 - Force-ChangePassword privilege can also allow you to change the password of a user
-
 - In case you have a GenericAll permission on a Group, Write permission, Write-Owner permission or Self permission, you can
   - Add yourself to this group, and as a result obtain the privileges that this group possesses.
-
 - In case you have WriteOwner permissions you can add a owner to the object.
 
 ### Permissions on a user
-
 #### Generic all / Force Change Password / AllExtendedRights - Reset password of a user
 ```
 net user <USERNAME> <PASSWORD> /domain
