@@ -570,6 +570,7 @@ SharpGpo.exe --Action NewGPO --GPOName SMB security
 SharpGpo.exe --Action NewGPLink --DN "OU=<OU>,DC=<DOMAIN>,DC=<DOMAIN>" --GPOName SMB security
 ```
 
+### Abuses
 #### Set autorun value
 - Uses RSAT tools
 - Best is to set the executable on a share in the domain
