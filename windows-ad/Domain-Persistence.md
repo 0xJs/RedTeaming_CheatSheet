@@ -14,6 +14,7 @@
   * [msDS-AllowedToDelegateTo](#msDS-AllowedToDelegateTo)
 * [Computer Account](#Computer-Account)
 * [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
+* [LAPS](#LAPS)
 
 ## Golden ticket
 - https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/kerberos-golden-tickets
