@@ -1334,6 +1334,11 @@ $data = $data -replace 'MSSQLSvc/', ''
 ```
 Get-SQLInstanceScanUDP -Computername <COMPUTER LIST> 
 ```
+
+#### Broadcast scan
+```
+Get-SQLInstanceBroadcast
+```
  
 #### Check Local Instance
 ```
@@ -1697,6 +1702,12 @@ Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded | Get-SQLColumnSampleDataT
 #### Identify sensitive data featuring transparent encryption
 ```
 Get-SQLInstanceDomain | Get-SQLConnectionTest | Get-SQLDatabaseThreaded -Verbose -Threads 10 -NoDefaults | Where-Object {$_.is_encrypted -eq 'TRUE'}| Get-SQLColumnSampleDataThreaded -Verbose -Threads 20 -Keyword "credit,creditcard,ssn,bsn,password,wachtwoord" -SampleSize 2 -ValidateCC -NoDefaults
+```
+
+### Query database 
+```
+Get-SQLQuery -Instance "<INSTANCE>" -Query "select @@servername"
+Get-SQLQuery -Instance "<INSTANCE>" -Query "<QUERY>"
 ```
 
 #### SQL Queries
