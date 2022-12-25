@@ -42,6 +42,7 @@
 * [SQL Server](#SQL-Server)
   * [Locating and accessing SQL Servers](#Locating-and-accessing-SQL-Servers)
   * [Initial foothold](#Initial-foothold)
+  * [Connect](#Connect)
   * [Privilege Escalation to sysadmin](#Privilege-Escalation-to-sysadmin)
    	* [SQL Server enumerate login](#SQL-Server-enumerate-login)
    	* [Impersonation attack](#Impersonation-attack)
@@ -1362,18 +1363,31 @@ Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose
 ```
  
 #### Check accessibility with other user account
-- Might need runas?
+- Requires to be used within runas
 ```
-Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose -Username <USERNAME> -Password <PASSWORD>
+Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose
 ```
 
+### Connect
+#### PowerUpSQL
+```
+Get-SQLInstancedomain | <PREFERED CMDLET>
+```
+
+#### Mssqlclient.py
+```
+mssqlclient.py -windows-auth <DOMAIN>/<USER>@<IP> -debug
+```
+
+#### Heidisql
+- https://www.heidisql.com/
+
+### Initial Recon
 #### Gather information
-- If connection succes! Connect to the DB with heidiSQL and look in it!
 ```
 Get-SQLInstanceDomain | Get-SQLServerInfo -Verbose
 ```
- 
-### Initial Recon
+
 #### Check if sysadmin query
 ```
 SELECT IS_SRVROLEMEMBER('sysadmin')
