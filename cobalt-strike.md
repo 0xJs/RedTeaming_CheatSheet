@@ -638,55 +638,132 @@ kill <PID>
 ### Malleable C2 profile
 - Example: https://github.com/Cobalt-Strike/Malleable-C2-Profiles
 
-### Artifact-kit
+#### Check profile for errors
 ```
-vim /opt/cobaltstrike/artifact-kit/src-common/bypass-pipe.c
-```
-
-### Changed this part from --> to
-```
-"%c%c%c%c%c%c%c%c%cMSSE-%d-server"
-"%c%c%c%c%c%c%c%c%cService-%d-server"
+./c2lint <PROFILE>
 ```
 
-#### Then run build.sh
-```
-./build.sh
-```
-
-#### Download files to W10
-```
-pscp -r root@kali:/opt/cobaltstrike/artifact-kit/dist-pipe .
-```
-    
-- Make sure C:\tools\cobaltstrike\Artifactkit\dist-pip\artifact.cna is loaded
-
-### Resource-kit
-```
-notepad C:\tools\cobaltstrike\ResourceKit\template.x64.ps1
-```
-    
-#### Changed all variables in the file from this part --> to
-```
-for ($x = 0; $x -lt $var_code.Count; $x++) {
-  $var_code[$x] = $var_code[$x] -bxor 35
-}
-
-
-for ($i = 0; $i -lt $var_service.Count; $i++) {
-	$var_service[$i] = $var_service[$i] -bxor 35
-}
-```
-
-- Find & Replace for $x -> $i and $var_code -> $var_service.
-- Make sure C:\tools\cobaltstrike\Resourcekit\resources.cna is loaded
-
-### Amsi
+### Amsi bypass
 #### Add the following to the .profile
+- `amsi_disable` only applies to `powerpick`, `execute-assembly` and `psinject`.  It does not apply to the powershell command
 ```
 post-ex {
     set amsi_disable "true";
 }
+```
+
+### Spawnto
+- `rundll32` being the default `spawnto` for Cobalt Strike is a common point of detectiom.
+- The process used for post-ex commands and psexec can be changed on the fly in the CS GUI. 
+
+#### Change spawnto
+```
+spawnto x64 %windir%\sysnative\dllhost.exe
+spawnto x86 %windir%\syswow64\dllhost.exe
+```
+
+#### Revert spawnto
+```
+spawnto
+```
+
+#### Change spawnto psexec
+```
+ak-settings spawnto_x64 C:\Windows\System32\dllhost.exe
+ak-settings spawnto_x86 C:\Windows\SysWOW64\dllhost.exe
+```
+
+#### Change service name for psexec
+```
+ak-settings service <NAME>
+```
+
+#### C2 profile
+```
+post-ex {
+        set amsi_disable "true";
+
+        set spawnto_x64 "%windir%\\sysnative\\dllhost.exe";
+        set spawnto_x86 "%windir%\\syswow64\\dllhost.exe";
+}
+```
+
+#### Restart teamserver
+- You will need to restart your team server and reacquire a beacon for changes to the profile to take effect.
+
+### Artifact-kit
+- Used to modify the binary (EXE & DLL) payloads
+- Location `cobaltstrike\arsenal-kit\kits\artifact`
+- The `src-main/main.c` is the entry points for the EXE artifacts.
+- `src-common/bypass-template.c` shows how one can implement some logic inside the start function from `main.c`
+- We can use the `bypass-pipe.c` to evade AV.
+
+### Change bypass-pipe.c
+```
+vim /opt/cobaltstrike/artifact-kit/src-common/bypass-pipe.c
+```
+
+### Edit the following line
+- Nothing needs to be changed right now, but might want to change the pipe name part. Example:
+```
+"%c%c%c%c%c%c%c%c%cnetsvc\\%d"
+"%c%c%c%c%c%c%c%c%cprintsvc-%d-server"
+```
+
+#### Built artifact kit
+- Files should go to the client.
+```
+./build.sh <techniques> <allocator> <stage> <rdll size> <include resource file> <output directory>
+./build.sh pipe VirtualAlloc 277492 5 false false /mnt/c/Tools/cobaltstrike/artifacts
+```
+
+#### Load artifact.cna
+- Click on Cobalt Strike -> Script Manager -> Load `artifact.cna` from the output directory
+- Reload cobaltstrike UI
+- Use Payloads -> Windows Stageless Generate All Payloads to replace all 
+
+#### Run threatcheck on payload
+```
+.\ThreatCheck.exe -f <PAYLOAD>
+```
+
+#### Load artifact.cna
+- Click on Cobalt Strike -> Script Manager -> Load `artifact.cna` 
+- Reload cobaltstrike UI
+- Use Payloads -> Windows Stageless Generate All Payloads to replace all 
+
+### Resource-kit
+- Used to modify script-based payloads including the PowerShell, Python, HTA and VBA templates.
+- Location: `cobaltstrike\arsenal-kit\kits\resource`
+- Using `template.x64.ps1` is enough.
+- Files should go to the client.
+
+#### Change template.x64.ps1
+- From --> To
+- Change ALL variables in the file
+```
+for ($zz = 0; $zz -lt $v_code.Count; $zz++) {
+	$v_code[$zz] = $v_code[$zz] -bxor 35
+}
+
+for ($i = 0; $i -lt $v_service.Count; $i++) {
+	$var_service[$i] = $v_service[$i] -bxor 35
+}
+```
+
+#### Rebuilt resource kit
+```
+./build.sh /mnt/c/Tools/cobaltstrike/resources
+```
+
+#### Load artifact.cna
+- Click on Cobalt Strike -> Script Manager -> Load `resources.cna` 
+- Reload cobaltstrike UI
+- Use Payloads -> Windows Stageless Generate All Payloads to replace all
+
+#### Run threatcheck on payload
+```
+.\ThreatCheck.exe -f <PAYLOAD> -e AMSI
 ```
 
 ## Extending Cobalt Strike
