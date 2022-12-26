@@ -51,6 +51,16 @@ Get-MpPreference | select Exclusion*
 Set-MpPreference -ExclusionPath "<path>"
 ```
 
+#### Check AV Detections
+```
+Get-MpThreatDetection | Sort-Object -Property InitialDetectionTime 
+```
+
+#### Get last AV Detection
+```
+Get-MpThreatDetection | Sort-Object -Property InitialDetectionTime | Select-Object -First 1
+```
+
 #### Disable AV monitoring
 ```
 Set-MpPreference -DisableRealtimeMonitoring $true
