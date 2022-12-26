@@ -27,6 +27,8 @@ gpresult /H gpos.html
 ```
 
 ## Windows Defender
+- Detects On-disk, In-Memory (AMSI) and Behavioural
+
 #### Check if windows defender is running
 ```
 Get-MpComputerStatus
