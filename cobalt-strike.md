@@ -25,7 +25,7 @@
 	* [Agressor scripts](#Agressor-scripts)
 	* [Beacon Object Files](#Beacon-Object-Files)
 
-# General
+## General
 #### Get current user
 ```
 getuid
@@ -70,7 +70,7 @@ keylogger
 portscan <CIDR> 139,445,3389,5985 none 1024
 ```
 
-## Webserver
+### Webserver
 #### Upload file
 - Go to Site Management -> Host File and select your document.
 - Set the Location URI, Local Host and click Launch.
@@ -78,7 +78,7 @@ portscan <CIDR> 139,445,3389,5985 none 1024
 #### Check web logs
 - Go to View -> Web log
 
-## Teamserver
+### Teamserver
 #### Start teamserver
 ```
 cd /opt/cobaltstrike
@@ -166,7 +166,7 @@ sudo vim /etc/systemd/system/csteamserver.service
 ExecStartPost=/bin/sh -c '/usr/bin/sleep 30; /home/attacker/cobaltstrike/agscript 127.0.0.1 50050 headless Passw0rd! host_payloads.cna &'
 ```
 
-## Listeners
+### Listeners
 ### Create a listener
 - Two type of listeners: `egress` (HTTP(S) and DNS) and `peer-to-peer` (SMB or TCP).
   - `egress` listens on the teamserver IP.
@@ -197,7 +197,7 @@ link <IP> <PIPE>
 - DNS: Since 0.0.0.0 is the default response (and also rather nonsensical), Cobalt Strike team servers can be fingerprinted in this way.  This can be changed in the Malleable C2 profile.
 - SMB: The default pipe name(`msagent_XX`) is quite well signatured. A good strategy is to emulate names known to be used by common applications or Windows itself.  Use `ls \\.\pipe\` to list all currently listening pipes for inspiration.  
 
-## Payloads
+### Payloads
 #### Create payloads
 - Click Payloads --> Select an option or all
 
@@ -219,9 +219,6 @@ link <COMPUTERNAME>
 #### OPSEC payloads
 - Staged payloads are good if your delivery method limits the amount of data you can send. However, they tend to have more indicators compared to stageless. Given the choice, go stageless.
 - The use of 64-bit payloads on 64-bit Operating Systems is preferable to using 32-bit payloads on 64-bit Operating Systems.
-
-## UAC Bypass
-- https://github.com/cobalt-strike/ElevateKit
 
 ## Command Execution
 #### Execute cmd command
@@ -250,6 +247,8 @@ execute-assembly <PATH TO EXE> -group=system
 powershell-import <FILE>
 ```
 
+## UAC Bypass
+- https://github.com/cobalt-strike/ElevateKit
 #### UAC bypass
 - Typing `elevate` and then tab lets you cycle through the methods.
 ```
