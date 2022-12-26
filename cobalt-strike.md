@@ -637,6 +637,7 @@ kill <PID>
 ## Evasion
 ### Malleable C2 profile
 - Example: https://github.com/Cobalt-Strike/Malleable-C2-Profiles
+- Changes to C2 profile requires teamserver restart and a new beacon!
 
 #### Check profile for errors
 ```
@@ -687,9 +688,6 @@ post-ex {
         set spawnto_x86 "%windir%\\syswow64\\dllhost.exe";
 }
 ```
-
-#### Restart teamserver
-- You will need to restart your team server and reacquire a beacon for changes to the profile to take effect.
 
 ### Artifact-kit
 - Used to modify the binary (EXE & DLL) payloads
