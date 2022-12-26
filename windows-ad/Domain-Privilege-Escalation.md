@@ -66,7 +66,7 @@
     * [Trust key](#Trust-key)
     * [Krbtgt hash](#Krbtgt-hash)
 * [Cross Forest attacks](#Crossforest-attacks)
-  * [One-way Outbound](#One---way-Outbound)
+  * [One-way Outbound](#One-way-Outbound)
   * [Kerberoast](#Kerberoast2)
   * [Printer Bug](#Printer-bug2) 
   * [Trust key](#Trust-key2) 
