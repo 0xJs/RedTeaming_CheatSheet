@@ -816,3 +816,8 @@ beacon_remote_exploit_register("dcom", "x64", "Use DCOM to run a Beacon payload"
 - Beacon Object Files (BOFs) are a post-ex capability that allows for code execution inside the Beacon host process.
 - BOFs are essentially tiny COFF objects (written in C or C++) on which Beacon acts as a linker and loader. 
 - Download https://hstechdocs.helpsystems.com/manuals/cobaltstrike/current/userguide/content/beacon.h
+- Usefull BOFs:
+  - https://github.com/trustedsec/CS-Situational-Awareness-BOF
+  - https://github.com/CCob/BOF.NET
+  - https://github.com/helpsystems/nanodump
+  - https://github.com/outflanknl/InlineWhispers
