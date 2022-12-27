@@ -154,12 +154,18 @@ net user <USERNAME> <PASSWORD> /add /Y  && net localgroup administrators <USERNA
 sudo timedatectl set-ntp 0
 ```
 
-#### Sync time
+#### Get time
 ```
 sudo net time set -S <DC IP>
-
-sudo ntpdate <DC IP>
 ```
+
+#### Set time and date
+```
+sudo timedatectl set-time `<YEAR>-<MONTH>-<DATE> xx:xx:xx`
+sudo timedatectl set-time `2022-12-28 20:59:33`
+```
+
+#### Execute commands
 
 #### Enable time sync again
 ```
