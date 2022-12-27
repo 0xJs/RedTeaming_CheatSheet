@@ -174,7 +174,10 @@ ssh <IP> -oKexAlgorithms=+<alg from error> -c <cipher from error>
 - Check Firefox debugger for outdated javascript libraries
 - Look for /robots.txt and /sitemap.xml
 
-#### Find subdomains from html pages
+#### HTTPS
+- If the webserver is running https, check the certificate for a url/hostname and add it to `/etc/hosts`
+
+#### Find subdomains
 ```
 curl <WEBPAGE>
 grep -o '[^/]*\.<DOMAIN>\.com' index.html | sort -u > subdomains.txt
