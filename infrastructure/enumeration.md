@@ -95,7 +95,25 @@ nmap <TARGET> -p- --script vuln -vv -oA vulnscan_<TARGET>
 nc -nv <IP> 25
 VRFY root
 VRFY idontexist
-Check output
+```
+
+```
+nmap -p25 --script smtp-enum-users <IP>
+```
+
+#### Enum smtp commands
+```
+nmap -p25 --script smtp-commands <IP>
+```
+
+#### nmap all smtp script
+```
+nmap -p25 --script *smtp* <IP>
+```
+
+#### Sendmail
+```
+sendEmail -t <VICTIM MAIL> -f <SENDER MAIL> -s <MAILSERVER IP> -u <TITLE OF MAIL> -a <ATTACHED FILE PATH>
 ```
 
 ### SMB 
