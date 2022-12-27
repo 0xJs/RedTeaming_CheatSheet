@@ -146,4 +146,22 @@ IEX ([System.IO.StreamReader]($r.GetResponseStream())).ReadToEnd()
 net user <USERNAME> <PASSWORD> /add /Y  && net localgroup administrators <USERNAME> /add && net localgroup "Remote Desktop Users" <USERNAME> /add && reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f && netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
 ```
 
+## Troubleshooting
+### KRB_AP_ERR_SKEW(Clock skew to great)
+#### Disable time sync
+- https://askubuntu.com/questions/683067/how-to-stop-automatic-time-update-via-terminal
+```
+sudo timedatectl set-ntp 0
+```
 
+#### Sync time
+```
+sudo net time set -S <DC IP>
+
+sudo ntpdate <DC IP>
+```
+
+#### Enable time sync again
+```
+sudo timedatectl set-ntp 1
+```
