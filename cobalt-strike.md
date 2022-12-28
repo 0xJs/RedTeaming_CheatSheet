@@ -757,11 +757,6 @@ vim /opt/cobaltstrike/artifact-kit/src-common/bypass-pipe.c
 .\ThreatCheck.exe -f <PAYLOAD>
 ```
 
-#### Load artifact.cna
-- Click on Cobalt Strike -> Script Manager -> Load `artifact.cna` 
-- Reload cobaltstrike UI
-- Use Payloads -> Windows Stageless Generate All Payloads to replace all 
-
 ### Resource-kit
 - Used to modify script-based payloads including the PowerShell, Python, HTA and VBA templates.
 - Location: `cobaltstrike\arsenal-kit\kits\resource`
@@ -786,7 +781,7 @@ for ($i = 0; $i -lt $v_service.Count; $i++) {
 ./build.sh /mnt/c/Tools/cobaltstrike/resources
 ```
 
-#### Load artifact.cna
+#### Load resources.cna
 - Click on Cobalt Strike -> Script Manager -> Load `resources.cna` 
 - Reload cobaltstrike UI
 - Use Payloads -> Windows Stageless Generate All Payloads to replace all
