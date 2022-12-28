@@ -17,7 +17,7 @@ pipx install package
 ## Virtual env
 #### Install
 ```
-python3 -m pip install --user virtualenv
+sudo apt install python3.10-venv
 ```
 
 #### Create virtual env
