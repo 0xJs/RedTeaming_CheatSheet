@@ -15,6 +15,11 @@ pipx install package
 ```
 
 ## Virtual env
+#### Install
+```
+python3 -m pip install --user virtualenv
+```
+
 #### Create virtual env
 ```
 mkdir my_awesome_project
