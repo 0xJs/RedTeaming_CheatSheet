@@ -1,5 +1,7 @@
 # Windows-Domain-Cheatsheet
 * [General](#General)
+  * [Relaying & Poisoning](relaying.md)
+  * [Linux AD](linux_ad.md)
 * [Initial Access](Initial-Access.md)
 * [Host Reconnaissance](Host-Reconnaissance.md)
 * [Host Persistence](Host-Persistence.md)
