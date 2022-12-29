@@ -2,7 +2,7 @@
 * [Poisoning](#Poisoning)
   * [Responder](#Responder)
   * [Inveigh](#Inveigh)
-  * [Active Directory-Integrated DNS (ADIDNS)](Active-Directory-Integrated-DNS-(ADIDNS))
+  * [Active Directory-Integrated DNS (ADIDNS)](#Active-Directory-Integrated-DNS-(ADIDNS))
   * [Mitm6](#Mitm6)
   * [Files](#Files)
   * [Force-authentication](#Force-authentication)
