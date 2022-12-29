@@ -2,7 +2,7 @@
 * [Poisoning](#Poisoning)
   * [Responder](#Responder)
   * [Inveigh](#Inveigh)
-  * [Active Directory-Integrated DNS (ADIDNS)](#Active-Directory-Integrated-DNS-(ADIDNS))
+  * [Active Directory-Integrated DNS (ADIDNS)](#Active-Directory-Integrated-DNS)
   * [Mitm6](#Mitm6)
   * [Files](#Files)
   * [Force-authentication](#Force-authentication)
@@ -78,7 +78,8 @@ Clear-Inveigh
 Get-Inveigh
 ```
 
-### Active Directory-Integrated DNS (ADIDNS)
+### Active Directory-Integrated DNS
+- ADIDNS
 - Windows uses DNS, LLMNR and then NBNS in the respective order
 - If a matching DNS record name does not already exist in a zone, an authenticated user can create the record.
 - If you detectthe same LLMNR/NBNS request from multiple systems, a matching record can be added to ADIDNS. This can be effective when systems are sending out LLMNR/NBNS requests for old hosts that are no longer in DNS. If multiple systems within a subnet are trying to resolve specific names, outside systems may also be trying. In that scenario, injecting into ADIDNS will help extend the attack past the subnet boundary.
