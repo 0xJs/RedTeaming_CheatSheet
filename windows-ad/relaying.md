@@ -21,6 +21,7 @@
 ## Poisoning
 - Poisoning is possible with Responder or Inveigh or manually, which will try to poison Link Local Multicast Name Resolution (LLMNR) and NetBIOS Name Resolution (NBT-NS).
 
+## LLMNR & NBT-NS
 ### Responder
 #### Analyse mode
 - It is possible to check if LLMNR and NBT-NS is used without poisoning any request.
