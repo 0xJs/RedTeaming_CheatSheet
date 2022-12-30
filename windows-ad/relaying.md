@@ -1,7 +1,8 @@
 # Relaying & Poisoning
 * [Poisoning](#Poisoning)
-  * [Responder](#Responder)
-  * [Inveigh](#Inveigh)
+  * [LLMNR & NBT-NS](#LLMNR-&-NBT-NS)
+    * [Responder](#Responder)
+    * [Inveigh](#Inveigh)
   * [Active Directory-Integrated DNS (ADIDNS)](#Active-Directory-Integrated-DNS)
   * [Mitm6](#Mitm6)
   * [Files](#Files)
