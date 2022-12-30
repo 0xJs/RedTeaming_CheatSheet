@@ -1,4 +1,5 @@
 # Domain Privilege escalation
+* [Relaying & Poisoning](../relaying.md)
 * [Password not required](#Password-not-required)
 * [Password in description](#Password-in-description)
 * [Password in shares](#Shares)
