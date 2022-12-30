@@ -4,7 +4,7 @@
     * [Responder](#Responder)
     * [Inveigh](#Inveigh)
   * [Active Directory-Integrated DNS (ADIDNS)](#Active-Directory-Integrated-DNS)
-  * [Mitm6](#Mitm6)
+  * [IPv6](#Mitm6)
   * [Files](#Files)
 * [Coercing](#Coercing)
 * [Relaying](#Relaying)
