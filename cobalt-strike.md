@@ -291,6 +291,7 @@ inject <PID> <ARCH> <BEACON>
 - Must be run from a folder the user has access to.
 - This command does not require local admin privileges and will also usually fail if run from a SYSTEM Beacon.
 ```
+make_token <DOMAIN>\<USER> <PASSWORD>
 spawnas <DOMAIN>\<USER> <PASSWORD> <BEACON>
 ```
 
