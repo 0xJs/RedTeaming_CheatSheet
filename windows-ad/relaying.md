@@ -9,7 +9,7 @@
 * [Coercing](#Coercing)
 * [Relaying](#Relaying)
   * [SMB relaying](#SMB-relaying)
-  * [LDAP(S) Relaying](#LDAP(S)-Relaying)
+  * [LDAP(S) Relaying](#LDAP-Relaying)
 
 - Credits to an amazing post: https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
@@ -280,7 +280,7 @@ proxychains python3 secretsdump.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGE
 proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
-## LDAP(S) Relaying
+## LDAP Relaying
 - Requires LDAP signing or LDAPS Binding to be turned off (default).
 
 #### Check LDAP Signing or Binding
