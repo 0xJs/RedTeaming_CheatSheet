@@ -292,7 +292,7 @@ cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-checker
 ```
 
 ### Resource Based Constraind Delegation attacks
-- [Webclient Attack](/Domain-Privilege-Escalation.md#Webclient-Attack)
-- [Change-Lockscreen](/Domain-Privilege-Escalation.md#Change-Lockscreen)
+- [Webclient Attack](Domain-Privilege-Escalation.md#Webclient-Attack)
+- [Change-Lockscreen](Domain-Privilege-Escalation.md#Change-Lockscreen)
 
 
