@@ -910,7 +910,7 @@ crackmapexec ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
 ```
 python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
 
-cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-signing
+cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-checker
 ```
 
 #### Scan for target with webclient active
