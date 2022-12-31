@@ -9,12 +9,7 @@
 * [Coercing](#Coercing)
 * [Relaying](#Relaying)
   * [SMB relaying](#SMB-relaying)
-  * [LDAP Relaying](#LDAP-Relaying)
-    * [LDAP Relay force HTTP requests](#LDAP-Relay-force-HTTP-requests)
-    * [LDAP Relay with Mitm6](#LDAP-Relay-with-Mitm6)
-  * [LDAPS Relaying](#LDAPS-Relaying)
-    * [Resource Based Constrained Delegation Webclient Attack](#Resource-Based-Constrained-Delegation-Webclient-Attack)
-* [Crack with Hashcat](#Crack-with-Hashcat)
+  * [LDAP(S) Relaying](#LDAP(S)-Relaying)
 
 - Credits to an amazing post: https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
 
@@ -285,7 +280,7 @@ proxychains python3 secretsdump.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGE
 proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
-## LDAP Relaying
+## LDAP(S) Relaying
 - Requires LDAP signing or LDAPS Binding to be turned off (default).
 
 #### Check LDAP Signing or Binding
@@ -297,6 +292,7 @@ cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-checker
 ```
 
 ### Resource Based Constraind Delegation attacks
-[Resource Based Constrained Delegation attacks](/Domain-Privilege-Escalation.md#Resource-Based-Constrained-Delegation)
+- [Webclient Attack](/Domain-Privilege-Escalation.md#Webclient-Attack)
+- [Change-Lockscreen](/Domain-Privilege-Escalation.md#Change-Lockscreen)
 
 
