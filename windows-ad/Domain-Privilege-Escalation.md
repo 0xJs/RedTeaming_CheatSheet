@@ -1644,7 +1644,7 @@ SELECT is_srvrolemember('sysadmin')
 - Found and abused with PowerUpSQL
 ```
 invoke-SQLAudit
-invoke-SQLEscalatedPriv
+invoke-SQLEscalatePriv -Verbose -Debug
 ```
 
 #### DB_Owner exploit script
