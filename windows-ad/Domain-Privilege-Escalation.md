@@ -1609,6 +1609,7 @@ Invoke-SQLAuditPrivTrustworthy -Instance <SQL INSTANCE> -Verbose -Debug
  
 #### Check the db_owner role
 ```
+USE <DB>;
 select rp.name as database_role, mp.name as database_user
 from sys.database_role_members drm
 join sys.database_principals rp on (drm.role_principal_id = rp.principal_id)
