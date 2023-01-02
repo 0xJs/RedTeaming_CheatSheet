@@ -1543,7 +1543,6 @@ Get-SQLInstanceDomain | Invoke-SQLAuditWeakLoginPw -Verbose
  
 ### Impersonation attack
 #### Check if impersonation is possible PowerUpSQL
-- Might be able to use the ```-exploit``` flag to exploit it
 ```
 Invoke-SQLAuditPrivImpersonateLogin -Instance <SQL INSTANCE> -Verbose -Debug
 ```
@@ -1602,6 +1601,11 @@ Get-SQLServerLinkCrawl -Instance <INSTANCE> -Verbose -Query 'SELECT distinct b.n
  - db_owner role
  - owner of the database high privileged user
  - Database set to thrustworthy (To enable xp_cmdshell)
+
+#### Check the db_owner role PowerUpSQL
+```
+Invoke-SQLAuditPrivTrustworthy -Instance <SQL INSTANCE> -Verbose -Debug
+```
  
 #### Check the db_owner role
 ```
