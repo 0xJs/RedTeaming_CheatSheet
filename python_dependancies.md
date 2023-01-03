@@ -30,5 +30,9 @@ python3 -m venv .my_awesome_project_venv
 #### Use virtual env
 ```
 source .my_awesome_project_venv/bin/activate
-(.my_awesome_project_venv) # pip install requests
+```
+
+#### Install python stuff
+```
+python3 -m pip install -r .\requirements.txt
 ```
