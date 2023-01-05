@@ -55,7 +55,6 @@
   * [Data exfiltration](#Data-exfiltration)
   * [SQL Queries](#SQL-Queries)
 * [WSUS](#Attacking-WSUS)
-* [S4U2self](#S4U2self)
 * [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
   * [Misconfigured Certificate Templates](#Misconfigured-Certificate-Templates)
   * [Relaying to ADCS HTTP Endpoints](#Relaying-to-ADCS-HTTP-Endpoints)
@@ -741,8 +740,9 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 
 ### Printer bug
 - A feature of MS-RPRN which allows any domain user (Authenticated User) can force any machine (running the Spooler service) to connect to second a machine of the domain user's choice.
-- A way to force a TGT of DC on the target machine
+- A way to force a TGT of computeraccount on the target machine (For example DC). Can be chained together with (S4Uself)[Lateral-Movement.md#S4U2self]
 - https://github.com/leechristensen/SpoolSample
+
 #### Check if spool server is running
 ```
 #Edit IP at the bottom
