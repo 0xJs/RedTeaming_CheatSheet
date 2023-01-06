@@ -10,6 +10,9 @@
     * [AS-REP Roasting](#AS-REP-Roasting)
     * [Exchange & OWA](#Exchange-&-OWA2)
   * [Relaying Attacks](#Relaying-Attacks)
+* [Anonymous Access](#Anonymous-Access)
+  * [SMB](#SMB)
+  * [LDAP](#LDAP)
 
 
 # From the outside
@@ -158,4 +161,52 @@ Invoke-SelfSearch -Mailbox <EMAIL> -ExchHostname <EXCHANGE SERVER NAME> -OutputC
 ```
 
 ## Relaying attacks
-[Relayin attacks](relaying.md)
+[Relaying page](relaying.md)
+
+## Anonymous LDAP
+### SMB
+#### Check for anonymous access
+```
+cme smb <IP> -u "" -p "" -d <DOMAIN>
+cme smb <IP> -u "" -p "" -d .
+
+cme smb <IP> -u "Guest" -p "" -d <DOMAIN>
+```
+
+#### List shares
+```
+cme smb <IP> -u "" -p "" -d <DOMAIN> --shares
+cme smb <IP> -u "" -p "" -d . --shares
+
+cme smb <IP> -u "Guest" -p "" -d <DOMAIN> --shares
+```
+
+#### Connect to share
+```
+smbclientsmbclient //<IP>/<SHARE> -U ""%""
+```
+
+### LDAP
+#### Check for anonymous ldap access
+- This is a legacy configuration, and as of Windows Server 2003
+```
+cme ldap <IP> -u "" -p "" -d <DOMAIN>
+
+cme ldap <IP> -u "Guest" -p "" -d <DOMAIN>
+```
+
+#### Run enum4linux
+```
+enum4linux <IP>
+```
+
+#### Windapsearch
+- https://github.com/ropnop/windapsearch
+```
+# Get computers
+python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --computers
+python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --groups
+python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --da
+python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --da
+python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --privileged-users
+```
