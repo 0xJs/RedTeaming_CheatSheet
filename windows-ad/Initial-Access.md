@@ -10,9 +10,9 @@
     * [AS-REP Roasting](#AS-REP-Roasting)
     * [Exchange & OWA](#Exchange-&-OWA2)
   * [Relaying Attacks](#Relaying-Attacks)
-* [Anonymous Access](#Anonymous-Access)
-  * [SMB](#SMB)
-  * [LDAP](#LDAP)
+  * [Anonymous Access](#Anonymous-Access)
+    * [SMB](#SMB)
+    * [LDAP](#LDAP)
 
 
 # From the outside
