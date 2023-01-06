@@ -283,6 +283,14 @@ Set-Item WSMan:\localhost\Client\TrustedHosts -Value '<MACHINE OR IP>' -Concaten
 Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*'
 ```
 
+#### Connect from kali
+```
+pwsh
+$pass = ConvertTo-SecureString '<PASS>' -AsPlainText -force
+$cred = New-Object System.Management.Automation.PSCredential('<FQDN DOMAIN>\<USER>',$pass)
+Enter-PSSession -Computer <IP> -credential $cred -Authentication Negotiate
+```
+
 ### PSexec
 ```
 psexec.exe -u <DOMAIN>\<USER> -p <PASSWORD> \\<TARGET> cmd.exe
