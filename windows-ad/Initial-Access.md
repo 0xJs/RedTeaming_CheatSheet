@@ -203,10 +203,12 @@ enum4linux <IP>
 #### Windapsearch
 - https://github.com/ropnop/windapsearch
 ```
-# Get computers
-python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --computers
-python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --groups
-python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --da
-python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --da
-python3 windapsearch.py --dc-ip <IP> -u john@domain.local -p password --privileged-users
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --users
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --computers
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --groups
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --da
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --privileged-users
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --user-spns
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --unconstrained-users
+python3 windapsearch.py --dc-ip <IP> -u "" -p "" --unconstrained-computers
 ```
