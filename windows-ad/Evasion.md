@@ -275,7 +275,7 @@ winrs -remote:server1 -u:<COMPUTERNAME>\<USER> -p:<PASS> hostname
 - Defines allowed cmdledt and commands that are allowed by defining role capabilities.
 
 #### Connect with JEA endpoint
-- Use DOMAIN\USER format
+- Use `DOMAIN\USER` format
 ```
 $creds = get-credential
 $sess = New-PSSession -ComputerName <FQDN> -ConfigurationName <JEA ENDPOINT CONF NAME> -Credential $creds
@@ -304,7 +304,7 @@ Start-Process cmd.exe calc.exe
 ```
 
 #### Abuse - Creating functions
-- Check if user can create their own functions
+- If JEA enpoint is running in Constrained Language Mode instead of NoLanguage it is possible to create your own functions!
 - Creates a function with the name `gl` and executes it.
 - Shortcut would be `${ <COMMAND>}`
 ```
