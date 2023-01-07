@@ -30,7 +30,7 @@
 * [Delegation](#Delegation) 
   * [Unconstrained Delegation](#Unconstrained-delegation)
     * [Unconstrained delegation computer](#Unconstrained-delegation-computer)
-    * [Printer Bug](#Printer-bug)
+      * [Printer Bug](#Printer-bug)
     * [Unconstrained delegation User](#Unconstrained-delegation-User)
   * [Constrained Delegation](#Constrained-delegation) 
     * [Constrained delegation User](#Constrained-delegation-User)
