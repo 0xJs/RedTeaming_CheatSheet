@@ -551,7 +551,7 @@ $ACE = New-ADObjectAccessControlEntry -Verbose -PrincipalIdentity '<USER>' -Righ
 
 #### Apply this ACE to our target OU:
 ```
-$OU = Get-DomainOU -Raw <OU NAME>
+$OU = Get-DomainOU -Raw <GUID>
 $DsEntry = $OU.GetDirectoryEntry()
 $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
 $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
