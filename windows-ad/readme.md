@@ -161,7 +161,8 @@ sudo timedatectl set-ntp 0
 sudo net time set -S <DC IP>
 ```
 
-#### Set time and date
+#### Set time and date manually
+- If above fails and only prints the time
 ```
 sudo timedatectl set-time `<YEAR>-<MONTH>-<DATE> xx:xx:xx`
 sudo timedatectl set-time `2022-12-28 20:59:33`
