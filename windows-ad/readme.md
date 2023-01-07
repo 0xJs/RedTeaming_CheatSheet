@@ -170,7 +170,7 @@ sudo timedatectl set-time `2022-12-28 20:59:33`
 
 #### Execute commands
 
-#### Enable time sync again
+#### Enable time sync again - Restore time to original
 ```
 sudo timedatectl set-ntp 1
 ```
