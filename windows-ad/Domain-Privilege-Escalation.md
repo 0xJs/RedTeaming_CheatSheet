@@ -53,7 +53,6 @@
 * [SQL Server](#SQL-Server)
   * [Locating and accessing SQL Servers](#Locating-and-accessing-SQL-Servers)
   * [Initial foothold](#Initial-foothold)
-  * [Connect](#Connect)
   * [Privilege Escalation to sysadmin](#Privilege-Escalation-to-sysadmin)
    	* [SQL Server enumerate login](#SQL-Server-enumerate-login)
    	* [Impersonation attack](#Impersonation-attack)
@@ -1695,7 +1694,7 @@ Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose
 Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded –Verbose
 ```
 
-### Connect
+### Connecting
 #### PowerUpSQL
 ```
 Get-SQLInstancedomain | <PREFERED CMDLET>
