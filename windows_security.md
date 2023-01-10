@@ -45,6 +45,7 @@
 
 ## Privileges
 - The right of an account to perform some system-level operation. [Microsoft's Documentation](https://learn.microsoft.com/en-us/windows/win32/secauthz/privilege-constants)
+- User rights assignments list [Link](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment)
 - Stored in the access token
 - The command `whoami /priv` lists the privileges of the current user/process.
 - Administrators can use Active Directory or the Local Security Policy Editor to grant or remove privileges. (Local Policies --> User Rights Assignment)
