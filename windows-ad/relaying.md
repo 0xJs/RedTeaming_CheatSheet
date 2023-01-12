@@ -256,6 +256,7 @@ crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
 #### Relay requests SMB and dump SAM
 - We have to modify the ```/etc/responder/Responder.conf``` file and disable the HTTP and SMB servers (as NTLM relay will be our SMB and HTTP server).
 - the ```-d``` flag has now been changed from “Enable answers for NETBIOS domain suffix queries. Answering to domain suffixes will likely break stuff on the network. Default: False” to “Enable answers for DHCP broadcast requests. This option will inject a WPAD server in the DHCP response. Default: False”. It should also be noted that ```-d``` as it is now CAN have an impact on your client’s network, as you are effectively poisoning the WPAD file over DHCP, which does not always revert back immediately once you stop the attack. It will likely require a reboot.
+- The file `smb_hosts_nosigning.txt` should only contain IP's, FQDN doesn't work, see (issue)[https://github.com/fortra/impacket/issues/642]
 ```
 ntlmrelayx.py -tf smb_hosts_nosigning.txt -smb2support
 ```
