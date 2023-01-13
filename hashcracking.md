@@ -7,6 +7,15 @@
 - Wordlists
   - https://github.com/danielmiessler/SecLists/tree/master/Passwords  
 
+## Extracting hashes from files
+- https://github.com/openwall/john
+- Extracing files
+  - `androidbackup2john.py`
+  - `ethereum2john.py`
+  - `keepass2john.py`
+  - `office2john.py`
+  - `pdf2john.pl`
+  - `ssh2john.py`
 
 # Hashcat
 ## General
@@ -15,6 +24,7 @@
   -  `--benchmark` run a benchmark
   -  `-O` Enable optimized kernels (limits password length) - Makes hashcat a bit faster for me
   -  `-w3` Enable a specific workload profile, see pool below - Makes hashcat a bit faster for me
+  - `--increment` Enable incremental attack when using masks. If supplied `?a?a?a?a?a?a?a?a` it will bruteforce 1 till 8 characters.
 
 ## Most used Hash modes
 - Hashcat supports over 300 hash modes.
@@ -45,6 +55,12 @@
   s |  !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
   a | ?l?u?d?s
   b | 0x00 - 0xff
+```
+
+#### Possible to create own charsets
+- Creates `?1` charset with UPPER and lower chars and `?2` with digits and symbols.
+```
+hashcat -a 3 -m <HASH TYPE> -1 ?u?l -2 ?d?s ?1?1?1?1?1?1?2?2
 ```
 
 ## Attack modes
@@ -79,6 +95,7 @@ hashcat -a 0 -m <HASH TYPE> <HASH FILE> <WORDLIST> -r <RULE FILE>
 ```
 
 #### Bruteforce 
+- Used when the minimum passwod length is not high and cracking of hashtype is fast or having a lot of cracking power!
 - Bruteforces 1 till 8 characters. For more characters add an extra `?a`.
 ```
 hashcat -a 3 -m <HASH TYPE> <HASH FILE> ?a?a?a?a?a?a?a?a --increment
@@ -94,29 +111,17 @@ hashcat -a 3 -m <HASH TYPE> <HASH FILE> ?u?l?l?l?l?l?l?l?d
 hashcat -a 3 -m <HASH TYPE> <HASH FILE> <MASK FILE>
 ```
 
-##### Mask attack + Word
-- Save the following wordlist as a ruleset and replace `companyname` and `Companyname` with the name of the target.
-- Will bruteforce the masks till 5 characters after or before the company name and 3 before & after.
+#### Hybrid attack
+- Mix mask with a wordlist
+- `6 Wordlist + Mask`
+- `7 Mask + Wordlist`
 ```
-companyname?a?a?a?a?a
-companyname?a?a?a?a
-companyname?a?a?a
-companyname?a?a
-Companyname?a?a?a?a?a
-Companyname?a?a?a?a
-Companyname?a?a?a
-Companyname?a?a
-?a?a?a?a?acompanyname
-?a?a?a?acompanyname
-?a?a?acompanyname
-?a?acompanyname
-?a?a?a?a?aCompanyname
-?a?a?a?aCompanyname
-?a?a?aCompanyname
-?a?aCompanyname
-?a?a?acompanyname?a?a?a
-?a?acompanyname?a?a
-?a?a?aCompanyname?a?a?a
-?a?aCompanyname?a?a
+hashcat -a 6 -m <HASH TYPE> <WORDLIST> <MASK>
+hashcat -a 7 -m <HASH TYPE> <MASK> <WORDLIST>
+
+hashcat -a 6 -m <HASH TYPE> <WORDLIST> ?a?a?a?a --increment
+hashcat -a 7 -m <HASH TYPE> ?a?a?a?a <WORDLIST> --increment
 ```
 
+## My methodology
+- WIP
