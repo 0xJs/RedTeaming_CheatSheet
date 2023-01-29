@@ -784,6 +784,9 @@ for ($i = 0; $i -lt $v_service.Count; $i++) {
 }
 ```
 
+#### Channge compress.ps1
+- https://offensivedefence.co.uk/posts/making-amsi-jump/
+
 #### Rebuilt resource kit
 ```
 ./build.sh /mnt/c/Tools/cobaltstrike/resources
