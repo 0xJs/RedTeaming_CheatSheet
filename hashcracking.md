@@ -22,9 +22,11 @@
 - Usefull hashcat flags:
   - `--potfile-path` to supply where to save the potfile of cracked hashes
   -  `--benchmark` run a benchmark
+  -  `--speed-only` Use for benchmarks to get a more acurate speed
   -  `-O` Enable optimized kernels (limits password length) - Makes hashcat a bit faster for me
   -  `-w3` Enable a specific workload profile, see pool below - Makes hashcat a bit faster for me
   - `--increment` Enable incremental attack when using masks. If supplied `?a?a?a?a?a?a?a?a` it will bruteforce 1 till 8 characters.
+
 
 ## Most used Hash modes
 - Hashcat supports over 300 hash modes.
@@ -122,6 +124,12 @@ hashcat -a 7 -m <HASH TYPE> <MASK> <WORDLIST>
 hashcat -a 6 -m <HASH TYPE> <WORDLIST> ?a?a?a?a --increment
 hashcat -a 7 -m <HASH TYPE> ?a?a?a?a <WORDLIST> --increment
 ```
+
+#### Best effore - Base loop
+- You can crack at `9.56` GH/s for a 95^8 keyspace. `95^8 / 9.56 GH/s = 693,954 secs = ~8 days`
+- If you have only 8 hours for example, which is 28,800 seconds. `9.56 GH/s * 28,800 seconds = 275,328,000,000,000` needed in 8 hours
+- `275,328,000,000,000 (1/8) = 64`
+- Then execute with hashcat with `-t 64` to use the top 64 chars (markov)
 
 ## My methodology
 - WIP
