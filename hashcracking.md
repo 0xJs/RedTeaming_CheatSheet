@@ -21,12 +21,12 @@
 ## General
 - Usefull hashcat flags:
   - `--potfile-path` to supply where to save the potfile of cracked hashes
-  -  `--benchmark` run a benchmark
-  -  `--speed-only` Use for benchmarks to get a more acurate speed
-  -  `-O` Enable optimized kernels (limits password length) - Makes hashcat a bit faster for me
-  -  `-w3` Enable a specific workload profile, see pool below - Makes hashcat a bit faster for me
+  - `--idenitfy` identify the hash
+  - `--benchmark` run a benchmark
+  - `--speed-only` Use for benchmarks to get a more acurate speed
+  - `-O` Enable optimized kernels (limits password length) - Makes hashcat a bit faster for me
+  - `-w3` Enable a specific workload profile High (1 = low, 2 = default, 3 = high, 4 = nightmare)
   - `--increment` Enable incremental attack when using masks. If supplied `?a?a?a?a?a?a?a?a` it will bruteforce 1 till 8 characters.
-
 
 ## Most used Hash modes
 - Hashcat supports over 300 hash modes.
@@ -131,5 +131,54 @@ hashcat -a 7 -m <HASH TYPE> ?a?a?a?a <WORDLIST> --increment
 - `275,328,000,000,000 (1/8) = 64`
 - Then execute with hashcat with `-t 64` to use the top 64 chars (markov)
 
-## My methodology
-- WIP
+#### Keyboard walk
+- https://github.com/hashcat/kwprocessor
+
+```
+kwp -z basechars/full.base keymaps/en-us.keymap routes/2-to-16-max-3-direction-changes.route > keymap.txt
+
+hashcat -a 0 -m <HASH TYPE> keymap.txt
+```
+
+#### Target specific wordlist generation
+- https://www.kali.org/tools/cewl/
+
+```
+cewl -d 2 -e -v -w wordlist.txt <URL TARGET>
+
+hashcat -a 0 -m <HASH TYPE> wordlist.txt
+```
+
+### Combinator attack
+#### Combinator two words
+- Passphrases, with for example Top 10k / 20k words https://github.com/first20hours/google-10000-english
+```
+hashcat -a 1 -m <HASH TYPE> 20k.txt 20k.txt
+```
+
+#### Combinator 3 or 4 words
+```
+./combinator 20k.txt 20k.txt > 20k-combined.txt
+
+hashcat -a 1 -m <HASH TYPE> 20k-combined.txt 20k-combined.txt
+```
+
+#### Add spaces
+```
+awk '{print $0" "}' 20k.txt > 20k-space.txt
+
+./combinator 20k-space 20k.txt > 20k-combined-mid-space.txt
+```
+
+#### Rules
+- `-j` apply singe rule to the left. `-k` apply single rule to the right
+```
+hashcat -a 1 -m <HASH TYPE> -a1 20k-combined-mid-space.txt -j '$ ' 20k.txt
+hashcat -a 1 -m <HASH TYPE> -a1 20k-combined-mid-space.txt -j '$ ' 20k-combined-mid-space.txt
+```
+
+```
+awk '{print $0" "}' 20k-combined-mid-space.txt > 20k-combined-mid-end-space.txt
+
+./combinator 20k-combined-mid-end-space.txt 20k-combined-mid-space.txt | hashcat -a 1 -m <HASH TYPE> -r rules/OneRuleToRuleThemAll.rule
+```
