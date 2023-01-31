@@ -160,7 +160,7 @@ hashcat -a 1 -m <HASH TYPE> <HASH FILE> 20k.txt 20k.txt
 
 #### Combinator 3 or 4 words
 ```
-./combinator 20k.txt 20k.txt > 20k-combined.txt
+/usr/lib/hashcat-utils/combinator.bin 20k.txt 20k.txt > 20k-combined.txt
 
 hashcat -a 1 -m <HASH TYPE> <HASH FILE> 20k-combined.txt 20k-combined.txt
 ```
@@ -169,11 +169,11 @@ hashcat -a 1 -m <HASH TYPE> <HASH FILE> 20k-combined.txt 20k-combined.txt
 ```
 awk '{print $0" "}' 20k.txt > 20k-space.txt
 
-./combinator 20k-space 20k.txt > 20k-combined-mid-space.txt
+/usr/lib/hashcat-utils/combinator.bin 20k-space 20k.txt > 20k-combined-mid-space.txt
 ```
 
 #### Rules
-- `-j` apply singe rule to the left. `-k` apply single rule to the right
+- `-j` apply single rule to the left. `-k` apply single rule to the right
 ```
 hashcat -a 1 -m <HASH TYPE> <HASH FILE> -a1 20k-combined-mid-space.txt -j '$ ' 20k.txt
 hashcat -a 1 -m <HASH TYPE> <HASH FILE> -a1 20k-combined-mid-space.txt -j '$ ' 20k-combined-mid-space.txt
@@ -182,7 +182,7 @@ hashcat -a 1 -m <HASH TYPE> <HASH FILE> -a1 20k-combined-mid-space.txt -j '$ ' 2
 ```
 awk '{print $0" "}' 20k-combined-mid-space.txt > 20k-combined-mid-end-space.txt
 
-./combinator 20k-combined-mid-end-space.txt 20k-combined-mid-space.txt | hashcat -a 1 -m <HASH TYPE> <HASH FILE> -r dive.rule
+/usr/lib/hashcat-utils/combinator.bin 20k-combined-mid-end-space.txt 20k-combined-mid-space.txt | hashcat -a 1 -m <HASH TYPE> <HASH FILE> -r dive.rule
 ```
 
 ### Loopback attack
