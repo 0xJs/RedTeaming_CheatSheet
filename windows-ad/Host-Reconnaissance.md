@@ -36,6 +36,12 @@ net users
 query user
 ```
 
+- https://learn.microsoft.com/en-us/sysinternals/downloads/logonsessions
+
+```
+.\logonsessions64.exe
+```
+
 ### Networking
 #### Current configuration
 ```
