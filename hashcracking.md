@@ -213,3 +213,14 @@ hashcat -m <HASH TYPE> <HASH FILE> --remve -a 1 word.list word.list -o word.list
 awk -F ":" '{print $NF}' < word.list2 | ./expander | sort -u > word.list3
 hashcat -m <HASH TYPE> <HASH FILE> --remve -a 1 word.list3 word.list3 -o word.list4
 ```
+
+### Prince attack
+- https://hashcat.net/wiki/doku.php?id=princeprocessor
+```
+./pp.bin word.list --pw-min=8 | hashcat -m <HASH TYPE> hashes.txt
+```
+
+#### Prinception
+```
+./pp.bin word.list --pw-min=8 | ./pp.bin word.list --pw-min=8 | hashcat -m <HASH TYPE> hashes.txt -g 300000
+```
