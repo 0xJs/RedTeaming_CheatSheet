@@ -3,6 +3,7 @@
 - Great resource/course: https://in.security/technical-training/password-cracking/
 - https://github.com/hashcat/hashcat
 - Rules
+  - https://github.com/hashcat/hashcat/blob/master/rules/dive.rule
   - https://github.com/stealthsploit/OneRuleToRuleThemStill
 - Wordlists
   - https://github.com/danielmiessler/SecLists/tree/master/Passwords  
@@ -190,5 +191,25 @@ awk '{print $0" "}' 20k-combined-mid-space.txt > 20k-combined-mid-end-space.txt
 ```
 awk -F ":" '{print $NF}' < hashcat.potfile > potfile.list
 
-hashcat -a 0 -m <HASH TYPE> -r dive.rule --loopback
+hashcat -a 0 -m <HASH TYPE> <HASH FILE> -r dive.rule --loopback
+```
+
+### Expander attack
+- Split candidates into single chars, mutates & recondstructs
+- Needs to be recompiled with LEN_MAX 8 and only use unique output
+- https://github.com/hashcat/hashcat-utils
+
+```
+./expander < woprdlist.txt | sort -u > wordlist_expander.txt
+```
+
+### Fingerprint attack
+- https://hashcat.net/wiki/doku.php?id=fingerprint_attack
+- Expand previously cracked passwords, combo the resulting file with itself, update (expand) wordlist, rinse and repeat
+
+```
+awk -F ":" '{print $NF}' < hashcat.potfile | ./expander | sort -u > word.list
+hashcat -m <HASH TYPE> <HASH FILE> --remve -a 1 word.list word.list -o word.list2
+awk -F ":" '{print $NF}' < word.list2 | ./expander | sort -u > word.list3
+hashcat -m <HASH TYPE> <HASH FILE> --remve -a 1 word.list3 word.list3 -o word.list4
 ```
