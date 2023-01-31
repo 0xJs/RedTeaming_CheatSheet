@@ -1130,6 +1130,9 @@ crackmapexec smb <HOST> -d <DOMAIN> -u <USER> -p <PASSWORD> -M webdav
 </searchConnectorDescription>
 ```
 
+#### If got shell on target, activate webclient
+- https://github.com/eversinc33/SharpStartWebclient
+
 #### Create a DNS record pointing to the attacker's machine IP
 - https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
 - https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
