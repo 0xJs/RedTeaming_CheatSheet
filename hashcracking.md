@@ -62,7 +62,7 @@
 #### Possible to create own charsets
 - Creates `?1` charset with UPPER and lower chars and `?2` with digits and symbols.
 ```
-hashcat -a 3 -m <HASH TYPE> -1 ?u?l -2 ?d?s ?1?1?1?1?1?1?2?2
+hashcat -a 3 -m <HASH TYPE> <HASH FILE> -1 ?u?l -2 ?d?s ?1?1?1?1?1?1?2?2
 ```
 
 ## Attack modes
@@ -118,14 +118,14 @@ hashcat -a 3 -m <HASH TYPE> <HASH FILE> <MASK FILE>
 - `6 Wordlist + Mask`
 - `7 Mask + Wordlist`
 ```
-hashcat -a 6 -m <HASH TYPE> <WORDLIST> <MASK>
-hashcat -a 7 -m <HASH TYPE> <MASK> <WORDLIST>
+hashcat -a 6 -m <HASH TYPE> <HASH FILE> <WORDLIST> <MASK>
+hashcat -a 7 -m <HASH TYPE> <HASH FILE> <MASK> <WORDLIST>
 
-hashcat -a 6 -m <HASH TYPE> <WORDLIST> ?a?a?a?a --increment
-hashcat -a 7 -m <HASH TYPE> ?a?a?a?a <WORDLIST> --increment
+hashcat -a 6 -m <HASH TYPE> <HASH FILE> <WORDLIST> ?a?a?a?a --increment
+hashcat -a 7 -m <HASH TYPE> <HASH FILE> ?a?a?a?a <WORDLIST> --increment
 ```
 
-#### Best effore - Base loop
+#### Best effort - Base loop
 - You can crack at `9.56` GH/s for a 95^8 keyspace. `95^8 / 9.56 GH/s = 693,954 secs = ~8 days`
 - If you have only 8 hours for example, which is 28,800 seconds. `9.56 GH/s * 28,800 seconds = 275,328,000,000,000` needed in 8 hours
 - `275,328,000,000,000 (1/8) = 64`
@@ -137,7 +137,9 @@ hashcat -a 7 -m <HASH TYPE> ?a?a?a?a <WORDLIST> --increment
 ```
 kwp -z basechars/full.base keymaps/en-us.keymap routes/2-to-16-max-3-direction-changes.route > keymap.txt
 
-hashcat -a 0 -m <HASH TYPE> keymap.txt
+hashcat -a 0 -m <HASH TYPE> <HASH FILE> keymap.txt
+
+hashcat -a 0 -m <HASH TYPE> <HASH FILE> keymap.txt -r dive.rule
 ```
 
 #### Target specific wordlist generation
@@ -146,21 +148,21 @@ hashcat -a 0 -m <HASH TYPE> keymap.txt
 ```
 cewl -d 2 -e -v -w wordlist.txt <URL TARGET>
 
-hashcat -a 0 -m <HASH TYPE> wordlist.txt
+hashcat -a 0 -m <HASH TYPE> <HASH FILE> wordlist.txt
 ```
 
 ### Combinator attack
 #### Combinator two words
 - Passphrases, with for example Top 10k / 20k words https://github.com/first20hours/google-10000-english
 ```
-hashcat -a 1 -m <HASH TYPE> 20k.txt 20k.txt
+hashcat -a 1 -m <HASH TYPE> <HASH FILE> 20k.txt 20k.txt
 ```
 
 #### Combinator 3 or 4 words
 ```
 ./combinator 20k.txt 20k.txt > 20k-combined.txt
 
-hashcat -a 1 -m <HASH TYPE> 20k-combined.txt 20k-combined.txt
+hashcat -a 1 -m <HASH TYPE> <HASH FILE> 20k-combined.txt 20k-combined.txt
 ```
 
 #### Add spaces
@@ -173,12 +175,20 @@ awk '{print $0" "}' 20k.txt > 20k-space.txt
 #### Rules
 - `-j` apply singe rule to the left. `-k` apply single rule to the right
 ```
-hashcat -a 1 -m <HASH TYPE> -a1 20k-combined-mid-space.txt -j '$ ' 20k.txt
-hashcat -a 1 -m <HASH TYPE> -a1 20k-combined-mid-space.txt -j '$ ' 20k-combined-mid-space.txt
+hashcat -a 1 -m <HASH TYPE> <HASH FILE> -a1 20k-combined-mid-space.txt -j '$ ' 20k.txt
+hashcat -a 1 -m <HASH TYPE> <HASH FILE> -a1 20k-combined-mid-space.txt -j '$ ' 20k-combined-mid-space.txt
 ```
 
 ```
 awk '{print $0" "}' 20k-combined-mid-space.txt > 20k-combined-mid-end-space.txt
 
-./combinator 20k-combined-mid-end-space.txt 20k-combined-mid-space.txt | hashcat -a 1 -m <HASH TYPE> -r rules/OneRuleToRuleThemAll.rule
+./combinator 20k-combined-mid-end-space.txt 20k-combined-mid-space.txt | hashcat -a 1 -m <HASH TYPE> <HASH FILE> -r dive.rule
+```
+
+### Loopback attack
+- Generate a wordlist of the potfile and run them again with rules
+```
+awk -F ":" '{print $NF}' < hashcat.potfile > potfile.list
+
+hashcat -a 0 -m <HASH TYPE> -r dive.rule --loopback
 ```
