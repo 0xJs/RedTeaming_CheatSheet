@@ -52,7 +52,7 @@
 - Most privileges are disabled by default. Must enable before utilization. This is used as a precaution so privileges are not used by mistake
 	- Certain API's check if a privilege exists and enabled before allowin operations to proceed.
 - Commonly abused privileges: [link](https://github.com/hatRiot/token-priv/blob/master/abusing_token_eop_1.0.txt)
-	- 1.  `SeBackupPrivilege` - This privilege causes the system to grant all read access control to any file, regardless of the [_access control list_](https://msdn.microsoft.com/library/windows/desktop/ms721532#-security-access-control-list-gly) (ACL) specified for the file.  
+	1.  `SeBackupPrivilege` - This privilege causes the system to grant all read access control to any file, regardless of the [_access control list_](https://msdn.microsoft.com/library/windows/desktop/ms721532#-security-access-control-list-gly) (ACL) specified for the file.  
 	    Attacker Tradecraft: Collection.
 	2.  `SeCreateTokenPrivilege` - Required to create a primary token.  
 	    Attacker Tradecraft: Privilege Escalation
