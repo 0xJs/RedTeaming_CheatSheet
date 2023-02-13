@@ -8,21 +8,7 @@
 - DLL are modules that are loaded in existing processes
 
 #### Example commandline exe
-```
-#include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-int main(void) {
-
-	printf("Test\n");
-	
-	getchar();
-    
-	return 0;
-}
-```
+- [Link](/cplusplus/Basics/implantDLL/implantDLL.cpp)
 
 ##### Build & Run
 ```
@@ -32,37 +18,7 @@ implant.exe
 ```
 
 #### Example dll
-```
-#include <Windows.h>
-#pragma comment (lib, "user32.lib")
-
-
-BOOL APIENTRY DllMain(HMODULE hModule,  DWORD  ul_reason_for_call, LPVOID lpReserved) {
-
-    switch (ul_reason_for_call)  {
-    case DLL_PROCESS_ATTACH:
-    case DLL_PROCESS_DETACH:
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-        break;
-    }
-    return TRUE;
-}
-
-extern "C" {
-__declspec(dllexport) BOOL WINAPI RunME(void) {
-	
-	MessageBox(
-		NULL,
-		"Test",
-		"Message",
-        MB_OK
-	);
-	 
-		 return TRUE;
-	}
-}
-```
+- [Link](/cplusplus/Basics/implantPE/implant.cpp)
 
 ##### Build & Run
 ```
