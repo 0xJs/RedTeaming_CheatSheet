@@ -8,7 +8,7 @@
 - DLL are modules that are loaded in existing processes
 
 #### Example commandline exe
-- [Link](/cplusplus/Basics/implantDLL/implantDLL.cpp)
+- [Link](cplusplus/Basics/implantDLL/implantDLL.cpp)
 
 ##### Build & Run
 ```
@@ -18,7 +18,7 @@ implant.exe
 ```
 
 #### Example dll
-- [Link](/cplusplus/Basics/implantPE/implant.cpp)
+- [Link](cplusplus/Basics/implantPE/implant.cpp)
 
 ##### Build & Run
 ```
