@@ -53,5 +53,6 @@ Most of my knowledge is gathered from the following coures, so big thanks to the
 - OSINT: PNPT Course
 - Coding: Pavel Yosifovich & Sektor7 Reenz0h
 
+# Misc
 #### Data exfiltration simulation
 - https://github.com/FortyNorthSecurity/Egress-Assess
