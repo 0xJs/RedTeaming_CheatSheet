@@ -1,6 +1,7 @@
+// author: reenz0h(twitter : @SEKTOR7net)
+
 #include <Windows.h>
 #pragma comment (lib, "user32.lib")
-
 
 BOOL APIENTRY DllMain(HMODULE hModule,  DWORD  ul_reason_for_call, LPVOID lpReserved) {
 

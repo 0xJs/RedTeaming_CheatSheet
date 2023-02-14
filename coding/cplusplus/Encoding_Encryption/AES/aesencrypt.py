@@ -1,3 +1,5 @@
+# author: reenz0h(twitter : @SEKTOR7net)
+
 import sys
 from Crypto.Cipher import AES
 from os import urandom

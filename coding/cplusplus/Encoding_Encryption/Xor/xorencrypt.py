@@ -1,3 +1,5 @@
+# author: reenz0h(twitter : @SEKTOR7net)
+
 import sys
 
 KEY = "<KEY>"
