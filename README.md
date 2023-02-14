@@ -45,6 +45,8 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
 - OPSEC (Operations Security) is a process that identifies critical information to determine if actions can be observed by enemy intelligence, determines if information obtained by adversaries could be interpreted to be useful to them, and then executes selected measures that eliminate or reduce adversary exploitation of critical information. It's generally used to describe the "ease" by which actions can be observed by "enemy" intelligence.
 
 # Sources & Credits
+Most of my knowledge is gathered from the following coures, so big thanks to them! If you like a specific topic I would recommend taking the courses from them!
+
 - Cloud: CARTP from Altered Security and breaching the cloud from antisyphon.
 - Windows: CRTP, CRTE, PACES from Altered Security, ECPTX from eLearnSecurity and CRTO from RastaMouse.
 - Infra: OSCP, PNPT from TCM Security and Tiberius privesc courses
