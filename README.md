@@ -44,11 +44,12 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
 > Red Teaming is the process of using tactics, techniques and procedures (TTPs) to emulate a real-world threat, with the goal of measuring the effectiveness of the people, processes and technologies used to defend an environment.
 - OPSEC (Operations Security) is a process that identifies critical information to determine if actions can be observed by enemy intelligence, determines if information obtained by adversaries could be interpreted to be useful to them, and then executes selected measures that eliminate or reduce adversary exploitation of critical information. It's generally used to describe the "ease" by which actions can be observed by "enemy" intelligence.
 
-# Sources
-- Cloud: CARTP from Pentester Academy and breaching the cloud from antisyphon.
-- Windows: CRTP, CRTE, PACES from Pentester Academy, ECPTX from eLearnSecurity and CRTO from RastaMouse.
+# Sources & Credits
+- Cloud: CARTP from Altered Security and breaching the cloud from antisyphon.
+- Windows: CRTP, CRTE, PACES from Altered Security, ECPTX from eLearnSecurity and CRTO from RastaMouse.
 - Infra: OSCP, PNPT from TCM Security and Tiberius privesc courses
 - OSINT: PNPT Course
+- Coding: Pavel Yosifovich & Sektor7 Reenz0h
 
 #### Data exfiltration simulation
 - https://github.com/FortyNorthSecurity/Egress-Assess
