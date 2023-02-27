@@ -297,6 +297,21 @@ Send-MailMessage -SmtpServer CompanyDomain-com.mail.protection.outlook.com -Subj
 ### Device code auth
 - https://aadinternals.com/post/phishing/
 
+#### Common application ID's
+```
+ACOM Azure Website 	23523755-3a2b-41ca-9315-f81f3f566a95
+AEM-DualAuth 	69893ee3-dd10-4b1c-832d-4870354be3d8
+ASM Campaign Servicing 	0cb7b9ec-5336-483b-bc31-b15b5788de71
+Azure Advanced Threat Protection 	7b7531ad-5926-4f2d-8a1d-38495ad33e17
+Azure Data Lake 	e9f49c6b-5ce5-44c8-925d-015017e9f7ad
+Azure Lab Services Portal 	835b2a73-6e10-4aa5-a979-21dfda45231c
+Azure Portal 	c44b4083-3bb0-49c1-b47d-974e53cbdf3c
+AzureSupportCenter 	37182072-3c9c-4f6a-a4b3-b3f91cacffce
+Bing 	9ea1ad79-fdb6-4f9a-8bc3-2b70f96e34c7
+CPIM Service 	bb2a2e3a-c5e7-4f0a-88e0-8e01fd3fc1f4
+CRM Power BI Integration 	e64aa8bc-8eb4-40e2-898b-cf261a25954f
+```
+
 ## Public Storage
 ### Find data in public storage
 - https://github.com/initstring/cloud_enum can scan all three cloud services for multiple services.
