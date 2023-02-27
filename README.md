@@ -56,3 +56,7 @@ Most of my knowledge is gathered from the following coures, so big thanks to the
 # Misc
 #### Data exfiltration simulation
 - https://github.com/FortyNorthSecurity/Egress-Assess
+
+#### Nuget Package Manager dependancies
+- Open Tools --> NuGet Package Manager --> Package Manager Settings --> Package Sources
+- Add a source. Name `nuget.org` and Source `https://api.nuget.org/v3/index.json`
