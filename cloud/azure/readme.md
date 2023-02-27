@@ -14,6 +14,7 @@
   - https://pentestbook.six2dez.com/enumeration/cloud/azure
   - https://github.com/Kyuu-Ji/Awesome-Azure-Pentest
   - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/Azure.md
+- List of tools https://www.pwndefend.com/2023/01/11/tools/
 
 #### Save Credentials
 ```
