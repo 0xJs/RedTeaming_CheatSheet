@@ -205,7 +205,32 @@ lures create 0365
 lures get-url <ID>
 ```
 
+### Avoid detection
+- Avoid detection by removing default Evilginx2 HTTP Header and white list outgoing and incoming IP addresses.
+
+#### Change default redirect uri
+```
+vim config.go
+
+#Change line with DEFAULT_REDIRECT_URL
+```
+
+#### Change the headers
+```
+vim http_proxy.go
+
+# Comment the following lines
+reg.Header.Set(string(hg) egg2)
+reg.Header.Set(string(e), e_host)
+reg.Header.Set(string(b), nothing_to_see_here)
+```
+
+#### Firewall
+- Use CSFirewall or iptables to block VPS incoming and outgoing internet access (e.g Allow only Microsoft and the target IP addresses).
+
 ## Illicit Consent Grant phishing
+- Verified publisher: https://techcommunity.microsoft.com/t5/microsoft-entra-azure-ad-blog/publisher-verification-and-app-consent-policies-are-now/ba-p/1257374
+
 #### Create a application
 - Login to the Azure portal and in the left menu go to 'Azure Active Directory' --> 'App registrations' and click 'new registration'
 - Set a application name and choose 'Accounts in any organizational directory (Any Azure AD Directory - Multitenant'
@@ -296,6 +321,8 @@ Send-MailMessage -SmtpServer CompanyDomain-com.mail.protection.outlook.com -Subj
 
 ### Device code auth
 - https://aadinternals.com/post/phishing/
+- https://www.offsec-journey.com/post/phishing-with-azure-device-codes
+- https://www.youtube.com/watch?v=GZ_nn0uRLr4
 
 #### Common application ID's
 ```
