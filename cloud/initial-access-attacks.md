@@ -11,6 +11,7 @@
   * [Server Side Template Injection](#Server-Side-Template-Injection)
   * [OS Command injection](#OS-Command-injection)
 * [Phishing](#Phishing)
+  * [Teams](#Teams)
   * [Phishing Evilginx2](#Phishing-Evilginx2)
   * [Illicit Consent Grant phishing](#Illicit-Consent-Grant-phishing)
   * [Google workspace calendar event injection](#Google-workspace-calendar-event-injection)
@@ -21,6 +22,7 @@
 ### Password spraying
 - https://github.com/dafthack/MSOLSpray
 - https://github.com/ustayready/fireprox
+- Also possible with https://github.com/0xZDH/o365spray
 ```
 Import-Module .\MSOLSpray.ps1
 Invoke-MSOLSpray -UserList validemails.txt -Password <PASSWORD> -Verbose
@@ -150,6 +152,11 @@ curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.com/&api-version=2017-09
 - This is usually due to insecure parsing of user input such as parameters, uploaded files and HTTP requests. 
 
 ## Phishing
+### Teams
+- By default Microsoft Teams has federation open with all external Teams organisations.
+- This means that other Teams users from different Azure tenants can communicate to your employees directly and exchange messages or files. An attacker can leverage this feature to launch a Social Engineering attack against the victim user.
+- Moreover, it is possible to bypass the message request approval by creating a Teams group chat rather than direct chat to the victim.
+
 ### Phishing Evilginx2
 - https://github.com/kgretzky/evilginx2
 - Evilginx acts as a relay/man-in-the-middle between the legit web page and the target user. The user always interacts with the legit website and Evilginx captures usernames, passwords and authentication cookies.
@@ -277,25 +284,41 @@ python 365-Stealer.py --refresh-all
 - Include link to phishing page
 - https://www.blackhillsinfosec.com/google-calendar-event-injection-mailsniper/
 
+### Email spoofing
+- https://www.blackhillsinfosec.com/spoofing-microsoft-365-like-its-1995/
+- Microsoft Direct Send is the feature that can be utilised to send spoofing emails.
+- The benefits for the the attackers is that the Direct Send feature requires NO authentication and can be sent from OUTSIDE of the organisation.
+- There are only 2 prerequisites: Microsoft 365 subscription and Exchange Online Plan
+
+```
+Send-MailMessage -SmtpServer CompanyDomain-com.mail.protection.outlook.com -Subject “Subject Here” -To ‘Full Name <user2@companyDomain.com>‘ -From ‘From Full Name <user1@companyDomain.com>‘ -Body “Hello From your Co-worker” -BodyAsHtml
+```
+
+### Device code auth
+- https://aadinternals.com/post/phishing/
+
 ## Public Storage
 ### Find data in public storage
 - https://github.com/initstring/cloud_enum can scan all three cloud services for multiple services.
+- https://github.com/jordanpotti/CloudScraper can scan all three cloud services for multiple services.
 
-### Public azure blobs
-- https://github.com/NetSPI/MicroBurst
+### Azure
+#### Google Dorks
 ```
-Invoke-EnumerateAzureBlobs –Base <base name>
+site:github.com “StorageConnectionString” “DefaultEndpointsProtocol”
+site:http://blob.core.windows.net
 ```
 
 #### Enumerate Azureblobs
 - add permutations to permutations.txt like common, backup, code in the misc directory.
 ```
 Import-Module ./Microburst.psm1
-Invoke-EnumerateAzureBlobs -Base defcorp
+Invoke-EnumerateAzureBlobs -Base <COMPANY NAME>
 ```
-- Access the URL's and see if any files are listed (Example https://defcorpcommon.blob.core.windows.net/backup?restype=container&comp=list)
-- Access the files by adding it to the url (Example https://defcorpcommon.blob.core.windows.net/backup/blob_client.py)
+- Access the URL's and see if any files are listed (Example https://<STORAGE NAME>.blob.core.windows.net/backup?restype=container&comp=list)
+- Access the files by adding it to the url (Example https://<STORAGE NAME>.blob.core.windows.net/backup/blob_client.py)
 - Check for a SAS URL, if found then open the "Connect to Azure Storage", select "blobl container" and select 'Shared Access Signatur (SAS)' and paste the URL, displayname will fill automatically.
+- Another example: https://<STORAGE NAME>.blob.core.windows.net/<container-name>?restype=container&comp=list
 
 ### Public AWS blobs
 - https://github.com/RhinoSecurityLabs/pacu
