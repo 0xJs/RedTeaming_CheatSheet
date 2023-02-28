@@ -21,6 +21,17 @@
 * [UAC Bypass](#UAC-bypass)
 
 ## General
+### Enumerating AV / EDR
+- https://github.com/tothi/serviceDetector
+```
+python3 serviceDetector.py -conf conf/edr.json <DOMAIN>/<USER>:<PASSWORD>@<TARGET>
+```
+
+#### Run against multiple targets
+```
+cat targets.txt | parallel -j 50 python3 serviceDetector.py -conf conf/edr.json <DOMAIN>/<USER>:<PASSWORD>@<TARGET>
+```
+
 #### Get all GPO's applied to a machine
 - Run with elevated prompt
 ```
