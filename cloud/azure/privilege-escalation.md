@@ -49,6 +49,7 @@ az account get-access-token --resource-type ms-graph
 
 ### General
 #### List all accessible resources
+- Or login in https://portal.azure.com and click all resources
 ```
 Get-AzResource
 
@@ -60,9 +61,11 @@ az resource list
 Get-AzResourceGroupDeployment -ResourceGroupName <RESOURCEGROUP>
 ```
 
-#### Check role assignments on ResourceID
+#### Check permissions on the resource
 ```
 Get-AzRoleAssignment -Scope <RESOURCE ID>
+
+az role assignment list
 ```
 
 #### Get the allowed actions on the role definition
@@ -89,6 +92,16 @@ Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
 #### Change User Agent
 - With developer tools or proxy
 - Or example: https://addons.mozilla.org/en-US/firefox/addon/custom-user-agent-revived/
+
+#### Edge
+- Open Developer tools with `F12`. Press `CTRL + SHIFT + M`.
+- Click on `Dimension: Responsive` and select `Edit`. Click `Add custom device...`
+- Add the desired name and user agent string and dimension. Example:
+
+```
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 12_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.3 Safari/605.1.15 Edg/100.0.4896.127
+Dimensions: 1200x1200
+```
 
 ## Automation account
 - Automation Account comes very handy in privilege escalation:
