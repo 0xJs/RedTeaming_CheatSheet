@@ -360,14 +360,13 @@ Connect-AzAccount -Credential $creds
 ```
 
 #### Login to account with access tokens for keyvault
-- Uses access tokens `mgmtToken` and `graphToken` from [shell upload](initial-access-attacks.md#use-access-tokens-to-connect-with-az-module)
+- Uses access tokens `mgmtToken` and `graphToken` from [shell upload](../initial-access-attacks.md#use-access-tokens-to-connect-with-az-module)
 ```
 $mgmtToken = <TOKEN>
 $graphToken = <TOKEN>
 $keyvaultToken = <TOKEN>
 
-Connect-AzAccount -AccessToken $mgmtToken -GraphAccessToken $graphToken -KeyVaultAccessToken $keyvault -AccountId
-8d8bb307-40ab-4eef-ba08-6b40584cd179
+Connect-AzAccount -AccessToken $mgmtToken -GraphAccessToken $graphToken -KeyVaultAccessToken $keyvault -AccountId <ID>
 ```
 
 ### Mimikatz
