@@ -189,7 +189,7 @@ Get-AzureADGroupMember -ObjectId <ID>
 #### Get groups and roles where the specified user is a member
 ```
 Get-AzureADUser -SearchString 'test' | Get-AzureADUserMembership
-Get-AzureADUserMembership -ObjectId test@defcorphq.onmicrosoft.com
+Get-AzureADUserMembership -ObjectId <UPN>
 ```
 
 #### Recursivly search through group
@@ -723,7 +723,7 @@ az ad user list --query "[].[displayName]" -o table
 
 #### Enumerate a specific user
 ```
-az ad user show --id test@defcorphq.onmicrosoft.com
+az ad user show --id <UPN>
 ```
 
 #### Search for users who contain the word "admin" in their Display name (case sensitive):
@@ -986,16 +986,15 @@ Get-AzAccessToken -ResourceTypeName AadGraph
 
 #### Use the access token
 ```
-Connect-AzAccount -AccountId test@defcorphq@onmicrosoft.com -AccessToken eyJ0eXA...
+Connect-AzAccount -AccountId <UPN> -AccessToken eyJ0eXA...
 ```
 
 #### Use other access token
 - In the below command, use the one for AAD Graph (access token is still required) for accessing Azure AD
 - To access something like keyvault you need to get the access token for it before you can access it.
 ```
-Connect-AzAccount -AccountId test@defcorphq@onmicrosoft.com -AccessToken eyJ0eXA... -GraphAccessToken eyJ0eXA...
-Connect-AzAccount -AccountId test@defcorphq@onmicrosoft.com -AccessToken eyJ0eXA... 
-Connect-AzAccount -AccountId test@defcorphq@onmicrosoft.com -AccessToken eyJ0eXA... -Tenantid <Tenant ID>
+Connect-AzAccount -AccountId <UPN> -AccessToken <TOKEN> -GraphAccessToken <TOKEN>
+Connect-AzAccount -AccountId <UPN> -AccessToken <TOKEN> -Tenantid <Tenant ID>
 ```
 
 ### Using tokes with CLI Tools - Azure CLI
