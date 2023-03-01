@@ -79,6 +79,13 @@ Get-AzRoleDefinition -Name "<ROLE DEFINITION NAME>"
 Add-AzureADGroupMember -ObjectId <GROUP ID> -RefObjectId <USER ID> -Verbose
 ```
 
+#### Authenticate with Service Principal / Managed Identity
+```
+$password = ConvertTo-SecureString '<SECRET>' -AsPlainText -Force
+$creds = New-Object System.Management.Automation.PSCredential('<ACCOUNT ID>', $password)
+Connect-AzAccount -ServicePrincipal -Credential $creds -Tenant <TENANT ID>
+```
+
 ## Bypass MFA
 ### Find Conditional Access bypasses
 - Use MFASweep to find inconsistensies through MFA requirements
@@ -514,7 +521,7 @@ $password = "<PASSWORD>" | ConvertTo-SecureString -AsPlainText –Force
 Add-AzADAppSecret -GraphToken $graphtoken -Verbose
 ```
 
-#### Use the secret to autheticate as service principal.
+#### Use the secret to authenticate as service principal
 ```
 $password = ConvertTo-SecureString '<SECRET>' -AsPlainText -Force
 $creds = New-Object System.Management.Automation.PSCredential('<ACCOUNT ID>', $password)
