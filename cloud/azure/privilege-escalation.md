@@ -330,11 +330,11 @@ Connect-AzAccount -AccessToken $mgmtToken -KeyVaultAccessToken $keyvaultToken -A
 #### Abuse the resource
 
 #### Stealing tokens from az powershell
-- Az PowerShell stores access tokens in clear text in ```TokenCache.dat``` in the directory ```C:\Users\<username>\.Azure```
+- Az PowerShell (older versions) stores access tokens in clear text in ```TokenCache.dat``` in the directory ```C:\Users\<username>\.Azure```
 - It also stores ServicePrincipalSecret in clear-text in AzureRmContext.jsonif a service principal secret is used to authenticate. 
 - Another interesting method is to take a process dump of PowerShell and looking for tokens in it!
-- Users can save tokens using Save-AzContext, look out for them! Search for Save-AzContext in PowerShell console history!
-- Always use Disconnect-AzAccount!!
+- Users can save tokens using `Save-AzContext`, look out for them! Search for `Save-AzContext` in PowerShell console history!
+- Always use `Disconnect-AzAccount`
 
 #### Save the AzureRmContext.json
 ```
