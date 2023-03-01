@@ -1,5 +1,6 @@
 # Privilege escalation
 * [Privesc enumeration](#Privesc-enumeration)
+* [Bypass MFA](#Bypass-MFA)
 * [Automation account](#Automation-account)
 * [Command execution on a VM](#Command-execution-on-a-VM)
 * [Getting credentials](#Getting-credentials)
@@ -74,6 +75,20 @@ Get-AzRoleDefinition -Name "<ROLE DEFINITION NAME>"
 ```
 Add-AzureADGroupMember -ObjectId <GROUP ID> -RefObjectId <USER ID> -Verbose
 ```
+
+## Bypass MFA
+### Find Conditional Access bypasses
+- Use MFASweep to find inconsistensies through MFA requirements
+- https://github.com/dafthack/MFASweep
+- Blogpost: https://www.blackhillsinfosec.com/exploiting-mfa-inconsistencies-on-microsoft-services/
+```
+Import-Module MFASweep.ps1
+Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
+```
+
+#### Change User Agent
+- With developer tools or proxy
+- Or example: https://addons.mozilla.org/en-US/firefox/addon/custom-user-agent-revived/
 
 ## Automation account
 - Automation Account comes very handy in privilege escalation:
