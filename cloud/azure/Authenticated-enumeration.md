@@ -657,6 +657,11 @@ az login
 az login -u <USERNAME> -p <PASSWORD>
 ```
 
+#### List resources
+```
+az resource list
+```
+
 #### List info on the current user
 ```
 az ad signed-in-user show
