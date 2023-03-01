@@ -56,21 +56,26 @@ Get-AzResource
 az resource list
 ```
 
-##### Get current Azure role assignments
-```
-Get-AzRoleAssignment
-```
-
-#### Check if it can read any deployment
-```
-Get-AzResourceGroupDeployment -ResourceGroupName <RESOURCEGROUP>
-```
-
 #### Check permissions on the resource
 ```
 Get-AzRoleAssignment -Scope <RESOURCE ID>
 
 az role assignment list
+```
+
+##### Get current Azure role assignments
+```
+Get-AzRoleAssignment
+```
+
+#### Get the role definition
+```
+Get-AzRoleDefinition -Id <ROLEDEFINITION ID>
+```
+
+#### Check if it can read any deployment
+```
+Get-AzResourceGroupDeployment -ResourceGroupName <RESOURCEGROUP>
 ```
 
 #### Get the allowed actions on the role definition
