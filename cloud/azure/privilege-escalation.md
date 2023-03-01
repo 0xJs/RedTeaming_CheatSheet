@@ -559,19 +559,21 @@ Get-AzResource
 Get-AzStorageContainer -Context (Get-AzStorageAccount -Name <NAME> -ResourceGroupName <RESOURCEGROUPNAME>).Context
 ```
 
-#### Check using the "Storage Explorer" application! Might be possible then!
+#### Access Storage Accounts AZ powershell
+```
+$StorageAccount = Get-AzStorageAccount -name <NAME> -ResourceGroupName <NAME>
+Get-AzStorageContainer -Context $StorageAccount.Context
+Get-AzStorageBlob -Container <NAME> -Context $StorageAccount.Context
+Get-AzStorageBlobContent -Container <NAME> -Context (Get-AzStorageAccount -name <NAME> -ResourceGroupName <NAME>).context -Blob <NAME>
+```
+
+#### Access Storage Account
+- https://azure.microsoft.com/en-us/products/storage/storage-explorer/
+- To connect with a account use the Subcription button.
 
 #### Check if you can access storage account keys
 ```
 Get-AzStorageAccountKey -name <NAME OF STORAGE> -resourcegroupname <NAME>
-```
-
-### Access Storage Accounts AZ powershell
-```
-Get-AzResource
-Get-AzStorageAccount -name <NAME> -ResourceGroupName <NAME>
-Get-AzStorageContainer -Context (Get-AzStorageAccount -name <NAME> -ResourceGroupName <NAME>).context
-Get-AzStorageBlobContent -Container <NAME> -Context (Get-AzStorageAccount -name <NAME> -ResourceGroupName <NAME>).context -Blob
 ```
 
 #### Connect to the storage account with "Storage Explorer" using the account name and account keys
