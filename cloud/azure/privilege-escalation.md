@@ -50,6 +50,8 @@ az account get-access-token --resource-type ms-graph
 #### List all accessible resources
 ```
 Get-AzResource
+
+az resource list
 ```
 
 #### Check if it can read any deployment
@@ -268,12 +270,36 @@ unknown command atm
 ```
 
 ### Stealing tokens
-#### Stealing tokens from az cli
-- az cli stores access tokens in clear text in ```accessTokens.json``` in the directory ```C:\Users\<username>\.Azure```
-- We can read tokens from the file, use them and request new ones too!
-- azureProfile.json in the same directory contains information about subscriptions. 
-- You can modify accessTokens.json to use access tokens with az cli but better to use with Az PowerShell or the Azure AD module.
+### Stealing tokens from az cli
+- az cli stores encrypted access tokens in the directory ```C:\Users\<username>\.Azure```
+  - Before 2.30.0 – January 2022 az cli stores access tokens in clear text in ```accessTokens.json```
+  - https://github.com/Azure/azure-cli/issues/19707 
 - To clear the access tokens, always use az logout
+
+#### Check which account is connected
+```
+az account show
+```
+
+#### Check permissions the account has
+```
+az resource list
+```
+
+#### Get access token
+```
+az account get-access-token --resource https://management.azure.com
+az account get-access-token --resource https://vault.azure.net
+```
+
+#### Connect with tokens
+```
+$mgmtToken = <TOKEN>
+$keyvaultToken = <TOKEN>
+Connect-AzAccount -AccessToken $mgmtToken -KeyVaultAccessToken $keyvaultToken -AccountId <ID>
+```
+
+#### Abuse the resource
 
 #### Stealing tokens from az powershell
 - Az PowerShell stores access tokens in clear text in ```TokenCache.dat``` in the directory ```C:\Users\<username>\.Azure```
