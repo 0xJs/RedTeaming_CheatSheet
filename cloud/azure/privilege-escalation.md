@@ -25,6 +25,7 @@
 * [Azure Container Registry dump](#Azure-Container-Registry-dump)
 * [Azure ARC](#Azure-ARC)
 * [Illicit Consent Grant Phishing](#Illicit-Consent-Grant-Phishing)
+* [Kubernetes](#Kubernetes)
 
 ## Privesc enumeration
 ### When on a new machine
@@ -662,3 +663,44 @@ az connectedmachine extension create --machine-name i-0ef6d7a83a00e --resource-g
 - If app registration is allowed for users [link](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/UserSettings) and you can enumerate AD users/emails you can perform Illicit Consent Grant Phishing with an app from inside the tenant.
 - [Link](../initial-access-attacks.md#Illicit-Consent-Grant-phishing) to the attack from Initial Access Attacks
 - Use `Accounts in this organizational directory only (<TENANT NAME> only - Single tenant)` since its from inside the tenant already!
+
+## Kubernetes
+- https://cloud.hacktricks.xyz/pentesting-cloud/kubernetes-pentesting
+
+#### Check if machine is kubernetes
+```
+ls -lsa /var/run/secrets/
+```
+
+#### Check for secrets of serviceaccount
+- Contains the files:
+  - `ca.crt`: It's the ca certificate to check kubernetes communications
+  - `namespace`: It indicates the current namespace
+  - `token`: It contains the service token of the current pod.
+
+```
+ls -lsa /run/secrets/kubernetes.io/serviceaccount
+ls -lsa /var/run/secrets/kubernetes.io/serviceaccount
+ls -lsa /secrets/kubernetes.io/serviceaccount
+
+cat /var/run/secrets/kubernetes.io/serviceaccount/token
+```
+
+### Enum with kubectl
+- https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux
+- https://cloud.hacktricks.xyz/pentesting-cloud/kubernetes-pentesting/kubernetes-enumeration
+
+#### Get services
+```
+./kubectl get services
+```
+
+#### Retrieve pods
+```
+./kubectl get pods
+```
+
+#### Check if we can view namespace
+```
+./kubectl describe pods
+```
