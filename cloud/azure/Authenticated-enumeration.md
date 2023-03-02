@@ -1072,6 +1072,8 @@ Headers = @{ 'Authorization' = "Bearer $Token" } }
 (Invoke-RestMethod @RequestParams).value
 ```
 
+- https://learn.microsoft.com/en-us/onedrive/developer/rest-api/api/driveitem_list_children?view=odsp-graph-online#list-children-of-a-driveitem-with-a-known-path
+- Where MyPAT is the `Name` of the Folder.
 ```
 $Token = <TOKEN>
 $URi = 'https://graph.microsoft.com/v1.0/me/drive/root:/MyPAT:/children'
@@ -1081,6 +1083,8 @@ Uri = $URI
 Headers = @{ 'Authorization' = "Bearer $Token" } }
 (Invoke-RestMethod @RequestParams).value
 ```
+
+- Browe to the `@microsoft.graph.downloadUrl` value to download the files.
 
 ### Abusing tokens
 #### Check the resources available to the managed identity
