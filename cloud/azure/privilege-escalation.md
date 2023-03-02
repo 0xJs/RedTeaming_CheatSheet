@@ -27,6 +27,9 @@
 
 ## Privesc enumeration
 ### When on a new machine
+### Check other tenants
+- Login to the Azure portal and in the right top click on the user and then `Switch Directory`.
+
 #### Get context of current user
 ```
 az ad signed-in-user show
@@ -47,7 +50,7 @@ az account get-access-token
 az account get-access-token --resource-type ms-graph 
 ```
 
-### General
+### When got a new user
 #### List all accessible resources
 - Or login in https://portal.azure.com and click all resources
 ```
@@ -83,6 +86,7 @@ Get-AzResourceGroupDeployment -ResourceGroupName <RESOURCEGROUP>
 Get-AzRoleDefinition -Name "<ROLE DEFINITION NAME>"
 ```
 
+###  General
 #### Add a user to a group
 - Required aad-graph token
 ```
