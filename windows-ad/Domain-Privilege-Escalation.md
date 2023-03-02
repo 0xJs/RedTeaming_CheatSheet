@@ -160,7 +160,7 @@ spray.sh -smb <DC IP> <USER FILE> <PASSWORD FILE> <AttemptsPerLockoutPeriod> <Lo
 
 #### Reset password remotely
 - Usefull for when the password is expired or set to MUST CHANGE
-- [Link](/Post-Exploitation.md#resetting-a-password-remotely)
+- [Link](Post-Exploitation.md#resetting-a-password-remotely)
 
 ## Kerberoast
 - https://github.com/GhostPack/Rubeus
