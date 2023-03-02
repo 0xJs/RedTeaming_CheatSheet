@@ -667,6 +667,16 @@ az connectedmachine extension create --machine-name i-0ef6d7a83a00e --resource-g
 #### Request SharePoint with access token
 ```
 $Token = <TOKEN>
+$URi = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
+$RequestParams = @{
+Method = 'GET'
+Uri = $URI
+Headers = @{ 'Authorization' = "Bearer $Token" } }
+(Invoke-RestMethod @RequestParams).value
+```
+
+```
+$Token = <TOKEN>
 $URi = 'https://graph.microsoft.com/v1.0/me/drive/root:/MyPAT:/children'
 $RequestParams = @{
 Method = 'GET'
