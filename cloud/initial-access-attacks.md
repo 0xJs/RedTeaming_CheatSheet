@@ -263,14 +263,8 @@ reg.Header.Set(string(b), nothing_to_see_here)
 ## Illicit Consent Grant phishing
 - Verified publisher: https://techcommunity.microsoft.com/t5/microsoft-entra-azure-ad-blog/publisher-verification-and-app-consent-policies-are-now/ba-p/1257374
 
-#### Create a application
-- Login to the Azure portal and in the left menu go to 'Azure Active Directory' --> 'App registrations' and click 'new registration'
-- Set a application name and choose 'Accounts in any organizational directory (Any Azure AD Directory - Multitenant'
-- Use the URL of the student VM in the URI (https://xx.xx.xx.xx/login/authorized)
-- In the left menu go to 'Certificates & Secrets' and create a new client secret and copy it.
-- In the left menu go to 'API permissions' and add the 'user.read' and 'User.ReadBasic.All' for the Microsoft Graph.
-
 #### Check if users are allowed to consent to apps
+- Requires a valid account in the target tenant
 ```
 Import-Module AzureADPreview.psd1
 
@@ -284,29 +278,31 @@ Connect-AzureAD -Credential $creds
 ManagePermissionGrantsForSelf.microsoft-user-default-legacy
 ```
 
-#### Setup the 365-stealer
-- Copy the 365-stealer directory to the xampp directory
-- Edit the 365-stealer.py and edit the CLIENTID (client application id), REDIRECTEDURL and CLIENTSECRET (From the certificate)
+#### Create a application
+- Login to the Azure portal and in the left menu go to `Azure Active Directory` --> `App registrations` and click `New registration`
+- Set a application name and choose `Accounts in any organizational directory (Any Azure AD Directory - Multitenant`
+  - Choose `Accounts in this organizational directory only (<TENANT> only - Single tenant)` if you are executing the attack from inside the target tenant
+- Fill in the URL (https://xx.xx.xx.xx/login/authorized) and click Register
+- In the left menu go to `Certificates & Secrets` and create a new client secret and copy it.
+- In the left menu go to `API permissions`. Click `Add a permission`, click `Microsoft Graph` and `Delegated permissions` and add the desired permission. For example: `Files.ReadWrite, Mail.Read,  Mail.Send, offline_access, User.Read, User.ReadBasic.All`
 
-#### Start the 365-stealer
-```
-&"C:\Program Files\Python38\python.exe" C:\xampp\htdocs\365-Stealer\365-Stealer.py --run-app
-```
+### Setup attacking tool
+- Such as https://github.com/CoasterKaty/PHPAzureADoAuth
+- or https://github.com/AlteredSecurity/365-Stealer
+
+### 365 stealer
+- Follow the setup at: [https://github.com/AlteredSecurity/365-Stealer](https://github.com/AlteredSecurity/365-Stealer#setup-365-stealer)
+- Start Xammp and go to http://localhost/365-stealer/yourVictims/ then click `365-Stealer configuration`. Fill in the `Client ID`, `Client Secret` and `Redirect URI`
+- Start 365-Stealer `Python .\365-Stealer.py --run-app`
 
 #### Get the phishinglink
 - Browse to https://localhost and click on readmore. Copy the link!
 
-#### Enumerating applications to send the phishing link
-- Edit the permutations.txt to add permutations such as career, hr, users, file and backup
-```
-. C:\AzAD\Tools\MicroBurst\Misc\Invoke-EnumerateAzureSubDomains.ps1
-Invoke-EnumerateAzureSubDomains -Base <BASE> –Verbose
-```
+#### Send phishinglink to targets
 
 #### Get the access tokens
 - Browse to http://localhost:82/365-Stealer/yourvictims/
 - Click on the user and copy the access token from access_token.txt
-- See the "Using Azure tokens" section
 
 #### Get admin consent
 - https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/grant-admin-consent
