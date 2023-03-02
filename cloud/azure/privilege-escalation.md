@@ -27,8 +27,12 @@
 
 ## Privesc enumeration
 ### When on a new machine
-### Check other tenants
+#### Check for other tenants
 - Login to the Azure portal and in the right top click on the user and then `Switch Directory`.
+
+```
+Get-AzTenant
+```
 
 #### Get context of current user
 ```
