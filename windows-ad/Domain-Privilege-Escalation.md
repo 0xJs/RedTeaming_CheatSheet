@@ -158,6 +158,10 @@ crackmapexec smb <DC IP> -u <USER FILE> -p <PASSWORD FILE> --continue-on-success
 spray.sh -smb <DC IP> <USER FILE> <PASSWORD FILE> <AttemptsPerLockoutPeriod> <LockoutPeriodInMinutes> <DOMAIN>
 ```
 
+#### Reset password remotely
+- Usefull for when the password is expired or set to MUST CHANGE
+- [Link](/Post-Exploitation.md#resetting-a-password-remotely)
+
 ## Kerberoast
 - https://github.com/GhostPack/Rubeus
 #### Find user accounts used as service accounts
