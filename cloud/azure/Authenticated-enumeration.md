@@ -1222,21 +1222,57 @@ python C:\AzAD\Tools\stormspotter\stormcollector\sscollector.pyz cli
 - Use the built-in queries to visualize the data.
 
 ### Bloodhound / Azurehound
-- https://github.com/BloodHoundAD/AzureHound
 - More queries: https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/
 
-#### Run the collector to collect data
+## New collector
+- https://github.com/BloodHoundAD/AzureHound
+- https://bloodhound.readthedocs.io/en/latest/data-collection/azurehound.html
+
+### Without MFA/CA
 ```
-import-module .\AzureAD.psd1
+.\azurehound.exe -u <USER> -p <PASSWORD> list --tenant "<TENANT ID>" -o output.json
+```
 
-$passwd = ConvertTo-SecureString "<PASSWORD>" -AsPlainText -Force
-$creds = New-Object System.Management.Automation.PSCredential ("<USERNAME>", $passwd) 
-Connect-AzAccount -Credential $creds
-Connect-AzureAD -Credential $creds
+#### Device code login
+```
+$body = @{
+    "client_id" =     "1950a258-227b-4e31-a9cf-717495945fc2"
+    "resource" =      "https://graph.microsoft.com"
+}
+$UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+$Headers=@{}
+$Headers["User-Agent"] = $UserAgent
+$authResponse = Invoke-RestMethod `
+    -UseBasicParsing `
+    -Method Post `
+    -Uri "https://login.microsoftonline.com/common/oauth2/devicecode?api-version=1.0" `
+    -Headers $Headers `
+    -Body $body
+$authResponse
+```
 
+#### Retrieve access token
+```
+$body=@{
+    "client_id" =  "1950a258-227b-4e31-a9cf-717495945fc2"
+    "grant_type" = "urn:ietf:params:oauth:grant-type:device_code"
+    "code" =       $authResponse.device_code
+}
+$Tokens = Invoke-RestMethod `
+    -UseBasicParsing `
+    -Method Post `
+    -Uri "https://login.microsoftonline.com/Common/oauth2/token?api-version=1.0" `
+    -Headers $Headers `
+    -Body $body
+$Tokens
+```
 
-. C:\AzAD\Tools\AzureHound\AzureHound.ps1
-Invoke-AzureHound -Verbose
+#### Run the collector
+- Use `-v 2` to increase the verbosity
+```
+$Token = <ACCESS TOKEN>
+
+.\azurehound.exe -r $Token list --tenant "tenant ID" -o output.json
 ```
 
 #### Change object ID's to names in Bloodhound
