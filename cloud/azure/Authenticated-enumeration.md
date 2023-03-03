@@ -1223,8 +1223,6 @@ python C:\AzAD\Tools\stormspotter\stormcollector\sscollector.pyz cli
 
 ### Bloodhound / Azurehound
 - More queries: https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/
-
-## New collector
 - https://github.com/BloodHoundAD/AzureHound
 - https://bloodhound.readthedocs.io/en/latest/data-collection/azurehound.html
 
