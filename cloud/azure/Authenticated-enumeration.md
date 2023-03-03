@@ -26,7 +26,7 @@
 * [Tools](#Tools)
   * [Roadtools](#Roadtools)
   * [Stormspotter](#Stormspotter)
-  * [Bloodhound / Azurehound](#Bloodhound-/-Azurehound)
+  * [Azurehound](#Azurehound)
   * [Powerzure](#Powerzure-enumeration)
   * [MFAsweep](#MFASweep)
 
@@ -1221,7 +1221,7 @@ python C:\AzAD\Tools\stormspotter\stormcollector\sscollector.pyz cli
 - After login, upload the ZIP archive created by the collector.
 - Use the built-in queries to visualize the data.
 
-### Bloodhound / Azurehound
+### Azurehound
 - More queries: https://hausec.com/2020/11/23/azurehound-cypher-cheatsheet/
 - https://github.com/BloodHoundAD/AzureHound
 - https://bloodhound.readthedocs.io/en/latest/data-collection/azurehound.html
