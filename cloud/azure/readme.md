@@ -3,7 +3,7 @@
 # Index
 * [General](#General)
 * [Authenticated enumeration](Authenticated-enumeration.md )
-* [Exploitation](Exploitation.md)
+* [Exploitation](exploitation.md)
 * [Cloud <-> On-Prem - Lateral Movement](Cloud-OnPrem-lateral-movement.md)
 * [Persistence](persistence.md)
 * [Post exploitation](post-exploitation.md)
