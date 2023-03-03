@@ -26,6 +26,7 @@
 * [Azure ARC](#Azure-ARC)
 * [Illicit Consent Grant Phishing](#Illicit-Consent-Grant-Phishing)
 * [Kubernetes](#Kubernetes)
+* [Privileged Roles & Privileges](#Privileged-Roles-&-Privileges)
 
 ## Privesc enumeration
 ### When on a new machine
@@ -703,4 +704,14 @@ cat /var/run/secrets/kubernetes.io/serviceaccount/token
 #### Check if we can view namespace
 ```
 ./kubectl describe pods
+```
+
+## Privileged Roles & Privileges
+### Reset Password
+- The following roles can reset a password of the following roles:
+![image](https://user-images.githubusercontent.com/43987245/222741224-3b501706-b5b1-4b67-9622-526d4c563df9.png)
+
+#### Reset password
+```
+(Get-AzureADUser -All $true | ?{$_.UserPrincipalName -eq "<USER>"}).ObjectId | Set-AzureADUserPassword -Password $Password -Verbose
 ```
