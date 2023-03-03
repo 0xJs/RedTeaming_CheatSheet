@@ -64,6 +64,7 @@
 * [Windows Server Update Services WSUS](#WSUS)
 * [Microsoft System Center Configuration Manager SCCM](#SCCM)
 * [Active Directory Federation Services](#ADFS)
+* [Pre Windows 2000 Computers](#Pre-Windows-2000-Computers)
 * [Child to Parent](#Child-to-Parent)
   * [Kerberos](#Kerberos)
   * [Azure AD](#Azure-AD)
@@ -2306,7 +2307,10 @@ python3 ADFSpoof.py -b TKSKey.bin DKMkey.bin -s adfs.<DOMAIN>.local saml2 --endp
 
 #### Inject golden SAML token
 - Intercept with burp and inject inside SAMLResponse.
- 
+
+## Pre Windows 2000 computers
+- Check the [Initial Access page](Initial-Access.md#pre-windows-2000-computers)
+
 ## Child to Parent
 ### Kerberos
 - Anything related to Kerberos and users/groups etc could be performed from child to parent. Things like Roasting, password in description, anything related to attributes, ACL's etc etc!
