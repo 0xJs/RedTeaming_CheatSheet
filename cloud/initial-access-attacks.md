@@ -12,10 +12,15 @@
   * [OS Command injection](#OS-Command-injection)
 * [Phishing](#Phishing)
   * [Teams](#Teams)
-  * [Phishing Evilginx2](#Phishing-Evilginx2)
-  * [Illicit Consent Grant phishing](#Illicit-Consent-Grant-phishing)
+  * [Evilginx2](#Evilginx2)
+  * [Illicit Consent Grant](#Illicit-Consent-Grant)
+  * [Email Spoofing](#Email-spoofing)
+  * [Device code auth](#Device-code-auth)
   * [Google workspace calendar event injection](#Google-workspace-calendar-event-injection)
 * [Public storage](#public-storage)
+  * [Azure storage accounts](#Azure-storage-accounts)
+  * [AWS blobs](#AWS-blobs)
+  * [Google Storage Buckets](Google-Storage-Buckets)
 * [Misc](#misc)
 
 ## Password and credentials attacks
@@ -189,7 +194,7 @@ curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.com/&api-version=2017-09
 - This means that other Teams users from different Azure tenants can communicate to your employees directly and exchange messages or files. An attacker can leverage this feature to launch a Social Engineering attack against the victim user.
 - Moreover, it is possible to bypass the message request approval by creating a Teams group chat rather than direct chat to the victim.
 
-### Phishing Evilginx2
+### Evilginx2
 - https://github.com/kgretzky/evilginx2
 - Evilginx acts as a relay/man-in-the-middle between the legit web page and the target user. The user always interacts with the legit website and Evilginx captures usernames, passwords and authentication cookies.
 
@@ -260,7 +265,7 @@ reg.Header.Set(string(b), nothing_to_see_here)
 #### Firewall
 - Use CSFirewall or iptables to block VPS incoming and outgoing internet access (e.g Allow only Microsoft and the target IP addresses).
 
-## Illicit Consent Grant phishing
+## Illicit Consent Grant
 - Verified publisher: https://techcommunity.microsoft.com/t5/microsoft-entra-azure-ad-blog/publisher-verification-and-app-consent-policies-are-now/ba-p/1257374
 
 #### Check if users are allowed to consent to apps
@@ -331,12 +336,6 @@ cd C:\xampp\htdocs\365-Stealer\
 python 365-Stealer.py --refresh-all
 ```
 
-### Google workspace calendar event injection
-- Silently injects events to target calendars
-- Bypasses the “don’t auto-add” setting
-- Include link to phishing page
-- https://www.blackhillsinfosec.com/google-calendar-event-injection-mailsniper/
-
 ### Email spoofing
 - https://www.blackhillsinfosec.com/spoofing-microsoft-365-like-its-1995/
 - Microsoft Direct Send is the feature that can be utilised to send spoofing emails.
@@ -399,12 +398,18 @@ CPIM Service 	bb2a2e3a-c5e7-4f0a-88e0-8e01fd3fc1f4
 CRM Power BI Integration 	e64aa8bc-8eb4-40e2-898b-cf261a25954f
 ```
 
+### Google workspace calendar event injection
+- Silently injects events to target calendars
+- Bypasses the “don’t auto-add” setting
+- Include link to phishing page
+- https://www.blackhillsinfosec.com/google-calendar-event-injection-mailsniper/
+
 ## Public Storage
 ### Find data in public storage
 - https://github.com/initstring/cloud_enum can scan all three cloud services for multiple services.
 - https://github.com/jordanpotti/CloudScraper can scan all three cloud services for multiple services.
 
-### Azure
+### Azure storage accounts
 #### Google Dorks
 ```
 site:github.com “StorageConnectionString” “DefaultEndpointsProtocol”
@@ -422,7 +427,7 @@ Invoke-EnumerateAzureBlobs -Base <COMPANY NAME>
 - Check for a SAS URL, if found then open the "Connect to Azure Storage", select "blobl container" and select 'Shared Access Signatur (SAS)' and paste the URL, displayname will fill automatically.
 - Another example: https://<STORAGE NAME>.blob.core.windows.net/<container-name>?restype=container&comp=list
 
-### Public AWS blobs
+### AWS blobs
 - https://github.com/RhinoSecurityLabs/pacu
 
 #### Brute force bucket names
@@ -441,7 +446,7 @@ sudo aws s3 ls s3://<BUCKET> --profile <PROFILE>
 sudo aws s3 sync s3://<BUCKET> s3-files-dir --profile <PROFILE>
 ```
 
-### Public Google Storage Buckets
+### Google Storage Buckets
 - https://github.com/initstring/cloud_enum
 
 ### Public SQL database
