@@ -149,12 +149,28 @@ curl http://169.254.169.254/latest/meta-data/profile -H "X-aws-ec2-metadata-toke
 - Find we webapp which is vulnerable, test with injectin a expression ```{{7*7}}``` and see if it gets evaluated.
 - The way expression is evaluated means that, most probably, either PHP or Python is used for the web app. We may need to run some trial and error methods to find out the exact language and template framework. 
 - Use ```{{config.items()}}``` and see if it works.
-- Check if a managed identity is assigned (Check for the env variables IDENTITY_HEADER and IDENTITY_ENDPOINT)
-- If code execution is possible execute the following to get access tokens
+
+#### Execute env
+```
+?cmd=env
+```
+- if the app service contains environment variables `IDENITY_HEADER` and `IDENTITY_ENDPOINT`, it has a managed identity.
+
+#### Exploit
+- Go to [Exploitation Managed Identity](/cloud/azure/exploitation.md#Managed-Identity)
 
 ### OS Command injection
 - In case of OS command injection, it is possible to run arbitrary operating  system commands on the server where requests are processed. 
 - This is usually due to insecure parsing of user input such as parameters, uploaded files and HTTP requests. 
+
+#### Execute env
+```
+?cmd=env
+```
+- if the app service contains environment variables `IDENITY_HEADER` and `IDENTITY_ENDPOINT`, it has a managed identity.
+
+#### Exploit
+- Go to [Exploitation Managed Identity](/cloud/azure/exploitation.md#Managed-Identity)
 
 ## Phishing
 ### Teams
