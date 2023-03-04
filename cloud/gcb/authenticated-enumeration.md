@@ -242,10 +242,14 @@ kubectl cluster-info
 ```
 
 ## Serverless
+#### List cloud functions
+```
+gcloud functions list
+```
+
 #### GCP functions log analysis 
 - May get useful information from logs associated with GCP functions
 ```
-gcloud functions list
 gcloud functions describe <function name>
 gcloud functions logs read <function name> --limit <number of lines>
 ```
