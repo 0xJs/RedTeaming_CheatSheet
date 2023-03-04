@@ -2,6 +2,7 @@
 * [General](#General)
 * [Enumeration through Google Cloud portal](#Enumeration-through-Google-Cloud-portal)
 * [Enumeration with gcloud CLI](#Enumeration-with-gcloud-CLI)
+  * [Authentication Methods](#Authentication-Methods)
   * [Resource Hierarchy](#Resource-Hierarchy)
   * [Projects](#Projects)
   * [Service Accounts](#Service-accounts)
@@ -34,25 +35,29 @@
 gcloud
 ```
 
-#### User identity login
-- Saved in `C:\Users\<USER>\AppData\Roaming\gcloud\` or `/home/<USER>/.config/gcloud/`
+### Authentication Methods
+#### User account 
+- Login through the GUI with Username & Pass
 ```
 gcloud auth login
 ```
 
 #### Service account login
+- Json key file
 ```
-gcloud auth activate-service-account --key-file creds.json
+gcloud auth activate-service-account --key-file <JSON FILE>
 ```
 
-#### External application login
+#### User Account - Username & Pass - External application login
+- Also known as Application Default Credential
+- Login through the GUI with Username & Pass and creates `application_default_credentials.json`
 ```
 gcloud auth application-default login
 ```
 
-#### External application (default credential)
-- Usaed for Terraform for example
-- Stored in `$HOME/.config/gcloud/application_default_credentials.json` or `%APPDATA%\gcloud\application_default_credentials.json`
+#### Service Account - External application
+- Also known as Application Default Credential
+- Used for Terraform for example
 ```
 $env:GOOGLE_APPLICATION_CREDENTIALS="<PATH TO OF .json OF SERVICE ACCOUNT>"
 dir env:
