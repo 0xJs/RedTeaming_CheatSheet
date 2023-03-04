@@ -6,7 +6,7 @@
 * [Cloud Services](readme.md)
   * [Azure](azure/readme.md)
   * [Amazon Web Services](aws/readme.md)
-  * [Google Cloud Platform](gcb/readme.md)
+  * [Google Cloud](gc/readme.md)
 
 # General
 - Google Cloud Platform != Google Workspace
