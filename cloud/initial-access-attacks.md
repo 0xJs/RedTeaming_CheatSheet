@@ -20,7 +20,7 @@
 * [Public storage](#public-storage)
   * [Azure storage accounts](#Azure-storage-accounts)
   * [AWS blobs](#AWS-blobs)
-  * [Google Storage Buckets](Google-Storage-Buckets)
+  * [Google Storage Buckets](#Google-Storage-Buckets)
 * [Misc](#misc)
 
 ## Password and credentials attacks
