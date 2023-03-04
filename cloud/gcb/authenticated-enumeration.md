@@ -53,9 +53,14 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="<PATH TO .json>"
 dir env:
 ```
 
-#### Get current connected user
+#### get the current user
 ```
-gcloud config get account
+gcloud auth list
+```
+
+#### Change between user
+```
+gcloud config set account <ACCOUNT>
 ```
 
 ### Resource Hierarchy
