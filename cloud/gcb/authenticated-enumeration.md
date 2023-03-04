@@ -29,6 +29,11 @@
 -  ```gcloud``` CLI tool for managing auth, config, and interacting with GCP services
 -  ``` gsutil``` CLI tool for accessing GCP storage buckets
 
+#### Gcloud services and commands
+```
+gcloud
+```
+
 #### User identity login
 - Saved in `C:\Users\<USER>\AppData\Roaming\gcloud\` or `/home/<USER>/.config/gcloud/`
 ```
