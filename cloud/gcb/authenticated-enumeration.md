@@ -1,13 +1,19 @@
 # Authenticated enumeration
-## Index
+* [General](#General)
 * [Authentication](#Authentication)
 * [Manual Enumeration](#Manual-Enumeration)
+  * [Resource Hierarchy](#Resource-Hierarchy)
+  * [User](#User)
+  * [IAM](#IAM)
+  * [Projects](#Projects)
   * [Virtual machines](#Virtual-machines)
   * [Storage Buckets](#Storage-Buckets)
   * [Webapps and SQL](#Webapps-and-SQL)
   * [Networking](#Networking)
   * [Containers](#Containers)
   * [Serverless](#Serverless)
+
+## General
 
 ## Authentication
 #### User identity login
@@ -25,30 +31,45 @@ gcloud auth activate-service-account --key-file creds.json
 -  ```gcloud``` CLI tool for managing auth, config, and interacting with GCP services
 -  ``` gsutil``` CLI tool for accessing GCP storage buckets
 
-### Basic enumeration
-#### List accounts available to gcloud
+### Resource Hierarchy
+- Organization --> Folders --> Projects --> Resources
+
+#### List google cloud organizations the user has access too
 ```
-gcloud auth list
+gcloud organizations list
 ```
 
+#### List GCP folders
+```
+gcloud resource-manager folders list --organization <ORG ID>
+```
+
+### User
 #### Get account information
 ```
 gcloud config list
 ```
 
-#### List organizations
+#### List accounts available to gcloud
 ```
-gcloud organizations list
+gcloud auth list
 ```
 
+### IAM
 #### Enumerate IAM policies set ORG-wide
 ```
 gcloud organizations get-iam-policy <ORG ID>
 ```
 
-#### List projects
+### Projects
+#### Get projects
 ```
 gcloud projects list
+```
+
+#### Get hierachy of project
+```
+gcloud projects get-ancestors <PROJECT ID>
 ```
 
 #### Set a different project
