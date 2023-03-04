@@ -1,7 +1,7 @@
 # Authenticated enumeration
 * [General](#General)
-* [Authentication](#Authentication)
-* [Manual Enumeration](#Manual-Enumeration)
+* [Enumeration through Google Cloud portal]
+* [Enumeration with gcloud CLI](#Enumeration-with-gcloud-CLI)
   * [Resource Hierarchy](#Resource-Hierarchy)
   * [User](#User)
   * [IAM](#IAM)
@@ -12,11 +12,24 @@
   * [Networking](#Networking)
   * [Containers](#Containers)
   * [Serverless](#Serverless)
+* [Enumeration using Google Cloud API](#Enumeration-using-Google-Cloud-API)
 
 ## General
+## Enumeration through Google Cloud portal
+- Google Cloud login at https://console.cloud.google.com/
+- Google Workspace admin login at https://admin.google.com/
+- Google Workspace user access https://myaccount.google.com/
+  - Mail https://mail.google.com/
+  - Google Drive https://drive.google.com/
+  - Contacts https://contacts.google.com/
 
-## Authentication
+## Enumeration using gcloud CLI
+-  Most GCP instances have Google Cloud SDK installed
+-  ```gcloud``` CLI tool for managing auth, config, and interacting with GCP services
+-  ``` gsutil``` CLI tool for accessing GCP storage buckets
+
 #### User identity login
+- Saved in `C:\Users\<USER>\AppData\Roaming\gcloud\` or `/home/<USER>/.config/gcloud/`
 ```
 gcloud auth login
 ```
@@ -26,10 +39,17 @@ gcloud auth login
 gcloud auth activate-service-account --key-file creds.json
 ```
 
-## Manual Enumeration
--  Most GCP instances have Google Cloud SDK installed
--  ```gcloud``` CLI tool for managing auth, config, and interacting with GCP services
--  ``` gsutil``` CLI tool for accessing GCP storage buckets
+#### External application login
+```
+gcloud auth application-default login
+```
+
+#### External application (default credential)
+- Stored in `$HOME/.config/gcloud/application_default_credentials.json` or `%APPDATA%\gcloud\application_default_credentials.json`
+```
+$env:GOOGLE_APPLICATION_CREDENTIALS="<PATH TO .json>"
+dir env:
+```
 
 ### Resource Hierarchy
 - Organization --> Folders --> Projects --> Resources
@@ -56,6 +76,11 @@ gcloud auth list
 ```
 
 ### IAM
+- Three roletypes
+  - Basic roles, provides broader access to Google Cloud resources - Owner, Editor, Viewer
+  - Predefined roles, provides granular access to specific Google Cloud resources.
+  - Custom Roles, provides custom access to Google Cloud resources.
+
 #### Enumerate IAM policies set ORG-wide
 ```
 gcloud organizations get-iam-policy <ORG ID>
@@ -215,3 +240,16 @@ gcloud run services describe <service-name>
 gcloud run revisions describe --region=<region> <revision-name>
 ```
 
+## Enumeration using Google Cloud API
+- Service Endpoint : https://[ServiceName].googleapis.com
+- Documentation: https://developers.google.com/apis-explorer
+
+#### Validate access token
+```
+curl https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=<ACCESS TOKEN>
+```
+
+#### Access Google API
+```
+curl -X Method -H “Authorization: Bearer $AccessToken” https://API-URL
+```
