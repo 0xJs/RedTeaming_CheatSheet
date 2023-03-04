@@ -50,6 +50,7 @@ gcloud config set project <PROJECT NAME>
 
 #### Check IAM policy on project level
 ```
+gcloud projects get-iam-policy <PROJECT ID>
 gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
 ```
 
