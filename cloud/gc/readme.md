@@ -6,6 +6,7 @@
 * [Lateral-movement](lateral-movement.md)
 * [Persistence](persistence.md)
 * [Post Exploitation](post-exploitation.md)
+* [Persistence](persistence.md)
 
 ## General
 
