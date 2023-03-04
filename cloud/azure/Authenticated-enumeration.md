@@ -1,6 +1,4 @@
 # Authenticated enumeration
-
-* [Enumerating through Azure Portal](#Enumeration-through-Azure-portal)
 * [Enumeration using AzureAD Module](#Enumeration-using-AzureAD-Module)
   * [User enumeration](#User-enumeration)
   * [Group enumeration](#Group-enumeration)
@@ -39,6 +37,8 @@
     - **Used to manage Azure resources.**
   - Azure CLI. Syntax used is ```*az *``` (Az space)
     - **Create and manage Azure Resources.**
+- AzureAD is for the Active Directory part of Azure. Users, Groups Etc.
+- Azure PowerShell and Azure CLI Enumerate is for the Azure Cloud resources part.
 
 #### Check MFA configuration of user
 - https://github.com/dafthack/MFASweep
