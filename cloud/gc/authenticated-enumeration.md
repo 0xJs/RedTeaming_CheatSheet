@@ -87,6 +87,12 @@ gcloud organizations list
 gcloud resource-manager folders list --organization <ORG ID>
 ```
 
+#### List resources
+- Required `cloudasset.googleapis.com` to be enabled for project
+```
+gcloud beta asset search-all-resources
+```
+
 ### Projects
 - All Google Cloud resources are in projects. When quering for resources it is limited to the projects. You gotta change projects to enumerate everything!
 
