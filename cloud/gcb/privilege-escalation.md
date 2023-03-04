@@ -37,6 +37,16 @@
 - The default service account can access EVERY storage bucket in a project
 
 ## Exploitation enumeration
+#### Check accessible projects
+```
+gcloud projects list
+```
+
+#### Set a project
+```
+gcloud config set project <PROJECT NAME> 
+```
+
 #### Check IAM policy on project level
 ```
 gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
