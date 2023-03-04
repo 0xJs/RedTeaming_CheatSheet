@@ -1,11 +1,12 @@
 # Authenticated enumeration
 * [General](#General)
-* [Enumeration through Google Cloud portal]
+* [Enumeration through Google Cloud portal](#Enumeration-through-Google-Cloud-portal)
 * [Enumeration with gcloud CLI](#Enumeration-with-gcloud-CLI)
   * [Resource Hierarchy](#Resource-Hierarchy)
   * [User](#User)
   * [IAM](#IAM)
   * [Projects](#Projects)
+  * [Service Accounts](#Service-accounts)
   * [Virtual machines](#Virtual-machines)
   * [Storage Buckets](#Storage-Buckets)
   * [Webapps and SQL](#Webapps-and-SQL)
@@ -24,6 +25,7 @@
   - Contacts https://contacts.google.com/
 
 ## Enumeration using gcloud CLI
+- Documentation: https://cloud.google.com/sdk/gcloud/reference
 -  Most GCP instances have Google Cloud SDK installed
 -  ```gcloud``` CLI tool for managing auth, config, and interacting with GCP services
 -  ``` gsutil``` CLI tool for accessing GCP storage buckets
@@ -86,6 +88,16 @@ gcloud auth list
 gcloud organizations get-iam-policy <ORG ID>
 ```
 
+#### Check IAM policy on project level
+```
+gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
+```
+
+#### List all permission in custom role
+```
+gcloud iam roles describe <ROLE> --project <PROJECT ID>
+```
+
 ### Projects
 #### Get projects
 ```
@@ -115,6 +127,12 @@ gcloud source repos list
 #### Clone repo to home dir
 ```
 gcloud source repos clone <repo_name>
+```
+
+### Service accounts
+#### List service accounts on project level
+```
+gcloud iam service-accounts list
 ```
 
 ### Virtual machines
