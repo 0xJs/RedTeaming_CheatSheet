@@ -64,6 +64,8 @@ gcloud config set account <ACCOUNT>
 ```
 
 #### Get config of all sessions/users
+- Such as project set etc.
+- Usefull if using multiple users
 ```
 gcloud config list
 ```
@@ -110,6 +112,7 @@ gcloud services list
 ```
 
 #### Get information about project
+- 
 ```
 gcloud projects describe <PROJECT ID>
 ```
