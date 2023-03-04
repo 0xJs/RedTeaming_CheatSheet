@@ -141,7 +141,7 @@ curl http://169.254.169.254/latest/meta-data/profile -H "X-aws-ec2-metadata-toke
 - if the app service contains environment variables `IDENITY_HEADER` and `IDENTITY_ENDPOINT`, it has a managed identity.
 
 #### Exploit
-- Go to [Exploitation Managed Identity](/cloud/azure/exploitation.md#Managed-Identity)
+- Go to [Exploitation Managed Identity](/cloud/azure/privilege-escalation.md#Managed-Identity)
 
 ### Server Side Template Injection
 - SSTI allows an attacker to abuse template syntax to inject payloads in a template that is executed on the server side. 
@@ -157,7 +157,7 @@ curl http://169.254.169.254/latest/meta-data/profile -H "X-aws-ec2-metadata-toke
 - if the app service contains environment variables `IDENITY_HEADER` and `IDENTITY_ENDPOINT`, it has a managed identity.
 
 #### Exploit
-- Go to [Exploitation Managed Identity](/cloud/azure/exploitation.md#Managed-Identity)
+- Go to [Exploitation Managed Identity](/cloud/azure/privilege-escalation.md#Managed-Identity)
 
 ### OS Command injection
 - In case of OS command injection, it is possible to run arbitrary operating  system commands on the server where requests are processed. 
@@ -170,7 +170,7 @@ curl http://169.254.169.254/latest/meta-data/profile -H "X-aws-ec2-metadata-toke
 - if the app service contains environment variables `IDENITY_HEADER` and `IDENTITY_ENDPOINT`, it has a managed identity.
 
 #### Exploit
-- Go to [Exploitation Managed Identity](/cloud/azure/exploitation.md#Managed-Identity)
+- Go to [Exploitation Managed Identity](/cloud/azure/privilege-escalation.md#Managed-Identity)
 
 ## Phishing
 ### Teams
