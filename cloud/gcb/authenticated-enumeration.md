@@ -3,7 +3,6 @@
 * [Enumeration through Google Cloud portal](#Enumeration-through-Google-Cloud-portal)
 * [Enumeration with gcloud CLI](#Enumeration-with-gcloud-CLI)
   * [Resource Hierarchy](#Resource-Hierarchy)
-  * [User](#User)
   * [Projects](#Projects)
   * [IAM](#IAM)
   * [Service Accounts](#Service-accounts)
@@ -112,20 +111,8 @@ gcloud services list
 ```
 
 #### Get information about project
-- 
 ```
 gcloud projects describe <PROJECT ID>
-```
-
-### User
-#### Get account information
-```
-gcloud config list
-```
-
-#### List accounts available to gcloud
-```
-gcloud auth list
 ```
 
 ### IAM
