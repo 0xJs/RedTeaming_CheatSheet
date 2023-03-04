@@ -3,6 +3,7 @@
   * [Requesting access tokens](#Requesting-access-tokens)
 * [Exploitation Enumeration](#Exploitation-Enumeration)
   * [When on a new machine](#When-on-a-new-machine)
+  * [After getting a new user](#After-getting-a-new-user)
 * [Azure AD](#Azure-AD-Exploitation)
   * [Bypass MFA](#Bypass-MFA)
     * [Conditional Access](#Conditional-Access) 
