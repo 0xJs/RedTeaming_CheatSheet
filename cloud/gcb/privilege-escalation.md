@@ -1,4 +1,4 @@
-# Privilege Escalation
+# Exploitation & Privilege Escalation
 ## Index
 * [General](#General)
 * [Exploitation Enumeration](#Exploitation-Enumeration)
