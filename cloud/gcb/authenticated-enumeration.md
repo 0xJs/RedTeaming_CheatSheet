@@ -84,7 +84,7 @@ gcloud resource-manager folders list --organization <ORG ID>
 ```
 
 ### Projects
-- All Google Cloud resources are in resources. When quering for resource it is limited to the projects. You gotta change projects to enumerate everything!
+- All Google Cloud resources are in projects. When quering for resources it is limited to the projects. You gotta change projects to enumerate everything!
 
 #### Get projects
 ```
