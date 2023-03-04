@@ -10,7 +10,12 @@
 
 # General
 - Google Cloud Platform != Google Workspace
-- Azure != Microsoft 365
+  - Google Cloud Platform provides cloud services. Iaas, Paas, Saas
+  - Google Workspace (G-suite) provides business applications. Saas, Idaas
+- Azure != Microsoft 365 != Azure AD
+  - Azure AD is the Identity Management part of Azure. This is where all the users are.
+  - Azure provides cloud services. Iaas, Paas, Saas
+  - Microsoft365 provides business applications. Saas, Idaas
 - Google Workspace and Microsoft 365 are productivity suites
 - Rules of engagement 
   - Azure https://www.microsoft.com/en-us/msrc/pentest-rules-of-engagement
