@@ -6,5 +6,9 @@
 -  API and service account tokens
   -  Create a new project on cloud.google.com
   -  Enable API access with scopes set to any resources you can
-  -  or Create private key JSON file for service account
-  -  ```gcloud iam service-accounts keys create --iam-account my-iamaccount@somedomain.com key.json```
+  
+  ## Service Account
+  #### Private key
+  ```
+  gcloud iam service-accounts keys create --iam-account <PRIVILIGED SERVICE ACCOUNT> key.json
+  ```
