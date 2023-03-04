@@ -4,8 +4,8 @@
 * [Enumeration with gcloud CLI](#Enumeration-with-gcloud-CLI)
   * [Resource Hierarchy](#Resource-Hierarchy)
   * [User](#User)
-  * [IAM](#IAM)
   * [Projects](#Projects)
+  * [IAM](#IAM)
   * [Service Accounts](#Service-accounts)
   * [Virtual machines](#Virtual-machines)
   * [Storage Buckets](#Storage-Buckets)
@@ -53,6 +53,11 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="<PATH TO .json>"
 dir env:
 ```
 
+#### Get current connected user
+```
+gcloud config get account
+```
+
 ### Resource Hierarchy
 - Organization --> Folders --> Projects --> Resources
 
@@ -64,6 +69,39 @@ gcloud organizations list
 #### List GCP folders
 ```
 gcloud resource-manager folders list --organization <ORG ID>
+```
+
+### Projects
+- All Google Cloud resources are in resources. When quering for resource it is limited to the projects. You gotta change projects to enumerate everything!
+
+#### Get projects
+```
+gcloud projects list
+```
+
+#### Get hierachy of project
+```
+gcloud projects get-ancestors <PROJECT ID>
+```
+
+#### Set a project
+```
+gcloud config set project <PROJECT NAME> 
+```
+
+#### Get current project set
+```
+gcloud config get project
+```
+
+#### Gives a list of all APIs that are enabled in project
+```
+gcloud services list
+```
+
+#### Get information about project
+```
+gcloud projects describe <PROJECT ID>
 ```
 
 ### User
@@ -98,27 +136,7 @@ gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --fil
 gcloud iam roles describe <ROLE> --project <PROJECT ID>
 ```
 
-### Projects
-#### Get projects
-```
-gcloud projects list
-```
-
-#### Get hierachy of project
-```
-gcloud projects get-ancestors <PROJECT ID>
-```
-
-#### Set a different project
-```
-gcloud config set project <PROJECT NAME> 
-```
-
-#### Gives a list of all APIs that are enabled in project
-```
-gcloud services list
-```
-
+### Repos
 #### Get source code repos available to user
 ```
 gcloud source repos list
