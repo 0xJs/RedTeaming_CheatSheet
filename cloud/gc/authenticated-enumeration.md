@@ -51,6 +51,7 @@ gcloud auth application-default login
 ```
 
 #### External application (default credential)
+- Usaed for Terraform for example
 - Stored in `$HOME/.config/gcloud/application_default_credentials.json` or `%APPDATA%\gcloud\application_default_credentials.json`
 ```
 $env:GOOGLE_APPLICATION_CREDENTIALS="<PATH TO OF .json OF SERVICE ACCOUNT>"
