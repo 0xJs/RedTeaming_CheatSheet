@@ -4,8 +4,8 @@
 * [Enumeration with gcloud CLI](#Enumeration-with-gcloud-CLI)
   * [Resource Hierarchy](#Resource-Hierarchy)
   * [Projects](#Projects)
-  * [IAM](#IAM)
   * [Service Accounts](#Service-accounts)
+  * [IAM](#IAM)
   * [Virtual machines](#Virtual-machines)
   * [Storage Buckets](#Storage-Buckets)
   * [Webapps and SQL](#Webapps-and-SQL)
@@ -126,6 +126,12 @@ gcloud services list
 gcloud projects describe <PROJECT ID>
 ```
 
+### Service accounts
+#### List service accounts on project level
+```
+gcloud iam service-accounts list
+```
+
 ### IAM
 - Three roletypes
   - Basic roles, provides broader access to Google Cloud resources - Owner, Editor, Viewer
@@ -147,6 +153,11 @@ gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --fil
 gcloud iam roles describe <ROLE> --project <PROJECT ID>
 ```
 
+#### List permissions of service account
+```
+gcloud iam service-accounts get-iam-policy <SERVICE ACCOUNT EMAIL>
+```
+
 ### Repos
 #### Get source code repos available to user
 ```
@@ -156,12 +167,6 @@ gcloud source repos list
 #### Clone repo to home dir
 ```
 gcloud source repos clone <repo_name>
-```
-
-### Service accounts
-#### List service accounts on project level
-```
-gcloud iam service-accounts list
 ```
 
 ### Virtual machines
