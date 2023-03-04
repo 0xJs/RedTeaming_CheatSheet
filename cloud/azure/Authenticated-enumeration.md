@@ -48,8 +48,8 @@ Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
 ```
 
 ## Enumeration through Azure portal
-#### Login azure portal
-Login to the azure portal with successfull attacks https://portal.azure.com/
+#### Login Azure portal
+- Login to the azure portal with successfull attacks https://portal.azure.com/
 
 #### Enumerate users, groups, devices, directory roles, enterprise applications
 - Open the left menu --> Azure Active directory and click check the users, groups, Roles and administrators, Enterprise Application and devices tab.
