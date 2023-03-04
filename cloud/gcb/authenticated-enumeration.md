@@ -63,6 +63,11 @@ gcloud auth list
 gcloud config set account <ACCOUNT>
 ```
 
+#### Get config of all sessions/users
+```
+gcloud config list
+```
+
 ### Resource Hierarchy
 - Organization --> Folders --> Projects --> Resources
 
