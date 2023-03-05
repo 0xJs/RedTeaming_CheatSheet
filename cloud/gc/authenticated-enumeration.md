@@ -9,11 +9,12 @@
   * [IAM](#IAM)
     * [Policies](#Policies)
     * [Roles](#Roles) 
+    * [ORG policies](#ORG-policies)
     * [Bruterforce Permissions](Bruterforce-Permissions)
   * [Virtual machines](#Virtual-machines)
+  * [Networking](#Networking)
   * [Storage Buckets](#Storage-Buckets)
   * [Webapps and SQL](#Webapps-and-SQL)
-  * [Networking](#Networking)
   * [Containers](#Containers)
   * [Serverless](#Serverless)
 * [Enumeration using Google Cloud API](#Enumeration-using-Google-Cloud-API)
@@ -201,6 +202,22 @@ gcloud iam service-accounts list
 gcloud iam service-accounts get-iam-policy <SERVICE ACCOUNT EMAIL>
 ```
 
+### ORG Policies
+#### List org policies on org level
+```
+gcloud resource-manager org-policies list --organization=<ORG ID>
+```
+
+#### List org policies on folder level
+```
+gcloud resource-manager org-policies list --folder=<FOLDER ID>
+```
+
+#### List org policies on project level
+```
+gcloud resource-manager org-policies list --project=<PROJECT ID>
+```
+
 ### Bruterforce Permissions
 - https://github.com/carlospolop/bf_my_gcp_permissions
 
@@ -237,6 +254,27 @@ curl http://metadata.google.internal/computeMetadata/v1/instance/service-account
 #### Use Google keyring to decrypt encrypted data
 ```
 gcloud kms decrypt --ciphertext-file=encrypted-file.enc --plaintext-file=out.txt --key <crypto-key> --keyring <crypto-keyring> --location global
+```
+
+### Networking
+#### List networks
+```
+gcloud compute networks list
+```
+
+#### List subnets
+```
+gcloud compute networks subnets list
+```
+
+#### List VPN tunnels
+```
+gcloud compute vpn-tunnels list
+```
+
+#### List Interconnects (VPN)
+```
+gcloud compute interconnects list
 ```
 
 ### Storage Buckets
@@ -280,27 +318,6 @@ gsutil cp gs://bucket-name/folder/ .
 gsutil mb gs://<googlestoragename>
 gsutil acl ch -u <service account> gs://<googlestoragename>
 gcloud sql export sql <sql instance name> gs://<googlestoragename>/sqldump.gz --database=<database name>
-```
-
-### Networking
-#### List networks
-```
-gcloud compute networks list
-```
-
-#### List subnets
-```
-gcloud compute networks subnets list
-```
-
-#### List VPN tunnels
-```
-gcloud compute vpn-tunnels list
-```
-
-#### List Interconnects (VPN)
-```
-gcloud compute interconnects list
 ```
 
 ### Containers
