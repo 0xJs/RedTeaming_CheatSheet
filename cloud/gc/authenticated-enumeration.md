@@ -173,13 +173,13 @@ gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --fil
 
 #### Oneliner to check permissions on all projects
 ```
-gcloud projects list | awk '{print $1}' | tail -n +2  | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project; done
+gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project; done
 ```
 
 #### Oneliner to check permissions of a user on all projects
 ```
 GCUSER=<USER EMAIL>
-gcloud projects list | awk '{print $1}' | tail -n +2  | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)"; done
+gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)"; done
 ```
 
 #### Enumerate IAM policies of a resource
@@ -215,13 +215,13 @@ gcloud iam service-accounts get-iam-policy <SERVICE ACCOUNT EMAIL>
 
 #### Oneliner to check permissions of all service accounts
 ```
-gcloud iam service-accounts list | rev | awk '{print $2}' | rev | tail -n +2 | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount; done
+gcloud iam service-accounts list --format="value(email)" | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount 2>/dev/null; done
 ```
 
 #### Oneliner to check permissions of a user on all service accounts
 ```
 GCUSER=<USER EMAIL>
-gcloud iam service-accounts list | rev | awk '{print $2}' | rev | tail -n +2 | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
+gcloud iam service-accounts list --format="value(email)" | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
 ```
 
 ### ORG Policies
