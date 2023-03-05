@@ -261,7 +261,7 @@ gcloud compute project-info add-metadata --metadata-from-file=ssh-keys=<KEY FILE
 
 #### Set ssh key value in the instance metadata
 ```
-gcloud compute instances add-metadata <VM NAME> --metadata-from-file ssh-keys=<KEY FILE>
+gcloud compute instances add-metadata <VM NAME> --metadata-from-file-ssh-keys=<KEY FILE>
 ```
 
 ### OsLogin
