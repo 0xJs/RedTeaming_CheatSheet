@@ -220,6 +220,17 @@ gcloud resource-manager org-policies list --project=<PROJECT ID>
 
 ### Bruterforce Permissions
 - https://github.com/carlospolop/bf_my_gcp_permissions
+- Open up `access_tokens.db` in `$HOME/.config/gcloud/` or `%APPDATA%\gcloud\`
+
+#### Run the tool with access token
+```
+python3 bf_my_gcp_perms.py -t <ACCESS TOKEN>
+```
+
+#### Run the tool with .json
+```
+
+```
 
 ### Repos
 #### Get source code repos available to user
