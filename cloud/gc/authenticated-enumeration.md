@@ -35,7 +35,7 @@
 gcloud
 ```
 
-### Authentication Methods
+### Authentication
 #### User account 
 - Login through the GUI with Username & Pass
 ```
