@@ -321,6 +321,11 @@ gsutil ls
 gsutil ls -r gs://<bucket name>
 ```
 
+#### Cat file
+```
+gsutil cat gs://<bucket name>/<FILE>
+```
+
 ### Webapps and SQL
 #### List webapps
 ```
