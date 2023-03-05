@@ -66,6 +66,16 @@ GCUSER=<USER EMAIL>
 gcloud iam service-accounts list | rev | awk '{print $2}' | rev | tail -n +2 | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
 ```
 
+#### Short list for resources to check access to
+- Gotta be extended
+```
+gcloud functions list
+gcloud compute instances list
+gcloud compute firewall-rules list
+gcloud secrets list
+gsutil ls
+```
+
 ## IAM Policy Permissions
 #### Check IAM policy on project level
 ```
