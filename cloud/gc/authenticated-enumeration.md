@@ -2,7 +2,7 @@
 * [General](#General)
 * [Enumeration through Google Cloud portal](#Enumeration-through-Google-Cloud-portal)
 * [Enumeration using gcloud CLI](#Enumeration-using-gcloud-CLI)
-  * [Authentication Methods](#Authentication-Methods)
+  * [Authentication](#Authentication)
   * [Resource Hierarchy](#Resource-Hierarchy)
   * [Projects](#Projects)
   * [Service Accounts](#Service-accounts)
