@@ -100,6 +100,20 @@ gcloud bigtable instances list --impersonate-service-account $serviceaccount
 gcloud container clusters list --impersonate-service-account $serviceaccount
 ```
 
+- With `--access-token-file=`
+```
+access-token-file="<PATH TO ACCESS TOKEN FILE>"
+gcloud functions list --access-token-file=$access-token-file
+gcloud compute instances list --access-token-file=$access-token-file
+gcloud compute firewall-rules list --access-token-file=$access-token-file
+gcloud secrets list --access-token-file=$access-token-file
+gcloud app instances list --access-token-file=$access-token-file
+gcloud sql instances list --access-token-file=$access-token-file
+gcloud spanner instances list --access-token-file=$access-token-file
+gcloud bigtable instances list --access-token-file=$access-token-file
+gcloud container clusters list --access-token-file=$access-token-file
+```
+
 ## IAM Policy Permissions
 - List of roles and permissions: https://cloud.google.com/iam/docs/understanding-roles#cloud-security-scanner-roles
 
