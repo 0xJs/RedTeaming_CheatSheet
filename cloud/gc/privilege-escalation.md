@@ -222,7 +222,7 @@ gcloud compute instances stop <INSTANCE>
 
 #### Change service account or oauth scope
 ```
-cloud compute instances set-service-account <INSTANCE> --service-account <SERVICE ACCOUNT NAME> --scopes <SCOPE> --zone <ZONE>
+gcloud compute instances set-service-account <INSTANCE> --service-account <SERVICE ACCOUNT NAME> --scopes <SCOPE> --zone <ZONE>
 ```
 
 #### Start compute instance
