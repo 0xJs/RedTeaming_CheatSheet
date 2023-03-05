@@ -7,6 +7,9 @@
   * [Projects](#Projects)
   * [Service Accounts](#Service-accounts)
   * [IAM](#IAM)
+    * [Policies](#Policies)
+    * [Roles](#Roles) 
+    * [Bruterforce Permissions](Bruterforce-Permissions)
   * [Virtual machines](#Virtual-machines)
   * [Storage Buckets](#Storage-Buckets)
   * [Webapps and SQL](#Webapps-and-SQL)
@@ -14,6 +17,8 @@
   * [Containers](#Containers)
   * [Serverless](#Serverless)
 * [Enumeration using Google Cloud API](#Enumeration-using-Google-Cloud-API)
+* [Automated Tools](#Automated-Tools)
+  * [GCP_Scanner](#GCP_Scanner) 
 
 ## General
 ## Enumeration through Google Cloud portal
@@ -63,7 +68,7 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="<PATH TO OF .json OF SERVICE ACCOUNT>"
 dir env:
 ```
 
-#### get the current user
+#### Get the current user
 ```
 gcloud auth list
 ```
@@ -122,20 +127,14 @@ gcloud config set project <PROJECT NAME>
 gcloud config get project
 ```
 
-#### Gives a list of all APIs that are enabled in project
-```
-gcloud services list
-```
-
 #### Get information about project
 ```
 gcloud projects describe <PROJECT ID>
 ```
 
-### Service accounts
-#### List service accounts on project level
+#### Gives a list of all APIs that are enabled in project
 ```
-gcloud iam service-accounts list
+gcloud services list
 ```
 
 ### IAM
@@ -144,25 +143,66 @@ gcloud iam service-accounts list
   - Predefined roles, provides granular access to specific Google Cloud resources.
   - Custom Roles, provides custom access to Google Cloud resources.
 
-#### Enumerate IAM policies set ORG-wide
+### Policies
+- A policy defines members for each role
+
+#### Enumerate all IAM policies on ORG-wide level
 ```
+gcloud organizations list
 gcloud organizations get-iam-policy <ORG ID>
 ```
 
-#### Check IAM policy on project level
+#### Enumerate all IAM policies on folder level
 ```
+gcloud resource-manager folders list --organization <ORG ID>
+gcloud resource-manager folders get-iam-policy <FOLDER ID>
+```
+
+#### Enumerate all IAM policies on project level
+```
+gcloud projects list
+gcloud projects get-iam-policy <PROJECT ID> 
+```
+
+#### Enumerate IAM policies project of user on project level
+```
+gcloud projects list
 gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
 ```
 
-#### List all permission in custom role
+#### Enumerate IAM policies of a resource
+- No easy command to enumerate all accesible resources. But example syntax would be:
 ```
-gcloud iam roles describe <ROLE> --project <PROJECT ID>
+gcloud compute instances get-iam-policy instance-1 --zone=us-central1-a
+```
+
+### Roles
+#### Enumerate custom roles on project level
+```
+gcloud iam roles list --project <PROJECT ID>
+```
+
+#### List all permission in custom role
+- Format of custom roles = `projects/<PROJECT NAME>/roles/<ROLE NAME>
+- Use the last part of the `name`. 
+```
+gcloud iam roles describe <ROLE NAME> --project <PROJECT ID>
+```
+
+#### List all permissions of a role
+- For example `roles/viewer`
+```
+gcloud iam roles describe <ROLE>
 ```
 
 #### List permissions of service account
 ```
+gcloud iam service-accounts list
 gcloud iam service-accounts get-iam-policy <SERVICE ACCOUNT EMAIL>
 ```
+
+### Bruterforce Permissions
+- https://github.com/carlospolop/bf_my_gcp_permissions
 
 ### Repos
 #### Get source code repos available to user
@@ -175,20 +215,18 @@ gcloud source repos list
 gcloud source repos clone <repo_name>
 ```
 
+### Service accounts
+- A service account always belongs to a project:
+
+#### List service accounts on project level
+```
+gcloud iam service-accounts list
+```
+
 ### Virtual machines
-#### List other compute instances in the same project
+#### List compute instances on project level
 ```
 gcloud compute instances list
-```
-
-#### Get shell access to instance
-```
-gcloud beta compute ssh --zone "<region>" "<instance name>" --project "<project name>"
-```
-
-#### Puts public ssh key onto metadata service for project
-```
-gcloud compute ssh <local host>
 ```
 
 #### Get access scopes if on an instance
@@ -315,3 +353,11 @@ curl https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=<ACCESS TOKEN>
 ```
 curl -X Method -H “Authorization: Bearer $AccessToken” https://API-URL
 ```
+
+## Automated Tools
+### GCP_Scanner
+- https://github.com/google/gcp_scanner
+- Uses all the credentials in the `$HOME/.config/gcloud` directory
+```
+python3 scanner.py -g "$HOME/.config/gcloud" -o .
+``` 
