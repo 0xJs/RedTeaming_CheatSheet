@@ -7,8 +7,14 @@
   -  Create a new project on cloud.google.com
   -  Enable API access with scopes set to any resources you can
   
-  ## Service Account
-  #### Private key
-  ```
-  gcloud iam service-accounts keys create --iam-account <PRIVILIGED SERVICE ACCOUNT> key.json
-  ```
+## Service Account
+#### Create a new key for specified service account.
+- Saves credentials in `key.json`
+```
+gcloud iam service-accounts keys create key.json --iam-account <SERVICE ACCOUNT ID>
+```
+
+#### Authenticate with key file
+```
+gcloud auth activate-service-account --key-file key.json
+```
