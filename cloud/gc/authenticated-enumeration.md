@@ -10,7 +10,7 @@
     * [Policies](#Policies)
     * [Roles](#Roles) 
     * [ORG policies](#ORG-policies)
-    * [Bruterforce Permissions](Bruterforce-Permissions)
+    * [Bruterforce Permissions](#Bruterforce-Permissions)
   * [Virtual machines](#Virtual-machines)
   * [Networking](#Networking)
   * [Storage Buckets](#Storage-Buckets)
