@@ -261,7 +261,7 @@ gcloud functions deploy <FUNCTION NAME> --timeout 539 --trigger-http --source <F
 
 #### Invoke cloud function and retrieve temporary credential
 ```
-gcloud functions call function-name --data '{}'
+gcloud functions call <FUNCTION NAME> --data '{}'
 ```
 
 #### Use token
