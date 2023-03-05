@@ -101,16 +101,6 @@ gcloud container clusters list --impersonate-service-account $serviceaccount
 ```
 
 ## IAM Policy Permissions
-#### Check IAM policy on project level
-```
-gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
-```
-
-#### List all permission in custom role
-```
-gcloud iam roles describe <ROLE> --project <PROJECT ID>
-```
-
 ### Set IAM policy permission
 - User or Service account can set IAM policy on Org / Folder / Project or individual resource level
 - Roles: `roles/resourcemanager.organizationAdmin`, `roles/owner`, `roles/[resource-admin]`
@@ -141,21 +131,6 @@ gcloud iam roles update <ROLE NAME> --project=<PROJECT ID> --add-permissions=res
 ```
 
 ## Service Account
-#### Check IAM policy on project level
-```
-gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
-```
-
-#### List service accounts on project level
-```
-gcloud iam service-accounts list
-```
-
-#### Get the IAM policy for a service account 
-```
-gcloud iam service-accounts get-iam-policy <SERVICE ACCOUNT ID>
-```
-
 ### Service Account Key Admin
 - Key admin can create a new key for service account. Max 10 keys per service account.
 - Roles: `roles/iam.serviceAccountAdmin`, `roles/iam.serviceAccountKeyAdmin`
@@ -215,11 +190,6 @@ gcloud functions call function-name --data '{}'
 ```
 
 ## Cloud Functions
-#### Check IAM policy on project level
-```
-gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
-```
-
 #### List all cloud functions on project level
 ```
 gcloud functions list
@@ -241,11 +211,6 @@ gcloud functions call <CLOUD FUNCTION NAME> --data '{}'
 ```
 
 ## Compute Instance
-#### Check IAM policy on project level
-```
-gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
-```
-
 #### List all compute instances on project level
 ```
 gcloud compute instances list
@@ -358,16 +323,6 @@ curl https://www.googleapis.com/oauth2/v1/tokeninfo?identity_token=[IdentityToke
 ```
 
 ## Virtual Private Cloud
-#### Check IAM policy on project level
-```
-gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
-```
-
-#### List all permission in custom role
-```
-gcloud iam roles describe <ROLE> --project <PROJECT ID>
-```
-
 ### Firewall Rule Manipulation
 - Roles: `roles/compute.admin`, `roles/compute.securityAdmin`
 - Permissions: `compute.firewalls.create`, `compute.firewalls.update`, `compute.networks.updatePolicy`
@@ -451,11 +406,6 @@ gcloud config list
   - Individual secret wide 
 - Roles: `roles/owner`, `roles/secretmanager.admin`, `roles/secretmanager.secretAccessor`
 - Permissions: `secretmanager.versions.access`
-
-#### Check IAM policy on project level
-```
-gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
-```
 
 #### List all secrets by name on project level
 ```
