@@ -74,6 +74,25 @@ gcloud compute instances list
 gcloud compute firewall-rules list
 gcloud secrets list
 gsutil ls
+gcloud app instances list
+gcloud sql instances list
+gcloud spanner instances list
+gcloud bigtable instances list
+gcloud container clusters list
+```
+
+- With `--impersonate-service-account`
+```
+serviceaccount=<SERVICE ACCOUNT EMAIL>
+gcloud functions list --impersonate-service-account $serviceaccount
+gcloud compute instances list --impersonate-service-account $serviceaccount
+gcloud compute firewall-rules list --impersonate-service-account $serviceaccount
+gcloud secrets list --impersonate-service-account $serviceaccount
+gcloud app instances list --impersonate-service-account $serviceaccount
+gcloud sql instances list --impersonate-service-account $serviceaccount
+gcloud spanner instances list --impersonate-service-account $serviceaccount
+gcloud bigtable instances list --impersonate-service-account $serviceaccount
+gcloud container clusters list --impersonate-service-account $serviceaccount
 ```
 
 ## IAM Policy Permissions
