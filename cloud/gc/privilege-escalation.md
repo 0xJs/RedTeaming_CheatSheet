@@ -310,7 +310,8 @@ gcloud functions list
 ### Cloud Function code update
 - Create a new function or modify the source code of any existing function.
 - Roles: `roles/cloudfunctions.admin`
-- Permissions: `cloudfunctions.functions.create`, `cloudfunctions.functions.update`, `cloudfunctions.functions.call`, `iam.serviceAccounts.actAs`
+- Permissions: `cloudfunctions.functions.create`, `cloudfunctions.functions.update`, `cloudfunctions.functions.call`
+- `iam.serviceAccounts.actAs` when a service account is in use
 
 #### Create / Update existing cloud function source code
 ```
