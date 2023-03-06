@@ -1,7 +1,7 @@
 # Pentesting the cloud cheatsheet
 * [General](#General)
   * [Scaning tools](#Scanning-tools)
-* [Recon \ OSINT](recon.md)
+* [Recon \ OSINT](/OSINT.md#Cloud)
 * [Initial access attacks](initial-access-attacks.md)
 * [Cloud Services](readme.md)
   * [Azure](azure/readme.md)
@@ -33,9 +33,8 @@
 
 ## Scanning tools
 ### Enumeration
-- WeirdAAL
+- AWS
   - https://github.com/carnal0wnage/weirdAAL
-  - AWS
 
 ### Vulnerability scanning
 - Scoutsuite
@@ -46,14 +45,11 @@
   - Scans AWS, Azure, GCP, Oracle
 
 ### Privesc scanning
-- GCP IAM privilege esalation
+- GCP
   - https://github.com/RhinoSecurityLabs/GCP-IAM-Privilege-Escalation/tree/master/PrivEscScanner
-  - GCP
-- PACU
+- AWS
   - https://github.com/RhinoSecurityLabs/pacu
-  - AWS 
-- Stormspotter
+- Azure
   - https://github.com/Azure/Stormspotter
-  - Azure
-- Skyark
+- General
   - https://github.com/cyberark/SkyArk
