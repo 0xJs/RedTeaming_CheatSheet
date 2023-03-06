@@ -410,6 +410,11 @@ gcloud compute ssh --zone=<ZONE> <VM NAME>
 gcloud beta compute ssh --zone "us-east1-b" "test-instance-1" --project "test-gcloud-project"
 ```
 
+#### Check service account
+```
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/
+```
+
 #### Access token
 ```
 curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/token"
