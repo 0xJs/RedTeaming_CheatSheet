@@ -104,6 +104,35 @@ gcloud bigtable instances list --access-token-file=$access-token-file
 gcloud container clusters list --access-token-file=$access-token-file
 ```
 
+### Automated Tools
+#### bf_my_gcp_permissions
+- https://github.com/carlospolop/bf_my_gcp_permissions
+```
+accesstoken=$(gcloud auth print-access-token)
+python3 bf_my_gcp_perms.py -t $accesstoken -p <PROJECT>
+```
+
+#### IAM Privilege Escalation
+- https://github.com/RhinoSecurityLabs/GCP-IAM-Privilege-Escalation
+
+#### Enumerate permissions on project
+```
+gcloud auth print-access-token
+
+python3 enumerate_member_permissions.py --project-id <PROJECT ID>
+```
+
+#### Enumerate privesc
+```
+python3 check_for_privesc.py
+```
+
+#### Review the results 
+- `all_org_folder_proj_sa_permissions.json` – All members and their associated privileges
+- `privesc_methods.txt` – All detected privilege escalation methods
+- `setIamPolicy_methods.txt` – All detected setIamPolicy methods
+
+
 ## IAM Policy Permissions
 - List of roles and permissions: https://cloud.google.com/iam/docs/understanding-roles#cloud-security-scanner-roles
 
