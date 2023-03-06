@@ -162,6 +162,7 @@ phoneinfoga scan -n <COUNTRYCODE><PHONENUMBER>
 
 ### Hunting subdomains
 - Script that uses multiple tools to enumerate subdomains: https://github.com/Gr1mmie/sumrecon
+
 #### Amass - Best tool
 - https://github.com/OWASP/Amass
 ```
@@ -183,6 +184,11 @@ sublister -domain <DOMAIN>
 - https://github.com/rbsec/dnscan
 ```
 dnscan.py <DOMAIN>
+```
+
+#### DNSrecon
+```
+python3 dnsrecon.py -d <DOMAIN>
 ```
 
 #### Other tools
