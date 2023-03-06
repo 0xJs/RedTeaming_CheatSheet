@@ -23,14 +23,6 @@
   - GCP  https://support.google.com/cloud/answer/6262505?hl=en
 - Enumerate host https://github.com/dafthack/HostRecon
 
-### Scan vulnerabilities in Terraform/Docker/Ansible etc
-- https://github.com/Checkmarx/kics
-
-#### Example
-```
-.\kics.exe scan -p <PATH>\Terraform --cloud-provider azure
-```
-
 ## Scanning tools
 ### Enumeration
 - AWS
@@ -43,6 +35,9 @@
 - Scoutsploit
   - https://github.com/cloudsploit/scans
   - Scans AWS, Azure, GCP, Oracle
+- Kics
+  - https://github.com/Checkmarx/kics
+  - Terraform, Ansible, Docker etc 
 
 ### Privesc scanning
 - GCP
