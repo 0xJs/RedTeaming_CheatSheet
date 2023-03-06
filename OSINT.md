@@ -47,7 +47,7 @@ searchterm site:example.com
 dig <DOMAIN> +short
 ```
 
-#### Check whois op each IP
+#### Check whois of each IP
 - Check who owns the IP, where is it hosted?
 ```
 whois <IP>
