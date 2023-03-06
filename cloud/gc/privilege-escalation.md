@@ -405,6 +405,14 @@ curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetada
 curl https://www.googleapis.com/oauth2/v1/tokeninfo?identity_token=[IdentityToken]
 ```
 
+#### Other endpoint commands
+```
+curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/
+curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/email 
+curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/scopes 
+curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/token
+```
+
 ## Virtual Private Cloud
 ### Firewall Rule Manipulation
 - Roles: `roles/compute.admin`, `roles/compute.securityAdmin`
