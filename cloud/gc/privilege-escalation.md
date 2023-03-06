@@ -25,17 +25,7 @@
 * [Metadata server](#Metadata-server)
 
 ## General
-- Google Cloud Platform has 2 user types
-  - User Accounts 
-    - Traditional user access with password 
-  - Service Accounts 
-    - Don’t have passwords 
-    - Every GCP project has a “Default” service account
-    - Default will get bound to instances if no other is set
-    - EVERY process running on the instance can authenticate as the service account
-- Got shell on a compute instance?
-- The default service account can access EVERY storage bucket in a project
-- Intersting other cheatsheet: https://cloud.hacktricks.xyz/pentesting-cloud/gcp-pentesting/gcp-privilege-escalation
+- Interesting other cheatsheet: https://cloud.hacktricks.xyz/pentesting-cloud/gcp-pentesting/gcp-privilege-escalation
 
 ## Exploitation enumeration
 #### Check accessible projects
