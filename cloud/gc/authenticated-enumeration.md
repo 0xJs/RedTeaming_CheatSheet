@@ -410,6 +410,13 @@ curl -X Method -H “Authorization: Bearer $AccessToken” https://API-URL
 ```
 
 ## Automated Tools
+### GCP_enum
+- https://gitlab.com/gitlab-com/gl-security/threatmanagement/redteam/redteam-public/gcp_enum
+- Login with account into the gcloud CLI.
+```
+bash gcp_enum.s
+```
+
 ### GCP_Scanner
 - https://github.com/google/gcp_scanner
 - Uses all the credentials in the `$HOME/.config/gcloud` directory
