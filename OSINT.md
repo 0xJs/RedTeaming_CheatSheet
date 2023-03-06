@@ -6,7 +6,7 @@
 * [Host Information](#Host-Information)
   * [Mail](#Mail)
 * [Hunting usernames](#Hunting-usernames)
-* [Hunting passwords](#Hunting-passwords)
+* [Hunting passwords & credentials](#Hunting-passwords-&-credentials)
 * [Hunting for personal information](#Hunting-for-personal-information)
 * [Web](#Web)
   * [General Info](#General-Info)
@@ -114,7 +114,7 @@ whatsmyname -u <USERNAME>
 sherlock <USERNAME>
 ```
 
-## Hunting passwords
+## Hunting passwords & credentials
 - https://www.dehashed.com/
 - https://www.weleakinfo.to/
 - https://leakcheck.io/
@@ -128,7 +128,7 @@ sherlock <USERNAME>
 ./breach-parse.sh @<DOMAIN> password.txt
 ```
 
-### H8mail
+#### H8mail
 - https://github.com/khast3x/h8mail
 ```
 h8mail -t <EMAIL>
@@ -141,6 +141,12 @@ h8mail -t <EMAIL> -bc "/opt/breach-parse/BreachCompilation/" -sk
 
 #### Check for hashes
 - https://hashes.org
+
+#### Leaked credentials on github
+- https://github.com/zricethezav/gitleaks
+```
+gitleaks --repo-url=<GIT REPO URL> -v
+```
 
 ## Hunting for personal information
 - https://www.whitepages.com/
@@ -345,6 +351,13 @@ https://login.microsoftonline.com/<TARGET DOMAIN>/v2.0/.well-known/openid-config
 - Look for any login portals
 - https://companyname.account.box.com
 
+### Enumerate public resources
+#### Cloud enum
+- Possible to use multiple `-k` keywords.
+```
+python3 cloud_enum.py -k <KEYWORD>
+```
+
 ### Azure
 #### Check if tenant is in use and if fedaration is in use.
 - Federation with Azure AD or O365 enables users to authenticate using on-premises credentials and access all resources in cloud.
@@ -388,8 +401,8 @@ Get-AADIntTenantID -Domain <DOMAIN>
 Get-AADIntTenantDomains -Domain <DOMAIN>
 ```
 
-### Microburst
-#### Enumerate used services
+### Enumerate used services
+#### Enumerate Azure subdomains
 - https://github.com/NetSPI/MicroBurst
 - Edit the permutations.txt to add permutations such as career, hr, users, file and backup
 ```
