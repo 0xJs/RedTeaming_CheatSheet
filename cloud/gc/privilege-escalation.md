@@ -552,7 +552,7 @@ gcloud secrets versions list <SECRET>
 
 #### Read secret
 ```
-gcloud secrets versions access --secret cpsa-key-json [1]
+gcloud secrets versions access --secret cpsa-key-json <VERSION>
 ```
 
 ## Metadata server
