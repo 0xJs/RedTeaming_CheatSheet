@@ -420,26 +420,21 @@ gcloud compute ssh --zone=<ZONE> <VM NAME>
 
 ### Access & Identity Token Extraction
 - After gaining command execution on a VM
-
-#### Execute commands on VM's
-- Can connect with gcloud ssh command, command can be retrieved from the portal in VM instances, remote access --> View gcloud command, looks like:
-```
-gcloud beta compute ssh --zone "us-east1-b" "test-instance-1" --project "test-gcloud-project"
-```
+- Can also be done by connecting to `http://169.254.169.254/`
 
 #### Check service account
 ```
-curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/"
+```
+
+#### Retrieve access token scope
+```
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/scopes
 ```
 
 #### Access token
 ```
 curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/token"
-```
-
-#### Retrieve access token scope
-```
-curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/scope
 ```
 
 #### Verify access token
@@ -457,12 +452,9 @@ curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetada
 curl https://www.googleapis.com/oauth2/v1/tokeninfo?identity_token=[IdentityToken]
 ```
 
-#### Other endpoint commands
+#### Retrieve IAM policy for service account on project level
 ```
-curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/
-curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/email 
-curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/scopes 
-curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/<SERVICE ACCOUNT>/token
+gcloud projects get-iam-policy <PROJECT> --flatten="bindings[].members" --filter="bindings.members=serviceAccount:<SERVICE ACCOUNT EMAIL>" --format="value(bindings.role)"
 ```
 
 ## Virtual Private Cloud
