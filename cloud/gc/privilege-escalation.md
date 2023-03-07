@@ -116,6 +116,12 @@ gcloud bigtable instances list --access-token-file=$access-token-file
 gcloud container clusters list --access-token-file=$access-token-file
 ```
 
+#### Check permissions on resource
+- No easy command to enumerate all accesible resources. But example syntax would be:
+``` 
+gcloud compute instances get-iam-policy <INSTANCE> --zone=<ZONE>
+```
+
 ### Automated Tools
 #### bf_my_gcp_permissions
 - https://github.com/carlospolop/bf_my_gcp_permissions
@@ -142,8 +148,7 @@ python3 check_for_privesc.py
 #### Review the results 
 - `all_org_folder_proj_sa_permissions.json` – All members and their associated privileges
 - `privesc_methods.txt` – All detected privilege escalation methods
-- `setIamPolicy_methods.txt` – All detected setIamPolicy methods
-
+- `setIamPolicy_methods.txt` – All detected setIamPolicy method
 
 ## IAM Policy Permissions
 - List of roles and permissions: https://cloud.google.com/iam/docs/understanding-roles#cloud-security-scanner-roles
