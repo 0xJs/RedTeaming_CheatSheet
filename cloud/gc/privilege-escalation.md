@@ -506,8 +506,32 @@ gcloud compute firewall-rules create threat-rule --allow=tcp:22 --source-ranges=
 ### Change bucket policy
 - Roles: `roles/storage.admin`
 - Permissions: `storage.buckets.setIamPolicy`
+- Use the `-i <SERVICE ACCOUNT>` parameter to use a service account.
 
-### Get the gcp bucket subdomain for an organization
+#### Check if there are buckets
+```
+gsutil ls
+```
+
+#### List all roles attached to this bucket
+```
+gsutil iam get gs://<BUCKET NAME>
+```
+
+#### Add viewer role for allUsers
+- Use the `-i <SERVICE ACCOUNT>` parameter to use a service account.
+```
+gsutil iam ch allUsers:objectViewer gs://prod-storage-metatech
+```
+
+#### Add an admin role for allUsers
+- Use the `-i <SERVICE ACCOUNT>` parameter to use a service account.
+```
+gsutil iam ch allUsers:admin gs://<BUCKET NAME>
+```
+
+### Enum buckets unauthenticated
+#### Get the gcp bucket subdomain for an organization
 - https://github.com/initstring/cloud_enum
 ```
 python3 cloudenum.py -k <KEYWORD>
@@ -526,15 +550,6 @@ licy&permissions=storage.buckets.update&permissions=storage.objects.create&permi
 missions=storage.objects.get&permissions=storage.objects.list&permissions=storage.objects.update] 
 ```
 
-#### List all roles attached to this bucket
-```
-gsutil iam get gs://<BUCKET NAME>
-```
-
-#### Add an admin role for allUsers
-```
-gsutil iam ch allUsers:admin gs://<BUCKET NAME>
-```
 
 ### Bucket access
 #### Check if user has default service account access
