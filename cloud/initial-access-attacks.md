@@ -60,9 +60,10 @@ Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
 
 ### Gitleaks
 - https://github.com/zricethezav/gitleaks
+
 #### Search for secrets
 ```
-./gitleaks detect -v source <DIRECTORY>
+./gitleaks detect -v source <DIRECTORY> --report-path gitleaks-report.json
 ```
 
 #### Use web browser to view the commit
