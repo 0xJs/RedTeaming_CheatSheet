@@ -165,10 +165,15 @@ gcloud projects list
 gcloud projects get-iam-policy <PROJECT ID> 
 ```
 
-#### Enumerate IAM policies project of user on project level
+#### Enumerate IAM policies of user on project level
 ```
 gcloud projects list
 gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
+```
+
+#### Enumerate IAM policies of service account on project level
+```
+gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=serviceAccount:<SERVICE ACCOUNT EMAIL>" --format="value(bindings.role)"
 ```
 
 #### Oneliner to check permissions on all projects
@@ -180,6 +185,12 @@ gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do e
 ```
 GCUSER=<USER EMAIL>
 gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)"; done
+```
+
+#### Oneliner to check permissions of a service account on all projects
+```
+GCUSER=<USER EMAIL>
+gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=serviceAccount:$GCUSER" --format="value(bindings.role)"; done
 ```
 
 #### Enumerate IAM policies of a resource
