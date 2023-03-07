@@ -28,6 +28,8 @@
 - Interesting other cheatsheet: https://cloud.hacktricks.xyz/pentesting-cloud/gcp-pentesting/gcp-privilege-escalation
 
 ## Enumeration
+- Make sure to check IAM privileges with a user that has access to read them of that folder/project/resource!
+
 #### Check accessible projects
 ```
 gcloud projects list
@@ -44,27 +46,33 @@ gcloud projects get-iam-policy <PROJECT ID>
 gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)" 
 ```
 
-#### Oneliner to check permissions of a user on all projects
+#### Set GCUSER for oneliners:
 ```
 GCUSER=<USER EMAIL>
+# OR
+GCUSER=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+```
+
+#### Oneliner to check permissions of a user on all projects
+```
 gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)"; done
 ```
 
 #### Oneliner to check permissions of a user on all service accounts
 ```
-GCUSER=<USER EMAIL>
 gcloud iam service-accounts list --format="value(email)" | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=user:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
 ```
 
 #### Oneliner to check permissions of a service account on all projects
 ```
-GCUSER=<USER EMAIL>
 gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=serviceAccount:$GCUSER" --format="value(bindings.role)"; done
 ```
 
 #### Oneliner to check permissions of a service account on all service accounts
 ```
 GCUSER=<USER EMAIL>
+GCUSER=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+
 gcloud iam service-accounts list --format="value(email)" | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=serviceAccount:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
 ```
 
