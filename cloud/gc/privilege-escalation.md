@@ -1,7 +1,7 @@
 # Exploitation & Privilege Escalation
 ## Index
 * [General](#General)
-* [Exploitation Enumeration](#Exploitation-Enumeration)
+* [Enumeration](#Enumeration)
 * [IAM Permissions](#IAM-Permissions)
   * [Set IAM policy permission](#Set-IAM-policy-permission)
   * [Custom role permission update](#Custom-role-permission-update)
@@ -27,7 +27,7 @@
 ## General
 - Interesting other cheatsheet: https://cloud.hacktricks.xyz/pentesting-cloud/gcp-pentesting/gcp-privilege-escalation
 
-## Exploitation enumeration
+## Enumeration
 #### Check accessible projects
 ```
 gcloud projects list
@@ -452,10 +452,8 @@ curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetada
 curl https://www.googleapis.com/oauth2/v1/tokeninfo?identity_token=[IdentityToken]
 ```
 
-#### Retrieve IAM policy for service account on project level
-```
-gcloud projects get-iam-policy <PROJECT> --flatten="bindings[].members" --filter="bindings.members=serviceAccount:<SERVICE ACCOUNT EMAIL>" --format="value(bindings.role)"
-```
+#### Retrieve IAM policy for service account
+- See [Enumeration](#Enumeration)
 
 ## Virtual Private Cloud
 ### Firewall Rule Manipulation
