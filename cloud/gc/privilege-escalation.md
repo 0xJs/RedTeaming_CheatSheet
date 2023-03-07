@@ -2,7 +2,7 @@
 ## Index
 * [General](#General)
 * [Enumeration](#Enumeration)
-* [IAM Permissions](#IAM-Permissions)
+* [IAM Policy Permissions](#IAM-Policy-Permissions)
   * [Set IAM policy permission](#Set-IAM-policy-permission)
   * [Custom role permission update](#Custom-role-permission-update)
 * [Service Account](#Service-Account)
