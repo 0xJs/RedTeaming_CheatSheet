@@ -545,11 +545,6 @@ gcloud config list
 gcloud secrets list
 ```
 
-#### Get IAM policy on individual secret level
-```
-gcloud secrets get-iam-policy <SECRET>
-```
-
 #### List versions for a secret
 ```
 gcloud secrets versions list <SECRET>
