@@ -27,3 +27,6 @@ gcloud auth list
 ```
 gcloud config set account <ACCOUNT EMAIL>
 ```
+
+#### Use raw access token
+- Save acces token in file and use the `--access-token-file=` parameter with gcloud CLI
