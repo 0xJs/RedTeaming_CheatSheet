@@ -15,7 +15,7 @@
   * [OAuth Scope Manipulation](#OAuth-Scope-Manipulation)
   * [SetMetaData](#SetMetaData)
   * [OsLogin](#OsLogin)
-  * [Access & Identity Token Extraction](#Access-&-Identity-Token-Extraction)
+  * [Token Extraction](#Token-Extraction)
 * [Virtual Private Cloud](#Virtual-Private-Cloud)
   * [Firewall Rule Manipulation](#Firewall-Rule-Manipulation)
 * [Cloud Storage](#Cloud-Storage)
@@ -418,7 +418,7 @@ gcloud compute instances add-metadata <VM NAME> --metadata-from-file-ssh-keys=<K
 gcloud compute ssh --zone=<ZONE> <VM NAME>
 ```
 
-### Access & Identity Token Extraction
+### Token Extraction
 - After gaining command execution on a VM
 - Can also be done by connecting to `http://169.254.169.254/`
 
