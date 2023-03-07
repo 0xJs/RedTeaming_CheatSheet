@@ -427,6 +427,11 @@ gcloud compute ssh --zone=<ZONE> <VM NAME>
 curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/"
 ```
 
+#### Check email
+```
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/email
+```
+
 #### Retrieve access token scope
 ```
 curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/scopes
