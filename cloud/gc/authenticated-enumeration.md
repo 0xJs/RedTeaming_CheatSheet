@@ -32,9 +32,10 @@
 
 ## Enumeration using gcloud CLI
 - Documentation: https://cloud.google.com/sdk/gcloud/reference
--  Most GCP instances have Google Cloud SDK installed
--  ```gcloud``` CLI tool for managing auth, config, and interacting with GCP services
--  ``` gsutil``` CLI tool for accessing GCP storage buckets
+- Most GCP instances have Google Cloud SDK installed
+- `gcloud` CLI tool for managing auth, config, and interacting with GCP services
+- `gsutil` CLI tool for accessing GCP storage buckets
+- Possible to use access token with `--access-token-file=`
 
 #### Gcloud services and commands
 ```
