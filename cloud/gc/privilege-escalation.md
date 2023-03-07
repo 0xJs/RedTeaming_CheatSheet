@@ -62,7 +62,7 @@ GCUSER=<USER EMAIL>
 gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do echo "\n [+] checking: $project\n" && gcloud projects get-iam-policy $project --flatten="bindings[].members" --filter="bindings.members=serviceAccount:$GCUSER" --format="value(bindings.role)"; done
 ```
 
-#### Oneliner to check permissions of a servie account on all service accounts
+#### Oneliner to check permissions of a service account on all service accounts
 ```
 GCUSER=<USER EMAIL>
 gcloud iam service-accounts list --format="value(email)" | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=serviceAccount:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
