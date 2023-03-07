@@ -291,16 +291,6 @@ gcloud iam service-accounts list
 gcloud compute instances list
 ```
 
-#### Get access scopes if on an instance
-```
-curl http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/scopes -H &#39;Metadata-Flavor:Google’
-```
-
-#### Use Google keyring to decrypt encrypted data
-```
-gcloud kms decrypt --ciphertext-file=encrypted-file.enc --plaintext-file=out.txt --key <crypto-key> --keyring <crypto-keyring> --location global
-```
-
 ### Networking
 #### List networks
 ```
