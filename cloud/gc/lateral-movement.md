@@ -1,6 +1,8 @@
 # Lateral Movement
 ## Index
 * [GCP Web console](#GCP-Web-console)
+* [Access tokens](#Access-tokens)
+* [GCP to Workspace](#GCP-to-Workspace)
 
 ## GCP Web console
 - Sometimes GUI access might be desirable
@@ -30,3 +32,7 @@ gcloud config set account <ACCOUNT EMAIL>
 
 #### Use raw access token
 - Save acces token in file and use the `--access-token-file=` parameter with gcloud CLI
+
+## GCP to Workspace
+### Domain wide delegation
+- https://gitlab.com/gitlab-com/gl-security/threatmanagement/redteam/redteam-public/gcp_misc/-/raw/master/gcp_delegation.py
