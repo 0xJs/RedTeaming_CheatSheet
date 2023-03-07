@@ -196,7 +196,7 @@ gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do e
 #### Enumerate IAM policies of a resource
 - No easy command to enumerate all accesible resources. But example syntax would be:
 ```
-gcloud compute instances get-iam-policy instance-1 --zone=us-central1-a
+gcloud compute instances get-iam-policy <INSTANCE> --zone=<ZONE>
 ```
 
 ### Roles
