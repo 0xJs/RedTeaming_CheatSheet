@@ -10,3 +10,20 @@
 ```
 gcloud projects add-iam-policy-binding <project name> --member user:<email address> --role roles/editor
 ```
+
+## Acess tokens
+#### Inject access token in gcloud CLI
+- Use `-D` to delete the access token
+```
+python3 /opt/gc/GCPTokenReuse/Gcp-Token-Updater.py -I --access-token "<ACCESS TOKEN>" --account-name <ACCOUNT EMAIL>
+```
+
+#### List sessions
+```
+gcloud auth list
+```
+
+#### Change user
+```
+gcloud config set account <ACCOUNT EMAIL>
+```
