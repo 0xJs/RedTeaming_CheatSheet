@@ -158,17 +158,17 @@ int GePr(const char *pname) {
         PROCESSENTRY32 pe32;
         int pid = 0;
 		
-		AESDecrypt((char *) sCreateToolhelp32Snapshot, sizeof(sCreateToolhelp32Snapshot), k, sizeof(k)); // THIS ONE DOESN'T WORK?
+		AESDecrypt((char *) sCreateToolhelp32Snapshot, sizeof(sCreateToolhelp32Snapshot), k, sizeof(k));
 		AESDecrypt((char *) sProcess32First, sizeof(sProcess32First), k, sizeof(k));
 		AESDecrypt((char *) sProcess32Next, sizeof(sProcess32Next), k, sizeof(k));
 		AESDecrypt((char *) sCloseHandle, sizeof(sCloseHandle), k, sizeof(k));
 		
-		pCreateToolhelp32Snapshot = GetProcAddress(GetModuleHandle(sKdll), sCreateToolhelp32Snapshot); // THIS ONE DOESN'T WORK?
+		pCreateToolhelp32Snapshot = GetProcAddress(GetModuleHandle(sKdll), sCreateToolhelp32Snapshot);
 		pProcess32First = GetProcAddress(GetModuleHandle(sKdll), sProcess32First);
 		pProcess32Next = GetProcAddress(GetModuleHandle(sKdll), sProcess32Next);
 		pCloseHandle = GetProcAddress(GetModuleHandle(sKdll), sCloseHandle);
                 
-        hProcSnap = pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); // THIS ONE DOESN'T WORK?
+        hProcSnap = pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 		
         if (INVALID_HANDLE_VALUE == hProcSnap) return 0;
                 
