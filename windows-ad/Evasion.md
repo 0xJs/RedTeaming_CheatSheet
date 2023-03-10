@@ -2,6 +2,7 @@
 * [General](#General)
 * [Windows Defender](#Windows-Defender)
 * [Windows Firewall](#Windows-Firewall)
+  * [ASR-Rules](#ASR-Rules) 
 * [PowerShell](#PowerShell)
    * [Execution-policy](#Execution-policy)
    * [AMSI](#AMSI)
