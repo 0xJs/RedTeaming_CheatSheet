@@ -130,7 +130,7 @@ crackmapexec smb hosts.txt -u administrator -H <HASH> -d .
 ## Password spraying
 #### Retrieve a list of usernames
 ```
-crackmapexec ldap <DC IP> -u <USER> -p <PASSWORD> --users
+crackmapexec ldap <DC FQDN> -u <USER> -p <PASSWORD> --users
 ```
 
 ```
@@ -1096,7 +1096,7 @@ dir \\<COMPUTER>\C$
 
 Get-DomainObject | Where-Object ms-ds-machineaccountquota
 
-crackmapexec ldap <DC IP> -d <DOMAIN> -u <USER> -p <PASS> -M maq
+crackmapexec ldap <DC FQDN> -d <DOMAIN> -u <USER> -p <PASS> -M maq
 ```
 
 #### Check LDAP Signing and LDAPS Binding
