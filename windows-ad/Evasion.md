@@ -81,6 +81,13 @@ Set-MpPReference -DisableIOAVProtection $true
 powershell.exe -c 'Set-MpPreference -DisableRealtimeMonitoring $true; Set-MpPReference -DisableIOAVProtection $true'
 ```
 
+### ASR Rules
+#### Enumerate ASR rules
+- https://github.com/directorcia/Office365/blob/master/win10-asr-get.ps1
+```
+. ./win10-asr-get.ps1
+```
+
 ## Windows Firewall
 #### Get state
 ```
