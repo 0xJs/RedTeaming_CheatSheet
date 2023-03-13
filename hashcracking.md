@@ -122,8 +122,8 @@ hashcat -a 3 -m <HASH TYPE> <HASH FILE> <MASK FILE>
 hashcat -a 6 -m <HASH TYPE> <HASH FILE> <WORDLIST> <MASK>
 hashcat -a 7 -m <HASH TYPE> <HASH FILE> <MASK> <WORDLIST>
 
-hashcat -a 6 -m <HASH TYPE> <HASH FILE> <WORDLIST> ?a?a?a?a --increment
-hashcat -a 7 -m <HASH TYPE> <HASH FILE> ?a?a?a?a <WORDLIST> --increment
+hashcat -a 6 -m <HASH TYPE> <HASH FILE> <WORDLIST> ?a?a?a --increment
+hashcat -a 7 -m <HASH TYPE> <HASH FILE> ?a?a?a <WORDLIST> --increment
 ```
 
 #### Best effort - Base loop
