@@ -407,9 +407,9 @@ site:http://blob.core.windows.net
 Import-Module ./Microburst.psm1
 Invoke-EnumerateAzureBlobs -Base <COMPANY NAME>
 ```
-- Access the URL's and see if any files are listed (Example https://<STORAGE NAME>.blob.core.windows.net/backup?restype=container&comp=list)
-- Access the files by adding it to the url (Example https://<STORAGE NAME>.blob.core.windows.net/backup/blob_client.py)
-- Check for a SAS URL, if found then open the "Connect to Azure Storage", select "blobl container" and select 'Shared Access Signatur (SAS)' and paste the URL, displayname will fill automatically.
+- Access the URL's and see if any files are listed (Example `https://<STORAGE NAME>.blob.core.windows.net/backup?restype=container&comp=list`)
+- Access the files by adding it to the url (Example `https://<STORAGE NAME>.blob.core.windows.net/backup/blob_client.py`)
+- Check for a SAS URL, if found then open the "Connect to Azure Storage", select "blob container" and select 'Shared Access Signatur (SAS)' and paste the URL, displayname will fill automatically.
 - Another example: https://<STORAGE NAME>.blob.core.windows.net/<container-name>?restype=container&comp=list
 
 ### AWS blobs
