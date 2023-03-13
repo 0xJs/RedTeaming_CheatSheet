@@ -92,9 +92,9 @@ hashcat -a 0 -m <HASH TYPE> <HASH FILE> <WORDLIST> -r <RULE FILE>
 ```
 
 #### Wordlist + Rules + Rules
-- Will combine all rules of file 1 with rules of file 2. Will increase the cracking time significant.
+- Will combine all rules of file 1 with rules of file 2. Will increase the cracking time significant. For example use dive + best64
 ```
-hashcat -a 0 -m <HASH TYPE> <HASH FILE> <WORDLIST> -r <RULE FILE>
+hashcat -a 0 -m <HASH TYPE> <HASH FILE> <WORDLIST> -r <RULE FILE> -r <RULE FILE>
 ```
 
 #### Bruteforce 
