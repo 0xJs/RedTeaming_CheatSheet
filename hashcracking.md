@@ -201,7 +201,7 @@ hashcat -a 0 -m <HASH TYPE> <HASH FILE> -r dive.rule -r best64.rule --loopback
 - https://github.com/hashcat/hashcat-utils
 
 ```
-./expander < woprdlist.txt | sort -u > wordlist_expander.txt
+./expander < wordlist.txt | sort -u > wordlist_expander.txt
 ```
 
 ### Fingerprint attack
