@@ -189,7 +189,7 @@ awk '{print $0" "}' 20k-combined-mid-space.txt > 20k-combined-mid-end-space.txt
 ### Loopback attack
 - Generate a wordlist of the potfile and run them again with rules
 ```
-awk -F ":" '{print $NF}' < hashcat.potfile > potfile.list
+awk -F ":" '{print $NF}' < hashcat.potfile | sort -u > potfile.list
 
 hashcat -a 0 -m <HASH TYPE> <HASH FILE> -r dive.rule --loopback
 hashcat -a 0 -m <HASH TYPE> <HASH FILE> -r dive.rule -r best64.rule --loopback
