@@ -1,5 +1,26 @@
 # Hashcracking
-## Sources
+* [General](#General)
+* [Hashcat](#Hashcat)
+  * [Attack modes](#Attack-modes)
+    * [Wordlist attack](#Wordlist-attack)
+    * [Wordlist + Rules](#Wordlist-+-Rules)
+    * [Wordlist + Rules + Rules](#Wordlist-+-Rules-+-Rules)
+    * [Bruteforce](#Bruteforce)
+    * [Mask attack](#Mask-attack)
+    * [Hybrid attack](#Hybrid-attack)
+    * [Best effort Base loop](#Best-effort-Base-loop)
+  * [Other attacks](#Other-attacks)
+	* [Keyboard walk](#Keyboard-walk)
+	* [Wordlist from website](#Wordlist-from-website)
+	* [Combinator attack](#Combinator-attack)
+	* [Loopback attack](#Loopback-attack)
+	* [Expander attack](#Expander-attack)
+	* [Fingerprint attack](#Fingerprint-attack)
+	* [Prince attack](#Prince-attack)
+* [Methodology](#Methodology)
+
+## General
+#### Sources
 - Great resource/course: https://in.security/technical-training/password-cracking/
 - https://github.com/hashcat/hashcat
 - Rules
@@ -8,7 +29,7 @@
 - Wordlists
   - https://github.com/danielmiessler/SecLists/tree/master/Passwords  
 
-## Extracting hashes from files
+#### Extracting hashes from files
 - https://github.com/openwall/john
 - Extracing files
   - `androidbackup2john.py`
@@ -18,8 +39,7 @@
   - `pdf2john.pl`
   - `ssh2john.py`
 
-# Hashcat
-## General
+## Hashcat
 - Usefull hashcat flags:
   - `--potfile-path` to supply where to save the potfile of cracked hashes
   - `--idenitfy` identify the hash
@@ -29,7 +49,7 @@
   - `-w3` Enable a specific workload profile High (1 = low, 2 = default, 3 = high, 4 = nightmare)
   - `--increment` Enable incremental attack when using masks. If supplied `?a?a?a?a?a?a?a?a` it will bruteforce 1 till 8 characters.
 
-## Most used Hash modes
+#### Most used Hash modes
 - Hashcat supports over 300 hash modes.
 ```
 - [ Hash modes ] -
@@ -44,7 +64,7 @@
  2100 | Domain Cached Credentials 2 (DCC2), MS Cache 2
 ```
 
-## Charsets
+#### Charsets
 ```
 - [ Built-in Charsets ] -
 
@@ -66,7 +86,7 @@
 hashcat -a 3 -m <HASH TYPE> <HASH FILE> -1 ?u?l -2 ?d?s ?1?1?1?1?1?1?2?2
 ```
 
-## Attack modes
+### Attack modes
 - Hashcat has multiple attack modes which are used with the `-a` parameter. For example `-a 0`.
 ```
 - [ Attack Modes ] -
@@ -126,15 +146,16 @@ hashcat -a 6 -m <HASH TYPE> <HASH FILE> <WORDLIST> ?a?a?a --increment
 hashcat -a 7 -m <HASH TYPE> <HASH FILE> ?a?a?a <WORDLIST> --increment
 ```
 
-#### Best effort - Base loop
+#### Best effort Base loop
 - You can crack at `9.56` GH/s for a 95^8 keyspace. `95^8 / 9.56 GH/s = 693,954 secs = ~8 days`
 - If you have only 8 hours for example, which is 28,800 seconds. `9.56 GH/s * 28,800 seconds = 275,328,000,000,000` needed in 8 hours
 - `275,328,000,000,000 (1/8) = 64`
 - Then execute with hashcat with `-t 64` to use the top 64 chars (markov)
 
+
+### Other attacks
 #### Keyboard walk
 - https://github.com/hashcat/kwprocessor
-
 ```
 kwp -z basechars/full.base keymaps/en-us.keymap routes/2-to-16-max-3-direction-changes.route > keymap.txt
 
@@ -143,9 +164,8 @@ hashcat -a 0 -m <HASH TYPE> <HASH FILE> keymap.txt
 hashcat -a 0 -m <HASH TYPE> <HASH FILE> keymap.txt -r dive.rule
 ```
 
-#### Target specific wordlist generation
+#### Wordlist from website
 - https://www.kali.org/tools/cewl/
-
 ```
 cewl -d 2 -e -v -w wordlist.txt <URL TARGET>
 
