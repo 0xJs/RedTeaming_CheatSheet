@@ -225,3 +225,129 @@ hashcat -m <HASH TYPE> <HASH FILE> --remve -a 1 word.list3 word.list3 -o word.li
 ```
 ./pp.bin word.list --pw-min=8 | ./pp.bin word.list --pw-min=8 | hashcat -m <HASH TYPE> hashes.txt -g 300000
 ```
+
+## Methodology
+Below is my methodology to reach high percentages cracked. Will add new things once I tested more of the attakcs above. The methodology is ordered in effectiveness but also how long it will take to run. Quick things will be at the top!
+
+#### Hashcat flags  
+-   Use `--username` if the hashes.txt file contains usernames
+-   Use `-w3` and `-O` to up the workload en performance.
+
+#### Password list & Rules
+Run the dutch_merged.txt and rockyou.txt with the dive ruleset
+
+```
+.\hashcat.exe -a 0 -m <HASH MODE> .\hashes.txt .\wordlists\dutch_merged.txt -r .\rules\dive.rule -w3 -O
+.\hashcat.exe -a 0 -m <HASH MODE> .\hashes.txt .\wordlists\rockyou.txt -r .\rules\dive.rule -w3 -O
+```
+
+#### Username as passwords + double rules  
+Extract the usernames from the hashdump and crack them using double rules, dive and best64. This will combine all rules from dive with each rule in best64.
+
+```
+cat hashes.txt | awk -F ":" '{print $1}' | awk -F '\' '{print $1 "\n" $2}' | sort -u > user_computer_domain.txt
+
+.\hashcat.exe -a 0 -m <HASH MODE> .\hashes.txt .\user_computer_domain.txt -r .\rules\dive.rule -r .\rules\best64.rule -w3 -O
+```
+
+#### Keyboard walk  
+Spray common keyboard walk patterns.  
+[https://github.com/Karmaz95/crimson_cracking/blob/main/Keyboard-Combinations.txt](https://github.com/Karmaz95/crimson_cracking/blob/main/Keyboard-Combinations.txt)  
+
+```
+.\hashcat.exe -a 0 -m <HASH MODE> .\hashes.txt .\wordlists\Keyboard-Combinations.txt -r .\rules\best64.rule -w3 -O
+```
+
+#### Mask attack - Company name  
+Use custom masks which brute-forces characters around the name of the company. Save the following masks in Custommasks.txt and change the all lowercase and all uppercase to the company name. Lower the amount of `?a` if it takes to long!
+
+```
+companyname?a?a?a?a?a
+companyname?a?a?a?a
+companyname?a?a?a
+companyname?a?a
+companyname?a
+Bakker?a?a?a?a?a
+Bakker?a?a?a?a
+Bakker?a?a?a
+Bakker?a?a
+Bakker?a
+?a?a?a?a?acompanyname
+?a?a?a?acompanyname
+?a?a?acompanyname
+?a?acompanyname
+?acompanyname
+?a?a?a?a?aCompanyname
+?a?a?a?aCompanyname
+?a?a?aCompanyname
+?a?aCompanyname
+?aCompanyname
+?acompanyname?a
+?a?acompanyname?a?a
+?a?a?acompanyname?a?a?a
+?aCompanyname?a
+?a?aCompanyname?a?a
+?a?a?aCompanyname?a?a?a
+?acompanyname?a?a
+?acompanyname?a?a?a
+?acompanyname?a?a?a?a
+?a?acompanyname?a?a?a?a
+?a?acompanyname?a
+?a?a?acompanyname?a
+?a?a?a?acompanyname?a
+?a?a?a?a?acompanyname?a
+?aCompanyname?a?a
+?aCompanyname?a?a?a
+?aCompanyname?a?a?a?a
+?a?aCompanyname?a?a?a?a
+?a?aCompanyname?a
+?a?a?aCompanyname?a
+?a?a?a?aCompanyname?a
+?a?a?a?a?aCompanyname?a
+```
+
+```
+.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt .\wordlists\Custommasks.txt -w3 -O
+```
+
+#### Password list & double rules  
+Run dutch_merged and rockyou using double rules, dive and best64. This will combine all rules from dive with each rule in best64.
+
+```
+.\hashcat.exe -a 0 -m <HAST MODE> .\hashes.txt .\wordlists\dutch_merged.txt -r .\rules\dive.rule -r .\rules\best64.rule -w3 -O
+.\hashcat.exe -a 0 -m <HAST MODE> .\hashes.txt .\wordlists\rockyou.txt -r .\rules\dive.rule -r .\rules\best64.rule -w3 -O
+```
+
+#### Hybrid attacks  
+Bruteforce up to 4 characters before and after each word in the wordlists. Lower the amount of `?a` if it takes to long!
+
+```
+.\hashcat.exe -a 6 -m <HASH MODE> .\hashes.txt .\wordlists\dutch_merged.txt ?a?a?a?a --increment -w3 -O
+.\hashcat.exe -a 6 -m <HASH MODE> .\hashes.txt .\wordlists\rockyou ?a?a?a?a --increment  -w3 -O
+.\hashcat.exe -a 7 -m <HASH MODE> .\hashes.txt ?a?a?a?a .\wordlists\dutch_merged.txt --increment -w3 -O
+.\hashcat.exe -a 7 -m <HASH MODE> .\hashes.txt ?a?a?a?a .\wordlists\rockyou.txt --increment -w3 -O
+```
+
+#### Bruteforce till 8 characters  
+Bruteforce up to 8 characters.
+
+```
+.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt ?a?a?a?a?a?a?a?a --increment
+```
+
+#### Mask attack - common masks
+Bruteforce with common masks and password patterns.  
+[https://raw.githubusercontent.com/sean-t-smith/Extreme_Breach_Masks/main/06%206-hours/6-hours_8-14.hcmask](https://raw.githubusercontent.com/sean-t-smith/Extreme_Breach_Masks/main/06%206-hours/6-hours_8-14.hcmask)
+
+```
+.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt .\wordlists\6-hours_8-14.hcmask -w3 -O
+```
+
+#### Loopback attack  
+Create a list of all the cracked passwords and rerun them using both rulesets.  
+
+```
+awk -F ":" '{print $NF}' < hashcat.potfile | sort -u > new_passwords.txt
+
+hashcat -a 0 -m <HASH TYPE> <HASH FILE> .\new_passwords.txt -r .\rules\dive.rule -r .\rules\best64.rule --loopback -w3 -O
+```
