@@ -2417,7 +2417,9 @@ Enter-PSSession -ComputerName <FQDN>
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
 
-## Crossforest attacks
+## Cross forest attacks
+- Great blogpost to abuse non-transitive https://exploit.ph/external-trusts-are-evil.html
+	
 ### One-way Outbound
 - With a One-Way Outbound trust from A --> B. Then B can enumerate users in A. If we are in domain A, its by design we can't access B.
 - Can still be exploited and obtain "domain user" access from A to B by using shared credential. (Using the user A$ in domain B). It uses the flatname that is infront of the <DOMAIN>\<USER> format.
