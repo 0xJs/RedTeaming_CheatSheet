@@ -71,7 +71,7 @@
   * [SQL Server](#SQL-Server)
   * [Trust key](#Trust-key)
   * [Krbtgt hash](#Krbtgt-hash)
-* [Cross Forest attacks](#Crossforest-attacks)
+* [Cross Forest attacks](#Cross-forest-attacks)
   * [Kerberos](#Kerberos)
   * [SQL Server](#SQL-Server)
   * [One-way Outbound](#One-way-Outbound)
