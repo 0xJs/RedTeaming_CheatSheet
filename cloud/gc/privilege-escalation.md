@@ -49,7 +49,7 @@ gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --fil
 #### Set GCUSER for oneliners:
 ```
 GCUSER=<USER EMAIL>
-# OR
+
 GCUSER=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
 ```
 
@@ -70,9 +70,6 @@ gcloud projects list --format="value(PROJECT_NUMBER)" | while read project; do e
 
 #### Oneliner to check permissions of a service account on all service accounts
 ```
-GCUSER=<USER EMAIL>
-GCUSER=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
-
 gcloud iam service-accounts list --format="value(email)" | while read serviceaccount; do echo "\n [+] checking: $serviceaccount\n" && gcloud iam service-accounts get-iam-policy $serviceaccount --flatten="bindings[].members" --filter="bindings.members=serviceAccount:$GCUSER" --format="value(bindings.role)" 2>/dev/null; done
 ```
 
