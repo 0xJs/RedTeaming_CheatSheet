@@ -346,6 +346,11 @@ gcloud functions deploy <CLOUD FUNCTION NAME> --timeout 539 --source <PATH TO SO
 gcloud functions call <CLOUD FUNCTION NAME> --data '{}'
 ```
 
+#### Retrieve service account
+```
+gcloud functions describe <CLOUD FUNCTION NAME>
+```
+
 ## Compute Instance
 #### List all compute instances on project level
 ```
