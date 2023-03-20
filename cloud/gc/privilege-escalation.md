@@ -123,7 +123,8 @@ gcloud container clusters list --access-token-file=$access-token-file
 
 #### Check permissions on resource
 - No easy command to enumerate all accesible resources. But example syntax would be:
-``` 
+```
+gcloud functions get-iam-policy <NAME>
 gcloud compute instances get-iam-policy <INSTANCE> --zone=<ZONE>
 ```
 
