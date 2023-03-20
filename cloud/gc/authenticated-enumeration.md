@@ -70,6 +70,13 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="<PATH TO OF .json OF SERVICE ACCOUNT>"
 dir env:
 ```
 
+#### Access token
+- Use the `--access-token-file=` or use the following tool:
+- https://github.com/RedTeamOperations/GCPTokenReuse
+```
+python3 /opt/gc/GCPTokenReuse/Gcp-Token-Updater.py -I --access-token "<ACCESS TOKEN>" --account-name <ACCOUNT NAME>
+```
+
 #### Get the current user
 ```
 gcloud auth list
