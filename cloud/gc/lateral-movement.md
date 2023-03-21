@@ -1,7 +1,8 @@
 # Lateral Movement
 ## Index
 * [GCP Web console](#GCP-Web-console)
-* [Access tokens](#Access-tokens)
+* [Gcloud CLI](#Gcloud-CLI)
+  * [Access tokens](#Access-tokens)
 * [GCP to Workspace](#GCP-to-Workspace)
 
 ## GCP Web console
@@ -39,7 +40,8 @@ gcloud auth activate-service-account --key-file key.json
 gcloud projects list
 ```
 
-## Acess tokens
+## Gcloud CLI
+### Acess tokens
 #### Inject access token in gcloud CLI
 - Use `-D` to delete the access token
 - https://github.com/RedTeamOperations/GCPTokenReuse
@@ -57,8 +59,17 @@ gcloud auth list
 gcloud config set account <ACCOUNT EMAIL>
 ```
 
-#### Use raw access token
+#### Access token parameter
 - Save acces token in file and use the `--access-token-file=` parameter with gcloud CLI
+
+### Accounts
+#### Change account
+```
+gcloud config set account <ACCOUNT>
+```
+
+#### Account parameter
+- use the parameter `--account <ACCOUNT` to execute commands with that account.
 
 ## GCP to Workspace
 ### Domain wide delegation
