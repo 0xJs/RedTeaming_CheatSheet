@@ -407,6 +407,7 @@ gcloud run revisions describe --region=<region> <revision-name>
 ## Enumeration using Google Cloud API
 - Service Endpoint : https://[ServiceName].googleapis.com
 - Documentation: https://developers.google.com/apis-explorer
+- Use the `--log-http` flag withing Gcloud CLI to see the requests it makes. Get the body, api endpoint etc and use it with Burp with other access token :)
 
 #### Validate access token
 ```
