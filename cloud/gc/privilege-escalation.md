@@ -390,8 +390,11 @@ gcloud compute instances start <INSTANCE>
 - Instance Level
   - Roles: `roles/compute.instanceAdmin.v1`, `roles/iam.serviceAccountUser`
   - Permissions: `compute.instances.setMetadata`, `iam.serviceAccounts.actAs`
+- Only works if `oslogin` is disabled
+
 
 #### Get the information about project metadata
+- Check if `enable-oslogin` is true.
 ```
 gcloud compute project-info describe
 ```
