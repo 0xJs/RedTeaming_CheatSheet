@@ -396,9 +396,9 @@ gcloud compute instances start <INSTANCE>
 gcloud compute project-info describe
 ```
 
-#### Generate ssh key pair
+#### Generate ssh key pair in current directory
 ```
-ssh-keygen
+ssh-keygen -f ./id_rsa
 ```
 
 #### Arrange ssh public key in this format in a file
