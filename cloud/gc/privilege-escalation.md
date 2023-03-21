@@ -180,7 +180,7 @@ gcloud projects add-iam-policy-binding <PROJECT ID> --member='serviceAccount:<US
 
 #### Retrieve the permissions of project for user
 ```
-gcloud projects get-iam-policy alert-nimbus-335411 --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)"
+gcloud projects get-iam-policy <PROJECT ID> --flatten="bindings[].members" --filter="bindings.members=user:<USER EMAIL>" --format="value(bindings.role)"
 ```
 
 ### Custom role permission update
