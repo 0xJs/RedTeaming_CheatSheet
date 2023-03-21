@@ -438,19 +438,24 @@ gcloud compute ssh --zone=<ZONE> <VM NAME>
 curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/"
 ```
 
+#### Set service account variable for following commands
+```
+SERVICEACCOUNT=$SERVICEACCOUNT
+```
+
 #### Check email
 ```
-curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/email
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/$SERVICEACCOUNT/email"
 ```
 
 #### Retrieve access token scope
 ```
-curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/scopes
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/$SERVICEACCOUNT/scopes"
 ```
 
 #### Access token
 ```
-curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/<SVC_ACCT>/token"
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/$SERVICEACCOUNT/token"
 ```
 
 #### Verify access token
@@ -460,7 +465,7 @@ curl https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=<ACCESS TOKEN>
 
 #### Identity token
 ```
-curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/[SVC_ACCT]/identity"
+curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/$SERVICEACCOUNT/identity"
 ```
 
 #### Verify identity token
