@@ -399,6 +399,11 @@ gcloud compute instances start <INSTANCE>
 gcloud compute project-info describe
 ```
 
+#### Disable oslogin on project
+```
+gcloud compute project-info add-metadata --metadata enable-oslogin=FALSE
+```
+
 #### Generate ssh key pair in current directory
 ```
 ssh-keygen -f ./id_rsa
@@ -417,6 +422,18 @@ gcloud compute project-info add-metadata --metadata-from-file=ssh-keys=<KEY FILE
 #### Set ssh key value in the instance metadata
 ```
 gcloud compute instances add-metadata <VM NAME> --metadata-from-file-ssh-keys=<KEY FILE>
+```
+
+#### Add a ssh key to existing list
+- save metadata from project info and add your own user
+```
+username:ssh-rsa [AAAAB3NzaC1yc2EAAAADAQABAAABAQ]
+username2:ssh-rsa [AAAAB3NzaC1yc2EAAAADAQABAAABAQ]
+newusername:ssh-rsa [AAAAB3NzaC1yc2EAAAADAQABAAABAQ]
+```
+
+```
+gcloud compute instances add-metadata [INSTANCE] --metadata-from-file ssh-keys=meta.txt
 ```
 
 ### OsLogin
