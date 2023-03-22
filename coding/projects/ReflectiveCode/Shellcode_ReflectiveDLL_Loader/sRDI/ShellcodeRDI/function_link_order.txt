@@ -1,0 +1,2 @@
+LoadDLL
+GetProcAddressWithHash
