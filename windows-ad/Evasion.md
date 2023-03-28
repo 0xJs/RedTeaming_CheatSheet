@@ -456,6 +456,8 @@ ls C:\Windows\system32\CodeIntegrity
 ```
 
 ### WDAC
+- Tool to bypass: https://github.com/nettitude/Aladdin
+
 #### Check for WDAC
 ```
 Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
