@@ -13,6 +13,7 @@
   * [Service Accounts](#Service-accounts)
   * [Virtual machines](#Virtual-machines)
   * [Networking](#Networking)
+  * [Function Apps](#Function-Apps)
   * [Storage Buckets](#Storage-Buckets)
   * [Webapps and SQL](#Webapps-and-SQL)
   * [Containers](#Containers)
@@ -317,6 +318,11 @@ gcloud compute vpn-tunnels list
 #### List Interconnects (VPN)
 ```
 gcloud compute interconnects list
+```
+
+### Function Apps
+```
+gcloud functions list
 ```
 
 ### Storage Buckets
