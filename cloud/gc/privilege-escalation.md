@@ -460,7 +460,7 @@ curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetada
 
 #### Set service account variable for following commands
 ```
-SERVICEACCOUNT=$SERVICEACCOUNT
+SERVICEACCOUNT=<EMAIL>
 ```
 
 #### Check email
