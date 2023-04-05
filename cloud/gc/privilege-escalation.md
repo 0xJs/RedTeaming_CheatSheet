@@ -416,12 +416,12 @@ username:ssh-rsa [AAAAB3NzaC1yc2EAAAADAQABAAABAQ]
 
 #### Set ssh key value in the project metadata
 ```
-gcloud compute project-info add-metadata --metadata-from-file=ssh-keys=<KEY FILE>
+gcloud compute project-info add-metadata --metadata-from-file ssh-keys=<KEY FILE>
 ```
 
 #### Set ssh key value in the instance metadata
 ```
-gcloud compute instances add-metadata <VM NAME> --metadata-from-file-ssh-keys=<KEY FILE>
+gcloud compute instances add-metadata <VM NAME> --metadata-from-file ssh-keys=<KEY FILE>
 ```
 
 #### Add a ssh key to existing list
