@@ -37,7 +37,7 @@ gcloud projects list
 
 #### Set a project
 ```
-gcloud config set project <PROJECT NAME> 
+gcloud config set project <PROJECT ID> 
 ```
 
 #### Check IAM policy on project level
