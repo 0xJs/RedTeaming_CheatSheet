@@ -131,6 +131,7 @@ Remove-NetFirewallRule -DisplayName "Allow port"
 #### Powershell detections
 - System-wide transcription
 - Script Block logging 
+- Module logging
 - AntiMalware Scan Interface (AMSI)
 - Constrained Language Mode (CLM) - Integrated with Applocker and WDAC (Device Guard)
 
@@ -140,6 +141,8 @@ Remove-NetFirewallRule -DisplayName "Allow port"
 ```
 
 ### Execution-policy
+- It is not a security boundary.
+
 #### Get Execution policy
 ```
 Get-Executionpolicy
@@ -265,12 +268,8 @@ certutil -urlcache -split -f <URL>
 - If applocker is there enumerate it to find a directory that lets you execute scripts in
 
 ### Logging evasion
-#### Script Block logging bypass
-- Bypass [ETW](#ETW)
-
-### System Wide Transcript
 #### Invisi-shell
-- Bypasses Sytem-Wide transcript
+- Bypasses all logging
 - https://github.com/OmerYa/Invisi-Shell
 - Type exit from the new PowerShell session to complete the clean-up.
 
@@ -283,6 +282,9 @@ certutil -urlcache -split -f <URL>
 ```
 RunWithRegistryNonAdmin.bat
 ```
+
+#### Script Block logging bypass
+- Bypass [ETW](#ETW)
 
 ##### Winrs
 - Use Winrs instead of PSRemoting to evade System-wide-transcript and deep script block logging
