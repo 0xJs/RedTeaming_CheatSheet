@@ -78,7 +78,7 @@ whois <IP>
 
 ### Mail
 #### Check spf, dkim, dmarc etc
-- https://github.com/BishopFox/spoofcheck
+- https://github.com/a6avind/spoofcheck
 ```
 ./spoofcheck.py <DOMAIN>
 ```
