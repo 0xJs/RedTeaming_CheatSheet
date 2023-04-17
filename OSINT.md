@@ -371,8 +371,8 @@ https://login.microsoftonline.com/<DOMAIN>/.well-known/openid-configuration
 ```
 
 ### AADinternals
-https://github.com/Gerenios/AADInternals
-https://o365blog.com/aadinternals/
+- https://github.com/Gerenios/AADInternals
+- https://o365blog.com/aadinternals/
 
 #### Import the AADinternals module
 ```
@@ -384,7 +384,7 @@ import-module .\AADInternals.psd1
 Invoke-AADIntReconAsOutsider -DomainName <DOMAIN>
 ```
 
-####  Get tenant name, authentication, brand name (usually same as directory name) and domain name
+#### Get tenant name, authentication, brand name (usually same as directory name) and domain name
 ```
 Get-AADIntLoginInformation -UserName <RANDOM USER>@<DOMAIN>
 ```
