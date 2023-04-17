@@ -363,13 +363,11 @@ python3 cloud_enum.py -k <KEYWORD>
 - Federation with Azure AD or O365 enables users to authenticate using on-premises credentials and access all resources in cloud.
 ```
 https://login.microsoftonline.com/getuserrealm.srf?login=<USER>@<DOMAIN>&xml=1
-https://login.microsoftonline.com/getuserrealm.srf?login=root@defcorphq.onmicrosoft.com&xml=1
 ```
 
 #### Get the Tenant ID
 ```
 https://login.microsoftonline.com/<DOMAIN>/.well-known/openid-configuration
-https://login.microsoftonline.com/defcorphq.onmicrosoft.com/.well-known/openid-configuration
 ```
 
 ### AADinternals
