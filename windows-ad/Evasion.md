@@ -404,13 +404,13 @@ Get-PSSessionConfiguration
 ```
 
 ## Applocker
-- AppLocker rules are split into 5 categories - Executable, Windows Installer, Script, Packaged App and DLLs, and each category can have its own enforcement (enforced, audit only, none).
-- AppLocker has a set of default allow rules such as, "allow everyone to execute anything within C:\Windows\*" - the theory being that everything in C:\Windows is trusted and safe to execute.
+- AppLocker rules are split into 5 categories - `Executable`, `Windows Installer`, `Script`, `Packaged App` and `DLLs`, and each category can have its own enforcement (enforced, audit only, none).
+- AppLocker has a set of default allow rules such as, `allow everyone to execute anything within C:\Windows\*` - the theory being that everything in `C:\Windows` is trusted and safe to execute.
 - The difficulty of bypassing AppLocker depends on the robustness of the rules that have been implemented. The default rule sets are quite trivial to bypass in a number of ways:
   - Executing untrusted code via trusts LOLBAS's.
   - Finding writeable directories within "trusted" paths.
   - By default, AppLocker is not even applied to Administrators.
-- Uploading into ```C:\Windows``` requires elevated privileges, but there are places like ```C:\Windows\Tasks``` that are writeable by standard users. 
+- Uploading into `C:\Windows` requires elevated privileges, but there are places like `C:\Windows\Tasks` that are writeable by standard users. 
 - DLL enforcement very rarely enabled due to the additional load it can put on a system, and the amount of testing required to ensure nothing will break.
 - Good repo for bypasses: https://github.com/api0cradle/UltimateAppLockerByPassList
 
