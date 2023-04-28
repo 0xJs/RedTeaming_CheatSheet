@@ -625,6 +625,9 @@ msbuild.exe <FILE>
 ```
 
 ## Defeating AV
+### General
+- EDR Hookdump https://github.com/zeroperil/HookDump
+
 ### Obfuscation tools
 #### C# binaries
 - Obfuscate C# binary with https://github.com/mkaring/ConfuserEx
