@@ -359,7 +359,7 @@ Code: <CODE>
 ```
 
 #### Capture Access Token
-- Once the user registers trhe device, TokenTactics will capture the token. This is saved in `$response.access_token
+- Once the user registers the device, TokenTactics will capture the token. This is saved in `$response.access_token`
 
 #### Post exploitation
 - Example dump mailbox with TokenTactics:
