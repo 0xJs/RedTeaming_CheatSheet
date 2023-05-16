@@ -695,6 +695,10 @@ The original Rotten Potato exploit was identified in 2016. Service accounts coul
 #### SeImpersonate / SeAssignPrimaryToken
 Service accounts are generally configured with these two privileges. They allow the account to impersonate the access tokens of other users (including the SYSTEM user). Any user with these privileges can run the token impersonation exploits in this lecture.
 
+### God potato
+- Just like juicy/sweet potato. Worked flawlesly on Windows Server 2022
+- https://github.com/BeichenDream/GodPotato
+ 
 ### Juicy potato
 - https://github.com/antonioCoco/JuicyPotatoNG (New one)
 - https://github.com/ohpe/juicy-potato
