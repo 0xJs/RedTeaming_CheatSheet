@@ -234,7 +234,7 @@ powerpick $ExecutionContext.SessionState.LanguageMode
 
 #### Execute assembly in memory
 ```
-execute-assembly <PATH TO EXE> -group=system
+execute-assembly <PATH TO EXE>
 ```
 
 #### Load PowerShell script
