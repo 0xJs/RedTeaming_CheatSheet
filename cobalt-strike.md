@@ -678,6 +678,7 @@ kill <PID>
 ### Malleable C2 profile
 - Example: https://github.com/Cobalt-Strike/Malleable-C2-Profiles
 - Changes to C2 profile requires teamserver restart and a new beacon!
+- Good changes: https://github.com/WKL-Sec/Malleable-CS-Profiles
 
 #### Check profile for errors
 ```
