@@ -30,11 +30,15 @@ def encr_string(string):
     enc_name = encrypt_AES(string_w_null, key)
 
     # print out the function name string
-    out = "AES encrypted string: "
+    out = "unsigned char s" + string + "[] = "
     out_hex = '{ 0x' + ', 0x'.join(hex(ord(chr(x)))[2:] for x in enc_name) + ' };'
     out_n = "\n"
     
-    print(out + out_hex + out_n)
+    print(out + out_hex)
+
+def decr_string(string):
+    print("AESDecrypt((char*)s" + string + ", sizeof(s" + string + "), (char *)key, sizeof(key));")
+    print("")
 
 def main():
     print_key()
@@ -48,6 +52,7 @@ def main():
             break
             
         encr_string(plaintext)
+        decr_string(plaintext)
         
 if __name__ == "__main__":
     main()
