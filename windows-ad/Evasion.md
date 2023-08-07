@@ -470,6 +470,12 @@ ls C:\Windows\system32\CodeIntegrity
 Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
 ```
 
+#### Check for policy
+- Check for `.xml` files
+```
+dir C:\Windows\System32\CodeIntegrity\
+```
+
 ### LOLBAS
 - Use Microsoft Signed Binaries to exploit https://lolbas-project.github.io/
 - Can be used to bypass Applocker or WDAC
