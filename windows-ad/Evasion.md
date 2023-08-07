@@ -470,10 +470,11 @@ ls C:\Windows\system32\CodeIntegrity
 Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
 ```
 
-#### Check for policy
-- Check for `.xml` files
+#### Check for the policy on disk
+- `.p7b` is a signed policy
+- Check if there are any `.xml` files which didn't got removed with the policy
 ```
-dir C:\Windows\System32\CodeIntegrity\
+ls C:\Windows\system32\CodeIntegrity
 ```
 
 ### LOLBAS
