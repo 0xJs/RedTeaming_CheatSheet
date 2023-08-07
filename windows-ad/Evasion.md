@@ -461,6 +461,10 @@ ls C:\Windows\system32\CodeIntegrity
 ### WDAC
 - Tool to bypass: https://github.com/nettitude/Aladdin
 
+### Disable WDAC
+- Policy in `C:\Windows\System32\CodeIntegrity\` in a `.p7b` file. Delete the file and reboot to delete policy.
+- Only works if WDAC isn't enforced through GPO but setup locally!
+
 #### Check for WDAC
 ```
 Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
