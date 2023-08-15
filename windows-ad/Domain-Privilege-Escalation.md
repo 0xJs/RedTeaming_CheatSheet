@@ -1958,7 +1958,7 @@ certipy template -u <USER> -hashes <NTLM HASH> -template <TEMPLATE NAME> -config
 
 #### RBCD or Shadow Credentials
 - [RBCD](#Computer-object-takeover)
-- [Shadow Credentials](#GenericWrite---Shadow-Credentials)
+- [Shadow Credentials](#Permissions-on-a-ComputerObject)
 
 ### ESC7 Vulnerable CA ACL
 - A low privilege user is granted the ManageCA (CA Administrator) and ManageCertificates (Certificate Manager) rights over the CA.
