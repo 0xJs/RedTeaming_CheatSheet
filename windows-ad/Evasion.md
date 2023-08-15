@@ -12,6 +12,7 @@
    * [Just Enough Admin](#Just-Enough-Admin)
 * [Applocker](#Applocker)
 * [WDAC](#WDAC)
+  * [Code signing](#Code-signing) 
 * [LOLBAS](#LOLBAS)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
@@ -475,6 +476,34 @@ Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\D
 - Check if there are any `.xml` files which didn't got removed with the policy
 ```
 ls C:\Windows\system32\CodeIntegrity
+```
+
+### Code signing
+- Code signing ensures that files weren't tampered with and are verified by a trusted authority.
+- ADCS code signing EKU = `Code Signing` (`1.3.6.1.5.5.7.3.3`)
+- Requires Code Signing cert to be extracted from a system, or created through ADCS and it should be allowed in the WDAC policy!
+
+#### Convert Pem to PFX with openssl
+```
+openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
+#### Check .pfx file for code signing EKU
+-  `Code Signing 1.3.6.1.5.5.7.3.3`
+-  `Cert Hash(sha1)` to validate cert hash
+```
+certutil -v -dump -p "<PASSWORD>" <PATH TO PFX>
+```
+
+#### Sign a tool
+- https://learn.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
+```
+.\signtool.exe sign /fd SHA256 /a /f <PATH TO PFX FILE> /p '<PASSWORD>' <EXE TO SIGN>
+```
+
+#### Get Signer Certificate of tool
+```
+Get-AuthenticodeSignature -FilePath <PATH TO EXE>
 ```
 
 ### LOLBAS
