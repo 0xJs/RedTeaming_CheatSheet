@@ -668,6 +668,7 @@ msbuild.exe <FILE>
 ## Defeating AV
 ### General
 - EDR Hookdump https://github.com/zeroperil/HookDump
+- Overview of methods: https://github.com/CMEPW/BypassAV
 
 ### Obfuscation tools
 #### C# binaries
