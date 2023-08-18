@@ -1800,7 +1800,7 @@ cme smb <FQDN> -u <USER> -H <NTLM HASH>
 	- User with Enrollment Rights
 
 #### Abuse same as ESC1 for Windows/Linux
-- [ESC1 Link](#ESC1 Request SAN of other user)
+- [ESC1 Link](#ESC1-Request-SAN-of-other-user)
 
 ### ESC3 Agent certificate & Enroll on behalf of other user
 - Requires two certficate templates
