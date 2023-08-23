@@ -114,6 +114,9 @@ Get-ADIDNSNodeAttribute -Node * -Attribute DNSRecord -Partition ForestDNSZones
 
 ```
 dnstool.py -u 'DOMAIN\USER' -p 'PASSWORD' --record '*' --action 'query' <DC IP>
+dnstool.py -u 'DOMAIN\USER' -p 'PASSWORD' --record '*' --action 'query' <DC IP> --legacy
+dnstool.py -u 'DOMAIN\USER' -p 'PASSWORD' --record '*' --action 'query' <DC IP> --forest
+dnstool.py -u 'DOMAIN\USER' -p 'PASSWORD' --record '*' --action 'query' <DC IP> --partition
 ```
 
 #### Create wildcard record
