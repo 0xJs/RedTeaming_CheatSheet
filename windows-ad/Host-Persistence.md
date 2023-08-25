@@ -18,7 +18,6 @@
 
 ## Persistence
 - Its important to implement a control mechanism in the payloads to stop multiple executions via for example mutex, file, event or something similar
-	- [LINK HERE]
 
 ## Userland
 - Persistence methods for low privilege persistence
