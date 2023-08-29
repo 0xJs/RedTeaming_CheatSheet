@@ -14,6 +14,7 @@
 * [WDAC](#WDAC)
   * [Code signing](#Code-signing) 
 * [LOLBAS](#LOLBAS)
+* [LSASS Protections](#LSASS-Protections)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
   * [Evasion techniques](#Evasion-techniques)
@@ -663,6 +664,26 @@ msbuild.exe <FILE>
     </Task>
   </UsingTask>
 </Project>
+```
+
+## LSASS Protections
+### Credential Guard
+#### Check if credential guard is configured
+```
+"CredentialGuard" -match ((Get-ComputerInfo).DeviceGuardSecurityServicesConfigured)
+```
+
+#### Check if credential guard is running
+```
+"CredentialGuard" -match ((Get-ComputerInfo).DeviceGuardSecurityServicesRunning)
+```
+
+### RunasPPL
+- https://itm4n.github.io/lsass-runasppl/
+
+#### Check if RunasPPL is configured
+```
+reg query HKLM\SYSTEM\CurrentControlSet\Control\Lsa\RunAsPPL
 ```
 
 ## Defeating AV
