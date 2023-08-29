@@ -926,7 +926,7 @@ Invoke-Mimikatz -Command '"lsadump::dcsync /user:<DOMAIN>\krbtgt /domain:<DOMAIN
 ```
 
 ### Unconstrained delegation User
-- Requires a user with unconstrained delegation and a SPN set which points to the attacker (or attacker controlled machine).
+- Requires
 	- A user with unconstrained delegation 
 	- User should have a SPN which doesn't point to a valid dns record - or it needs to point to a machine under your control - or able to set spn & create DNS record
 - https://exploit.ph/user-constrained-delegation.html
