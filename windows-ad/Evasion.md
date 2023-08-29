@@ -670,12 +670,12 @@ msbuild.exe <FILE>
 ### Credential Guard
 #### Check if credential guard is configured
 ```
-"CredentialGuard" -match ((Get-ComputerInfo).DeviceGuardSecurityServicesConfigured)
+if ((Get-ComputerInfo).DeviceGuardSecurityServicesConfigured -match "CredentialGuardA") {return $true}else{return $false}
 ```
 
 #### Check if credential guard is running
 ```
-"CredentialGuard" -match ((Get-ComputerInfo).DeviceGuardSecurityServicesRunning)
+if ((Get-ComputerInfo).DeviceGuardSecurityServicesRunning -match "CredentialGuardA") {return $true}else{return $false}
 ```
 
 ### RunasPPL
