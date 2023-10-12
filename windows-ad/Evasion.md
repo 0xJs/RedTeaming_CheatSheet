@@ -828,6 +828,7 @@ $v=[Ref].Assembly.GetType('System.Management.Automation.Am' + 'siUtils'); $v."Ge
 1. Run Threatcheck ```.\ThreatCheck.exe -f .\shell.exe```
 2. Replace string which gets detected.
 3. Recompile and check again!
+- Also possible to use https://github.com/dobin/avred
 
 ### Scanning amsi
 #### Threatcheck
