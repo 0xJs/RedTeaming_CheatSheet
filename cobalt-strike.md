@@ -121,7 +121,7 @@ sudo systemctl status csteamserver.service
 sudo systemctl enable teamserver.service
 ```
 
-### Persisten hosted files
+### Persistend hosted files
 - Hosted files are gone on restart. A solution is to use `agscript` utility with the `artifact_payload` and `site_host` functions.
 ```
 agscript <HOST> <PORT> <USER> <PASSWORD> <path/to/script.cna>
