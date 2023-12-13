@@ -358,9 +358,11 @@ Bruteforce up to 8 characters.
 #### Mask attack - common masks
 Bruteforce with common masks and password patterns.  
 [https://raw.githubusercontent.com/sean-t-smith/Extreme_Breach_Masks/main/06%206-hours/6-hours_8-14.hcmask](https://raw.githubusercontent.com/sean-t-smith/Extreme_Breach_Masks/main/06%206-hours/6-hours_8-14.hcmask)
+Removed all with a length of 16 (for 8 characters) since we already bruteforced them
 
 ```
-.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt .\wordlists\6-hours_8-14.hcmask -w3 -O
+cat 6-hours_8-14.hcmask | grep -v -x '.\{16,16\}' > 6-hours_9-14.hcmask
+.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt .\wordlists\6-hours_9-14.hcmask -w3 -O
 ```
 
 #### Loopback attack  
