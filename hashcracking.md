@@ -352,17 +352,17 @@ Bruteforce up to 4 characters before and after each word in the wordlists. Lower
 Bruteforce up to 8 characters.
 
 ```
-.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt ?a?a?a?a?a?a?a?a --increment
+hashcat -a 3 -m <HASH MODE> .\hashes.txt ?a?a?a?a?a?a?a?a --increment
 ```
 
 #### Mask attack - common masks
 Bruteforce with common masks and password patterns.  
-[https://raw.githubusercontent.com/sean-t-smith/Extreme_Breach_Masks/main/06%206-hours/6-hours_8-14.hcmask](https://raw.githubusercontent.com/sean-t-smith/Extreme_Breach_Masks/main/06%206-hours/6-hours_8-14.hcmask)
+https://raw.githubusercontent.com/sean-t-smith/Extreme_Breach_Masks/main/08%201-day/1-day_8-14.hcmask
 Removed all with a length of 16 (for 8 characters) since we already bruteforced them
 
 ```
-cat 6-hours_8-14.hcmask | grep -v -x '.\{16,16\}' > 6-hours_9-14.hcmask
-.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt .\wordlists\6-hours_9-14.hcmask -w3 -O
+cat 1-day_8-14.hcmask | grep -v -x '.\{16,16\}' > 1-day_9-14.hcmask
+.\hashcat.exe -a 3 -m <HASH MODE> .\hashes.txt .\masks\1-day_9-14.hcmask -w3 -O
 ```
 
 #### Loopback attack  
@@ -371,5 +371,5 @@ Create a list of all the cracked passwords and rerun them using both rulesets.
 ```
 awk -F ":" '{print $NF}' < hashcat.potfile | sort -u > new_passwords.txt
 
-hashcat -a 0 -m <HASH TYPE> <HASH FILE> .\new_passwords.txt -r .\rules\dive.rule -r .\rules\best64.rule --loopback -w3 -O
+.\hashcat.exe -a 0 -m <HASH TYPE> <HASH FILE> .\new_passwords.txt -r .\rules\dive.rule -r .\rules\best64.rule --loopback -w3 -O
 ```
