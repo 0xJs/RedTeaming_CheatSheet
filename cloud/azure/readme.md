@@ -29,6 +29,9 @@ $creds = New-Object System.Management.Automation.PSCredential('<USERNAME>', $pas
 Get-Childitem -Path C:\ -Force -Include <FILENAME OR WORD TO SEARCH> -Recurse -ErrorAction SilentlyContinue
 ```
 
+#### Get company branding
+- Browse to URL `https://login.microsoftonline.com/?whr=dhl.com` and replace dhl.com with company domain
+
 ## PSSession
 #### Save pssession in variable
 ```
