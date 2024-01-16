@@ -34,7 +34,7 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
   * [Cloud services](cloud/readme.md)
     * [Azure](cloud/azure/readme.md)
     * [Amazon Web Services](cloud/aws/readme.md)
-    * [Google Cloud Platform](cloud/gcb/readme.md)
+    * [Google Cloud Platform](cloud/gc/readme.md)
 * [C2 Frameworks]()
   * [Cobalt Strike](cobalt-strike.md)
   * [Covenant](covenant.md)
@@ -61,3 +61,6 @@ Most of my knowledge is gathered from the following coures, so big thanks to the
 #### Nuget Package Manager dependancies
 - Open Tools --> NuGet Package Manager --> Package Manager Settings --> Package Sources
 - Add a source. Name `nuget.org` and Source `https://api.nuget.org/v3/index.json`
+
+#### AV / EDR Netblocks for deny listing 
+- https://github.com/her0ness/av-edr-urls/blob/main/AV-EDR-Netblocks
