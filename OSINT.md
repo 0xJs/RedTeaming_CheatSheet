@@ -41,6 +41,9 @@
 - https://www.baidu.com/
 - https://yandex.com/
 
+#### Search through Github
+- https://github.com/search?type=code
+
 #### Create Sockpuppet / alias
 - Settings up a anonymous sockpuppet
 - https://www.reddit.com/r/OSINT/comments/dp70jr/my_process_for_setting_up_anonymous_sockpuppet/
