@@ -425,6 +425,9 @@ Dump-OWAMailboxViaMSGraphApi -AccessToken $response.access_token -mailFolder
 AllItems
 ```
 
+#### Dynamic Device Code Phishing
+- https://www.blackhillsinfosec.com/dynamic-device-code-phishing/
+
 ### Google workspace calendar event injection
 - Silently injects events to target calendars
 - Bypasses the “don’t auto-add” setting
