@@ -379,6 +379,11 @@ $secretByte = [Convert]::FromBase64String($secret)
 [System.IO.File]::WriteAllBytes("C:\Users\Public\Cert.pfx", $secretByte)
 ```
 
+#### Dump cert info
+```
+certutil.exe -dump C:\Users\Public\Cert.pfx
+```
+
 ## Automation account
 - Automation Account comes very handy in privilege escalation:
   - Run As account is by default contributor on the current subscription and possible to have contributor permissions on other subscriptions in the tenant.   
