@@ -16,7 +16,7 @@
     * [Reset password](#Reset-password) 
 * [Azure Resources Exploitation](#Azure-Resources-Exploitation)
   * [Storage account](#Storage-account)
-  * [Keyvault](#Keyvault)
+  * [Key Vault](#Key Vault)
   * [Automation account](#Automation-account)
   * [Virtual Machines](#Virtual-Machines)
   * [Deployments](#Deployments)
@@ -344,25 +344,39 @@ Get-AzStorageAccountKey -name <NAME OF STORAGE> -resourcegroupname <NAME>
 
 #### Connect to the storage account with "Storage Explorer" using the account name and account keys
 
-## Keyvault
-#### List keyvaults
+## Key Vault
+#### List key vaults
 ```
 Get-AzKeyVault
 ```
 
-#### Get info about a specific keyvault
+#### Get info about a specific key vault
 ```
 Get-AzKeyVault -VaultName <VAULT NAME>
 ```
 
-#### List the saved creds from keyvault
+#### List the saved creds from key vault
 ```
 Get-AzKeyVaultSecret -VaultName <VAULT NAME> -AsPlainText
 ```
 
-#### Read creds from a keyvault
+#### List saved certificates from key vault
+```
+Get-AzKeyVaultCertificate -VaultName <VAULT NAME>
+```
+
+#### Read creds from a key vault
 ```
 Get-AzKeyVaultSecret -VaultName <VAULT NAME> -Name <NAME> -AsPlainText
+```
+
+#### Read cert from a key vault
+```
+Get-AzKeyVaultSecret -VaultName <VAULT NAME> -Name <CERT NAME> -AsPlainText
+
+$secret = Get-AzKeyVaultSecret -VaultName <VAULT NAME> -Name <CERT NAME> -AsPlainText
+$secretByte = [Convert]::FromBase64String($secret)
+[System.IO.File]::WriteAllBytes("C:\Users\Public\Cert.pfx", $secretByte)
 ```
 
 ## Automation account
