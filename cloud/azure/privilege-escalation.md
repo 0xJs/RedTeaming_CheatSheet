@@ -16,7 +16,7 @@
     * [Reset password](#Reset-password) 
 * [Azure Resources Exploitation](#Azure-Resources-Exploitation)
   * [Storage account](#Storage-account)
-  * [Key Vault](#Key Vault)
+  * [Key Vault](#Key-Vault)
   * [Automation account](#Automation-account)
   * [Virtual Machines](#Virtual-Machines)
   * [Deployments](#Deployments)
