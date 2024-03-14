@@ -84,19 +84,6 @@ curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01
 Add-AzureADGroupMember -ObjectId <GROUP ID> -RefObjectId <USER ID> -Verbose
 ```
 
-#### Authenticate with Service Principal / Managed Identity
-- Uses cleartext credentials.
-```
-$password = ConvertTo-SecureString '<SECRET>' -AsPlainText -Force
-$creds = New-Object System.Management.Automation.PSCredential('<ACCOUNT ID>', $password)
-Connect-AzAccount -ServicePrincipal -Credential $creds -Tenant <TENANT ID>
-```
-
-- Using certificate
-```
-Connect-AzAccount -ServicePrincipal -ApplicationId <APP ID> -Tenant <TENANT ID> -CertificatePath <PATH TO CERT>
-```
-
 ## Exploitation Enumeration
 ### When on a new machine
 #### Get context of current user
@@ -250,12 +237,25 @@ env
 #### Request access token(s) for managed identity
 - See [Requesting access tokens](#Requesting-access-tokens)
 
-#### Use access tokens to connect with AZ Module
+#### Authenticate with Service Principal / Managed Identity
+- With cleartext credentials.
+```
+$password = ConvertTo-SecureString '<SECRET>' -AsPlainText -Force
+$creds = New-Object System.Management.Automation.PSCredential('<ACCOUNT ID>', $password)
+Connect-AzAccount -ServicePrincipal -Credential $creds -Tenant <TENANT ID>
+```
+
+- With Access tokens
 - Account ID can be found in `Client_ID` value from requesting the tokens.
 ```
 $mgmtToken = <TOKEN>
 $graphToken = <TOKEN>
 Connect-AzAccount -AccessToken $mgmtToken -GraphAccessToken $graphToken -AccountId <ID>
+```
+
+- Using certificate
+```
+Connect-AzAccount -ServicePrincipal -ApplicationId <APP ID> -Tenant <TENANT ID> -CertificatePath <PATH TO CERT>
 ```
 
 #### Use the AZ module to exploit the permissions this managed identity may have!
