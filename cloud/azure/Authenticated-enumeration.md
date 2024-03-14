@@ -7,7 +7,7 @@
   * [Administrative-unit Enumeration](#Administrative-unit-enumeration)
   * [App enumeration](#App-enumeration)
   * [Service-principals enumeration](#Service-principals-enumeration)
-* [Enumeration using Az powershell](#Enumeration-using-Az-powershell)
+* [Enumeration using Az PowerShell](#Enumeration-using-Az-powershell)
   * [Available resources](#Available-resources)
   * [Roles](#Roles)
   * [Users](#Users)
@@ -418,6 +418,24 @@ Get-Command *aZ*
 Get-Command *azvm*
 Get-Command -Noun *vm* -Verb Get
 Get-Command *vm*
+```
+
+#### Login with account
+```
+Connect-AzAccount
+```
+
+#### Authenticate with Service Principal / Managed Identity
+- Uses cleartext credentials.
+```
+$password = ConvertTo-SecureString '<SECRET>' -AsPlainText -Force
+$creds = New-Object System.Management.Automation.PSCredential('<ACCOUNT ID>', $password)
+Connect-AzAccount -ServicePrincipal -Credential $creds -Tenant <TENANT ID>
+```
+
+- Using certificate
+```
+Connect-AzAccount -ServicePrincipal -ApplicationId <APP ID> -Tenant <TENANT ID> -CertificatePath <PATH TO CERT>
 ```
 
 #### Get the information about the current context (Account, Tenant, Subscription etc).
