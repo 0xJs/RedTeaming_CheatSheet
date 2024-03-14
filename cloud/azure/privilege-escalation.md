@@ -92,6 +92,11 @@ $creds = New-Object System.Management.Automation.PSCredential('<ACCOUNT ID>', $p
 Connect-AzAccount -ServicePrincipal -Credential $creds -Tenant <TENANT ID>
 ```
 
+- Using certificate
+```
+Connect-AzAccount -ServicePrincipal -ApplicationId <APP ID> -Tenant <TENANT ID> -CertificatePath <PATH TO CERT>
+```
+
 ## Exploitation Enumeration
 ### When on a new machine
 #### Get context of current user
