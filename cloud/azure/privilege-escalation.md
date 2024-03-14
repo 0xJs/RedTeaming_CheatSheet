@@ -147,7 +147,7 @@ az account get-access-token --resource-type ms-graph
 env
 ```
 
-### After getting a new user
+### After getting a new user / managed identity
 #### Check for other tenants
 - Login to the Azure portal and in the right top click on the user and then `Switch Directory`.
 ```
@@ -179,6 +179,23 @@ az role assignment list
 ##### Get current Azure role assignments
 ```
 Get-AzRoleAssignment
+```
+
+#### Get Entra ID role assignments for objectID
+```
+Get-MgRoleManagementDirectoryRoleAssignment -Filter "principalId eq '<OBJECT ID>'" | ForEach-Object {
+	$roleDef = Get-MgRoleManagementDirectoryRoleDefinition -UnifiedRoleDefinitionId $_.RoleDefinitionId
+	[PSCustomObject]@{
+		RoleDisplayName = $roleDef.DisplayName
+		RoleId = $roleDef.Id
+		DirectoryScopeId = $_.DirectoryScopeId
+	}
+} | Select-Object RoleDisplayName, RoleId, DirectoryScopeId | fl
+```
+
+#### Check API permissions / App Role Assignments for OBJECT ID
+```
+Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId <OBJECT ID>
 ```
 
 #### Get the role definition
