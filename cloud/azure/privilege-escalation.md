@@ -342,17 +342,24 @@ Connect-AzAccount -ServicePrincipal -Credential $creds -Tenant <TENANT ID>
 Get-AzStorageAccount
 ```
 
-#### Check if there is a container that is acccessible
+#### Store context
 ```
-Get-AzStorageContainer -Context (Get-AzStorageAccount -Name <NAME> -ResourceGroupName <RESOURCEGROUPNAME>).Context
+$context = New-AzStorageContext -StorageAccountName <RESOURCE NAME>
 ```
 
-#### Access Storage Accounts AZ powershell
+#### Check if there is a container that is acccessible
 ```
-$StorageAccount = Get-AzStorageAccount -name <NAME> -ResourceGroupName <NAME>
-Get-AzStorageContainer -Context $StorageAccount.Context
-Get-AzStorageBlob -Container <NAME> -Context $StorageAccount.Context
-Get-AzStorageBlobContent -Container <NAME> -Context (Get-AzStorageAccount -name <NAME> -ResourceGroupName <NAME>).context -Blob <NAME>
+Get-AzStorageContainer -Context $context
+```
+
+#### List blobs
+```
+Get-AzStorageBlob -Container <NAME> -Context $context
+```
+
+#### Retrieve files
+```
+Get-AzStorageBlobContent -Container <NAME> -Context $context -Blob <NAME> -Verbose
 ```
 
 #### Access Storage Account
