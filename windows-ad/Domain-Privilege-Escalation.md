@@ -2367,9 +2367,9 @@ Get-SQLServerLinkCrawl -Instance <INSTANCE> -Verbose -Query 'SELECT distinct b.n
  
 ### Create Stored procedure as DB_Owner
 - Prerequisites:
- - db_owner role
- - owner of the database high privileged user
- - Database set to thrustworthy (To enable xp_cmdshell)
+  - db_owner role
+  - owner of the database high privileged user
+  - Database set to thrustworthy (To enable xp_cmdshell)
 
 #### Check the db_owner role PowerUpSQL
 ```
