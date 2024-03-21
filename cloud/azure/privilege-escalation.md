@@ -466,6 +466,7 @@ Start-AzAutomationRunbook -RunbookName <NAME OF RUNBOOK> -RunOn <WORKERGROUP NAM
 ```
 
 ### Extract credentials automation account
+- https://github.com/NetSPI/MicroBurst
 ```
 Import-Module Microburst.psm1
 Get-AzurePasswords
