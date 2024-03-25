@@ -173,6 +173,11 @@ enter-pssession $sess
 - Uses winrm / wmi
 - Work with the `-Credential $creds` parameter.
 
+#### Check if PSRemoting is enabled on target machine
+```
+Test-WSMan -ComputerName <IP> -Verbose
+```
+
 #### Create credential object
 ```
 $creds = get-credential
