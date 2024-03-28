@@ -1,6 +1,4 @@
 # OSINT
-- The page is bare, really need to do a OSINT course ;)
-
 * [General](#General)
 * [Google fu / dorks](#Google-fu-/-dorks)
 * [Host Information](#Host-Information)
