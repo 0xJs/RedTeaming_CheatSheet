@@ -348,7 +348,7 @@ https://login.microsoftonline.com/<TARGET DOMAIN>/v2.0/.well-known/openid-config
 - Check if any resources are being loaded from S3 buckets
 - Using burp, navigate the webapp and check for any calls to ```https://[bucketname].s3.amazonaws.com ``` or  ```• https://s3-[region].amazonaws.com/[Org Name]```
 
-#### Box.om usage
+#### Box.com usage
 - Look for any login portals
 - https://companyname.account.box.com
 
