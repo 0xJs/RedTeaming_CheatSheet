@@ -402,6 +402,19 @@ Get-AADIntTenantID -Domain <DOMAIN>
 Get-AADIntTenantDomains -Domain <DOMAIN>
 ```
 
+#### Check if user(s) exists in tenant
+- There are three different enumeration methods to choose from:
+	- Normal - This refers to the GetCredentialType API mentioned above. The default method.
+	- Login - This method tries to log in as the user.  
+		- OPSEC: queries will be logged to sign-ins log.
+	- Autologon - This method tries to log in as the user via autologon endpoint.  
+		- Queries are not logged to sign-ins log! As such, works well also for password spray and brute-force attacks.
+```
+Invoke-AADIntUserEnumerationAsOutsider -UserName <USER UPN>
+
+Get-Content .\users.txt | Invoke-AADIntUserEnumerationAsOutsider -Method Normal
+```
+
 ### Enumerate used services
 #### Enumerate Azure subdomains
 - https://github.com/NetSPI/MicroBurst
