@@ -400,6 +400,10 @@ Get-AADIntTenantID -Domain <DOMAIN>
 Get-AADIntTenantDomains -Domain <DOMAIN>
 ```
 
+#### Get company branding
+- Browse to URL `https://login.microsoftonline.com/?whr=<DOMAIN>` and replace `<DOMAIN>` with company domain
+
+
 #### Check if user(s) exists in tenant
 - There are three different enumeration methods to choose from:
 	- Normal - This refers to the GetCredentialType API mentioned above. The default method.
