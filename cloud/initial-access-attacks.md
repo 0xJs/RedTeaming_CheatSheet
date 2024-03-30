@@ -252,6 +252,7 @@ reg.Header.Set(string(b), nothing_to_see_here)
 
 ## Illicit Consent Grant
 - Verified publisher: https://techcommunity.microsoft.com/t5/microsoft-entra-azure-ad-blog/publisher-verification-and-app-consent-policies-are-now/ba-p/1257374
+- User Consent setting - "Allow user consent for apps from verified publishers, for selected permissions" (Note that this doesn't stop consent for applications from the same tenant as thetarget)
 
 #### Check if users are allowed to consent to apps
 - Requires a valid account in the target tenant
