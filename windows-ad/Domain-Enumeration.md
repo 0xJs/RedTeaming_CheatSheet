@@ -169,7 +169,7 @@ Get-DomainComputer -Computername <COMPUTERNAME> -FullData
 
 #### Get computers with a specific Operating System ""
 ```
-Get-DomainComputer -OperatingSystem "*<VERSION*"
+Get-DomainComputer -OperatingSystem "*<VERSION>*"
 ```
 
 #### Get list of all computer names and operating systems
