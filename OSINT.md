@@ -4,7 +4,7 @@
 * [Host Information](#Host-Information)
   * [Mail](#Mail)
 * [Hunting usernames](#Hunting-usernames)
-* [Hunting passwords & credentials](#Hunting-passwords-&-credentials)
+* [Hunting passwords & credentials](#Hunting-passwords-and-credentials)
 * [Hunting for personal information](#Hunting-for-personal-information)
 * [Web](#Web)
   * [General Info](#General-Info)
@@ -115,12 +115,10 @@ whatsmyname -u <USERNAME>
 sherlock <USERNAME>
 ```
 
-## Hunting passwords & credentials
+## Hunting passwords and credentials
 - https://www.dehashed.com/
-- https://www.weleakinfo.to/
 - https://leakcheck.io/
 - https://snusbase.com/
-- https://scylla.sh/
 - https://haveibeenpwned.com/
 
 #### Breachparse
