@@ -193,7 +193,19 @@ phoneinfoga scan -n <COUNTRYCODE><PHONENUMBER>
 ### Hunting subdomains
 - Script that uses multiple tools to enumerate subdomains: https://github.com/Gr1mmie/sumrecon
 
-#### Amass - Best tool
+#### Hunt domains connected to Azure tenant
+- [Link to Azure OSINT](#get-tenant-domains)
+
+#### CHAOS - Project Discovery
+- Best tool
+- https://chaos.projectdiscovery.io/#/
+- https://github.com/projectdiscovery/chaos-client
+
+```
+chaos -d <DOMAIN> -silent
+```
+
+#### Amass 
 - https://github.com/OWASP/Amass
 ```
 amass enum -d example.com
