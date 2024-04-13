@@ -396,22 +396,22 @@ Get-AzKeyVault
 Get-AzKeyVault -VaultName <VAULT NAME>
 ```
 
-#### List the saved creds from key vault
+#### List the saved credentials
 ```
 Get-AzKeyVaultSecret -VaultName <VAULT NAME> -AsPlainText
 ```
 
-#### List saved certificates from key vault
-```
-Get-AzKeyVaultCertificate -VaultName <VAULT NAME>
-```
-
-#### Read creds from a key vault
+#### Read creds
 ```
 Get-AzKeyVaultSecret -VaultName <VAULT NAME> -Name <NAME> -AsPlainText
 ```
 
-#### Read cert from a key vault
+#### List saved certificates 
+```
+Get-AzKeyVaultCertificate -VaultName <VAULT NAME>
+```
+
+#### Read certificate
 ```
 Get-AzKeyVaultSecret -VaultName <VAULT NAME> -Name <CERT NAME> -AsPlainText
 
@@ -420,7 +420,7 @@ $secretByte = [Convert]::FromBase64String($secret)
 [System.IO.File]::WriteAllBytes("C:\Users\Public\Cert.pfx", $secretByte)
 ```
 
-#### Dump cert info
+#### Dump certificate info
 ```
 certutil.exe -dump C:\Users\Public\Cert.pfx
 ```
