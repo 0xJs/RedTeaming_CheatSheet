@@ -438,6 +438,11 @@ Connect-AzAccount -ServicePrincipal -Credential $creds -Tenant <TENANT ID>
 Connect-AzAccount -ServicePrincipal -ApplicationId <APP ID> -Tenant <TENANT ID> -CertificatePath <PATH TO CERT>
 ```
 
+#### Login with access tokens
+```
+Connect-AzAccount -AccessToken $AMRAccessToken -AccountId <USER UPN>
+```
+
 #### Get the information about the current context (Account, Tenant, Subscription etc).
 ```
 Get-AzContext
