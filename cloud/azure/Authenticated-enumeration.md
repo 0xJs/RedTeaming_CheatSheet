@@ -19,13 +19,15 @@
     * [Administrative-unit Enumeration](#Administrative-unit-enumeration)
     * [App enumeration](#App-enumeration)
     * [Service-principals enumeration](#Service-principals-enumeration)
-* [Enumeration using Az PowerShell](#Enumeration-using-Az-powershell)
-  * [Available resources](#Available-resources)
-  * [Roles](#Roles)
-  * [Users](#Users)
-  * [Groups](#Groups)
-  * [Resources](#Resources)
-* [Enumeration using Azure CLI](#Enumeration-using-Azure-CLI)
+* [Azure Resources](#Azure-Resources)
+  * [Enumeration using AZ PowerShell](#Enumeration-using-AZ-powershell)
+    * [Available resources](#Available-resources)
+    * [Roles](#Roles)
+    * [Users](#Users)
+    * [Groups](#Groups)
+    * [Resources](#Resources)
+  * [Enumeration using Azure CLI](#Enumeration-using-Azure-CLI)
+  * [ARM API](#ARM-API)
 * [Using Azure tokens](#Using-Azure-tokens)
   * [Stealing tokens](#Stealing-tokens)
   * [Using tokes with CLI Tools - AZ PowerShell](#Using-tokes-with-CLI-Tools---AZ-PowerShell)
@@ -865,7 +867,8 @@ Get-AzureADServicePrincipal -ObjectId <ID> | Get-AzureADServicePrincipalMembersh
 Get-AzureADServicePrincipal | Get-AzureADServicePrincipalMembership
 ```
 
-## Enumeration using Az powershell
+## Azure resources
+## Enumeration using AZ powershell
 #### Install module
 ```
 Install-Module Az
@@ -1398,6 +1401,73 @@ az keyvault list
 #### List storage accounts
 ```
 az storage account list
+```
+
+## ARM API
+#### Check permissions on resource
+- https://learn.microsoft.com/en-us/rest/api/authorization/permissions?view=rest-authorization-2022-04-01
+
+```
+GET https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/permissions?api-version=2022-04-01
+```
+
+```
+https://management.azure.com/<RESOURCE ID PART OF Get-AzResource>/providers/Microsoft.Authorization/permissions?api-version=2022-04-01
+```
+
+- General example:
+```
+Get-AzResource
+```
+
+```
+$Name = "<RESOURCE NAME>"
+$ARMAccessToken = "<TOKEN>"
+
+$Resource = Get-AzResource -Name $Name
+$SubscriptionID = (Get-AzSubscription).Id
+$ResourceGroupName = $Resource.ResourceGroupName
+$ResourceName = $Resource.Name
+$ResourceProviderNamespace = $Resource.ResourceType
+
+$URI = "https://management.azure.com/subscriptions/$SubscriptionID/resourcegroups/$ResourceGroupName/providers/$ResourceProviderNamespace/$ResourceName/providers/Microsoft.Authorization/permissions?api-version=2022-04-01"
+$RequestParams = @{
+	Method = 'GET'
+	Uri = $URI
+	Headers = @{
+		'Authorization' = "Bearer $ARMAccessToken"
+	}
+}
+$Permissions = (Invoke-RestMethod @RequestParams).value
+
+$Permissions | fl *
+```
+
+- Loop through all resources using Object ID
+```
+$ARMAccessToken = "<TOKEN>"
+
+$Resources = Get-AzResource
+
+foreach($Resource in $Resources)
+{
+	$ID = $Resource.Id
+	$URI = "https://management.azure.com/$ID/providers/Microsoft.Authorization/permissions?api-version=2022-04-01"
+	$RequestParams = @{
+		Method = 'GET'
+		Uri = $URI
+		Headers = @{
+			'Authorization' = "Bearer $ARMAccessToken"
+		}
+		ContentType = "application/json"
+}
+
+$Result = Invoke-RestMethod @RequestParams
+$ResourceName = $Resource.Name
+
+Write-Output "ResourceName - $ResourceName"
+Write-Output "Permissions -" $Result.value | fl *
+}
 ```
 
 ## Using Azure tokens
