@@ -61,7 +61,7 @@ $ARMAccessToken = (Invoke-RefreshToAzureManagementToken -domain <COMPANY>.onmicr
 ```
 
 ### Stealing access tokens
-- [Link to Post-Exploitation](/post-exploitation.md#Stealing-tokens)
+- [Link to Post-Exploitation](/cloud/azure/post-exploitation.md#Stealing-tokens)
 
 ## Azure AD To On Premises
 ### Pass the certificate
