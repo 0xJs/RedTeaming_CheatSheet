@@ -543,6 +543,11 @@ $creds = New-Object System.Management.Automation.PSCredential ("<USERNAME>", $pa
 Connect-AzureAD -Credential $creds
 ```
 
+#### Connect with access tokens
+```
+Connect-AzureAD -AccountId <ID> -AadAccessToken $token -TenantId <TENANT ID>
+```
+
 #### Get the current session state
 ```
 Get-AzureADCurrentSessionInfo
