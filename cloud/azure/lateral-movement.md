@@ -5,7 +5,7 @@
 * [Pass the PRT](#Pass-the-PRT) 
 
 * [General](#General)
-  * [Access Tokens](#Access-Tokens)
+  * [Access and RefreshTokens](#Access-and-Refresh-Tokens)
 * [Azure AD To On-premises](#Azure-AD-To-On-Premises)
   * [Intune](#Intune)
   * [Application proxy abuse](#Application-proxy-abuse)
@@ -17,7 +17,7 @@
   * [Federation (ADFS)](#Federation-ADFS)
 
 ## General
-### Access Tokens
+### Access and Refresh Tokens
 - The Identity Platform (Entra ID) uses thee types of bearer tokens.
 	- ID Token - Contains basic information about the user
 		- Expiry is 1 hour
