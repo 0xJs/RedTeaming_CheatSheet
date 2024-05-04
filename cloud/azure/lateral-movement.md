@@ -4,9 +4,11 @@
 * [Pass the certificate](#Pass-the-certificate)
 * [Pass the PRT](#Pass-the-PRT) 
 
-## Azure AD --> On-prem
-* [Intune](#Intune)
-* [Application proxy abuse](#Application-proxy-abuse)
+* [General](#General)
+  * [Access Tokens](#Access-Tokens)
+* [Azure AD To On-premises](#Azure-AD-To-On-Premises)
+  * [Intune](#Intune)
+  * [Application proxy abuse](#Application-proxy-abuse)
 
 ## On-Prem --> Azure AD
 * [Azure AD Connect](#Azure-AD-Connect)
@@ -14,8 +16,55 @@
   * [Pass Through Authentication (PTA) Abuse](#Pass-Through-Authentication-Abuse)
   * [Federation (ADFS)](#Federation-ADFS)
 
-# Azure AD --> On-prem
-## Pass the certificate
+## General
+### Access Tokens
+- The Identity Platform (Entra ID) uses thee types of bearer tokens.
+	- ID Token - Contains basic information about the user
+		- Expiry is 1 hour
+	- Access token - Used to get access to a resource. Prone to token replay attacks.
+		- Expiry ranges from 70 minutes to 24 hours depending on type
+		- Can't be revoked.
+	- Refresh token - Can be used to request new access and ID Tokens.
+		- Expiry is 90 days for inactive tokens, no expiry for active tokens.
+
+#### Decode access token
+- https://jwt.io
+- You can get a lot of information about the access token such as the user, scope 
+	- the provenance of the token (`iss`)
+	- the resource owner and client application (`oid`/`upn`, `appid`)
+	- the authorized scopes (`scp`)
+	- the issuance and expiration times (`iat`, `exp`)
+	- the resource server (`aud`)
+	- the authentication methods that the resource owner used to authorize the client application (`amr`)
+
+### Request access tokens
+#### Using AZ Module
+- Requires a refresh token or normal login
+
+```
+$AADGraphToken = (Get-AzAccessToken -ResourceTypeName AadGraph).Token
+
+$ARMAccessToken = (Get-AzAccessToken -ResourceTypeName Arm).Token
+
+$StorageAccessToken = (Get-AzAccessToken -ResourceTypeName Storage).Token
+
+$KeyVault (Get-AzAccessToken -ResourceTypeName Storage).Token
+```
+
+### TokenTactics
+- Using Refresh token, `$tokens` variable from TokenTactics
+
+```
+$GraphAccessToken = (Invoke-RefreshToMSGraphToken -domain <DOMAIN>.onmicrosoft.com -refreshToken $tokens.refresh_token).access_token
+
+$ARMAccessToken = (Invoke-RefreshToAzureManagementToken -domain <COMPANY>.onmicrosoft.com -refreshToken $response.refresh_token).access_token
+```
+
+### Stealing access tokens
+- [Link to Post-Exploitation](../post-exploitation.md#Stealing-tokens)
+
+## Azure AD To On Premises
+### Pass the certificate
 - To go from Azure AD machine to other Azure AD machine if the user has administrative access to other machines.
 
 #### Check if machine is Azure AD Joined
@@ -50,7 +99,7 @@ python \AzureADJoinedMachinePTC\Main.py --usercert <PATH TO .pfx FILE> --certpas
 
 #### Use psremoting to access the machine
 
-## Pass the PRT
+### Pass the PRT
 - PRT is a special refresh token used for single sign-on (SSO)!
   – It can be used to obtain access and refresh tokens to any application.
   – Issued to a user for a specific device
