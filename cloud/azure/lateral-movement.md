@@ -247,7 +247,7 @@ Function        Invoke-RefreshToYammerToken                        0.0.2      To
 ```
 
 #### Request access tokens manually
-- Link to endpoints
+- [Link to endpoints](/azure/readme.md#Endpoints)
 - Using a refresh token in variable from TokenTactics/DeviceCode phish
 
 ```
@@ -359,7 +359,7 @@ return $response.access_token
 ```
 
 #### Craft JWT assertion, Request and sign Access token
-- Link to endpoints
+- [Link to endpoints](/azure/readme.md#Endpoints)
 
 ```
 $ARMAccessToken = New-AccessToken -clientCertificate $clientCertificate -tenantID <TENANT ID> -appID <APP ID> -scope 'https://management.azure.com/.default'
