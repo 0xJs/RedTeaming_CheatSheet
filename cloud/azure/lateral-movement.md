@@ -108,7 +108,7 @@ Function        Invoke-RefreshToYammerToken                        0.0.2      To
 ```
 roadtx interactiveauth --estscookie "0.Aa4Aq..." --resource msgraph
 
-$MsGraphAccessToken = (cat .roadtools_auth| ConvertFrom-Json).accessToken
+$GraphAccessToken = (cat .roadtools_auth| ConvertFrom-Json).accessToken
 ```
 
 #### Get access token info
