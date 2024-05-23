@@ -17,6 +17,14 @@
   - https://github.com/dafthack/CloudPentestCheatsheets/blob/master/cheatsheets/Azure.md
 - List of tools https://www.pwndefend.com/2023/01/11/tools/
 
+### Endpoints
+- List of endpoints:
+  - Microsoft Graph `https://graph.microsoft.com`
+  - AAD Graph `https://graph.windows.net`
+  - ARM: `https://management.azure.com/.default`
+  - Storage: `https://storage.azure.com/.default`
+  - Key Vault: `https://vault.azure.net/.default`
+
 #### Save Credentials
 ```
 $creds = get-credential
