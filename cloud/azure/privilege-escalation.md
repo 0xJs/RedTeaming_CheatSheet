@@ -249,7 +249,7 @@ Set-AzureADUser -ObjectId <ID> -OtherMails <EMAIL> -Verbose
 
 ## Illicit Consent Grant
 - If app registration is allowed for users [link](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/UserSettings) and you can enumerate AD users/emails you can perform Illicit Consent Grant Phishing with an app from inside the tenant.
-- [Link](../initial-access-attacks.md#Illicit-Consent-Grant-phishing) to the attack from Initial Access Attacks
+- [Link to initial access attacks](../initial-access-attacks.md#Illicit-Consent-Grant-phishing) to the attack from Initial Access Attacks
 - Use `Accounts in this organizational directory only (<TENANT NAME> only - Single tenant)` since its from inside the tenant already!
 
 ## JWT assertion Key vault sign permissions
@@ -432,7 +432,7 @@ Connect-AzAccount -AccessToken $ArmAccessToken -AccountId $AppID
 ```
 
 #### Request other endpoints using JWT-assertion
-- Link to endpoints
+- [Link to endpoints](/azure/readme.md#Endpoints)
 - Uses `AppID` and `$TenantID` variables from previous commands
 
 ```
@@ -713,7 +713,7 @@ New-MgGroupMember -GroupId <GROUP OBJECT ID> -DirectoryObjectId <TARGET OBJECT I
 	- Global Administrators, Privileged Authentication Administrators, Authentication Administrators or permissions `UserAuthenticationMethod.ReadWriteAll`
 - Read TAP policy
 	- A global reader or role with `Policy.Read.All` can read TAP policy
-- Link to defense evasion
+- [Link to defense evasion](/azure/defense-evasion.md#Temporary-Access-Pass)
 
 ## Abuse Claims nOAuth
 - Abusing claims is possible if they aren't handled correctly
