@@ -4,6 +4,7 @@
 * [General](#General)
 * [Authenticated enumeration](Authenticated-enumeration.md)
 * [Privilege Escalation & Exploitation](privilege-escalation.md)
+* [Defense Evasion](defense-evasion.md)
 * [Lateral Movement](lateral-movement.md)
 * [Persistence](persistence.md)
 * [Post exploitation](post-exploitation.md)
