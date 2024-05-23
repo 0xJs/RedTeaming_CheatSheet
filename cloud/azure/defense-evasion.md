@@ -219,11 +219,11 @@ Send-MailMessage @mailParams -Verbose
 ```
 
 ### Use access token PIM
-- Link to PIM section
+- [Link to PIM section](#Privileged-Identity-Management)
 
 ### EvilNginx
 - EvilNginx can capture session cookies by proxying the azure login, capturing credentials an cookies
-- Link to EvilNginx
+- [Link to EvilNginx](/cloud/azure/initial-access-attacks.md#Evilginx2)
 
 ### Break glass accounts
 - Another PrivEsc target is Azure “Break Glass” administrative accounts
