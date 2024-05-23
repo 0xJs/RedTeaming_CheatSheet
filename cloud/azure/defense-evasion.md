@@ -223,7 +223,7 @@ Send-MailMessage @mailParams -Verbose
 
 ### EvilNginx
 - EvilNginx can capture session cookies by proxying the azure login, capturing credentials an cookies
-- [Link to EvilNginx](/cloud/azure/initial-access-attacks.md#Evilginx2)
+- [Link to EvilNginx](/cloud/initial-access-attacks.md#Evilginx2)
 
 ### Break glass accounts
 - Another PrivEsc target is Azure “Break Glass” administrative accounts
