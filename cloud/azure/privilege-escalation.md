@@ -118,6 +118,8 @@ Get-MgServicePrincipalOwnedObject -ServicePrincipalId <ID> | select Id, @{Name='
 ```
 
 ## Azure
+- If `SubscriptionName` is empty after login then user/service principal might not have access to any resources
+
 #### List available resources
 ```
 Get-AzResource
