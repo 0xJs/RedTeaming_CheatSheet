@@ -13,16 +13,17 @@
 * [Privileged Identity Management](#Privileged-Identity-Management)
 
 ## Conditional Access
-- If successfully logged in with az module and the Get-AzResource works then MFA is required for specific resources if error below is shown:
+- If successfully logged in with az module and the Get-AzResource works then MFA is required for specific resources(cloud apps in CA) if error below is shown:
 ```
 Get-AzKeyVaultSecret -VaultName <NAME<
+
 Get-AzKeyVaultSecret : Your Azure credentials have not been set up or have expired, please run Connect-AzAccount to set up your Azure credentials.
 SharedTokenCacheCredential authentication unavailable. Token acquisition failed for user <USER>. Ensure that you have authenticated with a developer tool that supports Azure single sign on.
-At line:1 char:1
-+ Get-AzKeyVaultSecret -VaultName oiltapkeyvault
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : CloseError: (:) [Get-AzKeyVaultSecret], AzPSArgumentException
-    + FullyQualifiedErrorId : Microsoft.Azure.Commands.KeyVault.GetAzureKeyVaultSecret
+
+# OR ERROR
+
+Get-AzKeyVaultSecret : Your Azure credentials have not been set up or have expired, please run Connect-AzAccount to set up your Azure credentials.
+You must use multi-factor authentication to access resource AzureKeyVaultServiceEndpointResourceId, please rerun 'Connect-AzAccount' with additional parameter '-AuthScope AzureKeyVaultServiceEndpointResourceId'.
 ```
 
 ### Enumeration
