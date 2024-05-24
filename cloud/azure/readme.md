@@ -25,6 +25,22 @@
   - Storage: `https://storage.azure.com/.default`
   - Key Vault: `https://vault.azure.net/.default`
 
+#### Decode base64 cert
+```
+$Base64 = Invoke-RestMethod @Params -UseBasicParsing
+$Bytes = [Convert]::FromBase64String($Base64)
+[System.IO.File]::WriteAllBytes("C:\Users\Public\cert.pfx", $Bytes)
+```
+
+- Compare with thumbprint
+```
+$Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 -ArgumentList 'C:\Users\Public\cert.pfx'
+
+# Uses application data from before
+
+Import-Clixml C:\users\public\Applications.xml | Where {$_.keyCredentials.customKeyIdentifier -eq $Certificate.Thumbprint}
+```
+
 #### Save Credentials
 ```
 $creds = get-credential
