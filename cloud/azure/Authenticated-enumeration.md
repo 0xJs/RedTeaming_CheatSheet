@@ -108,7 +108,7 @@ Connect-MgGraph -ClientId <APPID> -TenantId <TENANT ID> -CertificateThumbprint <
 ```
 [X509Certificate]$AppCertificate = Get-PfxCertificate -FilePath <PATH TO CERT>
 
-Connect-MgGraph -Certificate $AppCertificate -ClientId <APPID> -TenantId <TENANT ID> -CertificateThumbprint <CERT THUMBPRINT>
+Connect-MgGraph -Certificate $AppCertificate -ClientId <APPID> -TenantId <TENANT ID> 
 ```
 
 #### Login with App-Only client secret
