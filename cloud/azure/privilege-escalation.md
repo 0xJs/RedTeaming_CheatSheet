@@ -415,20 +415,16 @@ $KVInfo
 - Load the function
 
 ```
-function Get-AKVCertificate($kvURI, $KeyVaultAccessToken, $keyName) {
-	$uri = "$($kvURI)/certificates?api-version=7.4"
-	$httpResponse = Invoke-WebRequest -Uri $uri -Headers @{ 
-		'Authorization' ="Bearer $($KeyVaultAccessToken)" 
-	}
-	$certs = $httpResponse.Content | ConvertFrom-Json
-	$certUri = $certs.Value | where {$_.id -like "*$($keyName)*"}
-	Write-Output $certUri
-	$httpResponse = Invoke-WebRequest -Uri "$($certUri.id)?api-version=7.3" -Headers @{ 'Authorization' = "Bearer $($KeyVaultAccessToken)" }
-	
-return $httpResponse.Content | ConvertFrom-Json
+function Get-AKVCertificate($kvURI, $KeyVaultToken, $keyName) {
+    $uri = "$($kvURI)/certificates?api-version=7.3"
+    $httpResponse = Invoke-WebRequest -Uri $uri -Headers @{ 'Authorization' = "Bearer $($KeyVaultToken)" }
+    $certs    = $httpResponse.Content | ConvertFrom-Json
+    $certUri  = $certs.Value | where {$_.id -like "*$($keyName)*"}
+    Write-Output $certUri
+    $httpResponse = Invoke-WebRequest -Uri "$($certUri.id)?api-version=7.3" -Headers @{ 'Authorization' = "Bearer $($KeyVaultToken)" }
+    return $httpResponse.Content | ConvertFrom-Json
 }
 ```
-
 - `kvURI` used `$Vaultname` from previous commands
 - `keyName` from the URL of the id value after `/certificates/<keyName>`
 ```
