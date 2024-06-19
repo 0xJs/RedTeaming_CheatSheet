@@ -61,6 +61,9 @@ Get-MpPreference | select Exclusion*
 (Get-MpPreference).Exclusionpath
 ```
 
+#### Script to dump MDE config / ASR rules
+- https://github.com/BlackSnufkin/Invoke-DumpMDEConfig?tab=readme-ov-file
+
 #### Create exclusion
 ```
 Set-MpPreference -ExclusionPath "<path>"
