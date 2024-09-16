@@ -471,6 +471,13 @@ ls C:\Windows\system32\CodeIntegrity
 - Only works if WDAC isn't enforced through GPO but setup locally!
 
 #### Check for WDAC
+- `SecurityServicesConfigured` and `SecurityServicesRunning` values are:
+  - 0. No services configured/running
+  - 1. If present, Credential Guard is configured/running.
+  - 2. If present, HVCI is configured/running.
+  - 3. If present, System Guard Secure Launch is configured/running.
+  - 4. If present, SMM Firmware Measurement is configured/running.
+
 ```
 Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
 ```
@@ -480,6 +487,8 @@ Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\D
 - Check if there are any `.xml` files which didn't got removed with the policy
 ```
 ls C:\Windows\system32\CodeIntegrity
+
+ls C:\Windows\system32\CodeIntegrity -Recurse -Include *.xml
 ```
 
 ### Code signing
