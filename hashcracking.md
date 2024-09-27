@@ -27,7 +27,8 @@
   - https://github.com/hashcat/hashcat/blob/master/rules/dive.rule
   - https://github.com/stealthsploit/OneRuleToRuleThemStill
 - Wordlists
-  - https://github.com/danielmiessler/SecLists/tree/master/Passwords  
+  - https://github.com/danielmiessler/SecLists/tree/master/Passwords
+  - https://weakpass.com/
 
 #### Extracting hashes from files
 - https://github.com/openwall/john
@@ -254,11 +255,13 @@ Below is my methodology to reach high percentages cracked. Will add new things o
 -   Use `-w3` and `-O` to up the workload en performance.
 
 #### Password list & Rules
-Run the dutch_merged.txt and rockyou.txt with the dive ruleset
+Run the dutch_merged.txt, weakpass_3 and rockyou.txt with the dive ruleset
+	- https://weakpass.com/wordlist/1947
 
 ```
 .\hashcat.exe -a 0 -m <HASH MODE> .\hashes.txt .\wordlists\dutch_merged.txt -r .\rules\dive.rule -w3 -O
 .\hashcat.exe -a 0 -m <HASH MODE> .\hashes.txt .\wordlists\rockyou.txt -r .\rules\dive.rule -w3 -O
+.\hashcat.exe -a 0 -m <HASH MODE> .\hashes.txt .\wordlists\weakpass_3 -r .\rules\dive.rule -w3 -O
 ```
 
 #### Username as passwords + double rules  
