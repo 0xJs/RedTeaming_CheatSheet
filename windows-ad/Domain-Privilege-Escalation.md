@@ -10,7 +10,7 @@
 * [AS-REP Roasting](#AS-REP-Roasting)
 * [High Privileged Groups](#High-Privileged-Groups)
   * [Backup Operators](#Backup-Operators)
-  * [Account Operators](#Account-Operators)
+  * [Account Operators](#Account-Operators)FV
   * [DNS Admins](#DNS-Admins)
   * [Schema Admins](#Schema-Admins)
   * [Computers with high privileges](#Computers-with-high-privileges)
@@ -2600,22 +2600,26 @@ Get-SQLQuery -Instance "<INSTANCE>" -Query "<QUERY>"
 
 #### SQL Queries
 ```
-#When able to connect directy to the instance
+# When able to connect directy to the instance
 Get-SQLDatabase
 Get-SQLTable
 Get-SQLColumn
 Get-SQLQuery -Query "use <DATABASE>; SELECT * from <TABLE>"
 
-#Through links
-List databases
+
+# List databases
+SELECT name FROM master..sysdatabases;
+
 Get-SQLServerLinkCrawl -Instance <INSTANCE> -Query 'SELECT name FROM master..sysdatabases;' | Where-Object customquery | Select-Object instance, customquery -ExpandProperty customquery | Select-Object instance, name
 
-#List tables
+# List tables
+SELECT name FROM <DATABASE>..sysobjects WHERE xtype = 'U'
+
 Get-SQLServerLinkCrawl -Instance <INSTANCE> -QueryTarget AC-DBBUSINESS -Query "SELECT name FROM <DATABASE>..sysobjects WHERE xtype = 'U'" | Select-Object -ExpandProperty customquery
 
-#List columns
+# List columns
 
-#List the contents of table
+# List the contents of table
 ```
  
 ### SQL Queries
