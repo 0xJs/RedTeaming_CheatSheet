@@ -10,7 +10,7 @@
 * [AS-REP Roasting](#AS-REP-Roasting)
 * [High Privileged Groups](#High-Privileged-Groups)
   * [Backup Operators](#Backup-Operators)
-  * [Account Operators](#Account-Operators)FV
+  * [Account Operators](#Account-Operators)
   * [DNS Admins](#DNS-Admins)
   * [Schema Admins](#Schema-Admins)
   * [Computers with high privileges](#Computers-with-high-privileges)
