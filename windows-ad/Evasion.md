@@ -483,12 +483,16 @@ ls C:\Windows\system32\CodeIntegrity
 Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
 ```
 
-#### Check for the policy on disk
+#### Check for policies
 - `.p7b` is a signed policy
+- Policies stored in `C:\Windows\System32\CodeIntegrity` either in a Single file `SiPolicy.p7b` or multiple policies in `\CiPolicies`.
 - Check if there are any `.xml` files which didn't got removed with the policy
 ```
 ls C:\Windows\system32\CodeIntegrity
+```
 
+#### Check for readable xml policies
+```
 ls C:\Windows\system32\CodeIntegrity -Recurse -Include *.xml
 ```
 
