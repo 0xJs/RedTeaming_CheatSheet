@@ -853,6 +853,7 @@ beacon_remote_exploit_register("dcom", "x64", "Use DCOM to run a Beacon payload"
   - https://github.com/CCob/BOF.NET
   - https://github.com/helpsystems/nanodump
   - https://github.com/outflanknl/InlineWhispers
+  - https://github.com/RalfHacker/Kerbeus-BOF
 
 ### External C2
 - https://github.com/RedSiege/GraphStrike?tab=readme-ov-file
