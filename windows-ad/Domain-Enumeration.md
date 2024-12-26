@@ -375,26 +375,16 @@ Get-NetSession
 ```
 
 ### BloodHound
-https://github.com/BloodHoundAD/BloodHound
-```
-cd Ingestors
-. ./sharphound.ps1
-Invoke-Bloodhound -CollectionMethod all -Verbose
-Invoke-Bloodhound -CollectionMethod LoggedOn -Verbose
-
-#Copy neo4j-community-3.5.1 to C:\
-#Open cmd
-cd C:\neo4j\neo4j-community-3.5.1-windows\bin
-neo4j.bat install-service
-neo4j.bat start
-#Browse to BloodHound-win32-x64 
-Run BloodHound.exe
-#Change credentials and login
-```
+- https://github.com/SpecterOps/BloodHound
+- Collectors: https://github.com/SpecterOps/SharpHound/releases
 
 #### Custom queries
 - https://github.com/SadProcessor/Cheats/blob/master/DogWhispererV2.md#v--rest-api
 - https://ernw.de/download/BloodHoundWorkshop/ERNW_DogWhispererHandbook.pdf
+
+#### Soaphound
+- Just like BloodHound but uses the ADWS-protocol
+- https://github.com/FalconForceTeam/SOAPHound
 
 ### Ldapsearch
 - https://github.com/yaap7/ldapsearch-ad
