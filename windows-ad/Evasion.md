@@ -841,7 +841,9 @@ $v=[Ref].Assembly.GetType('System.Management.Automation.Am' + 'siUtils'); $v."Ge
 ```
 
 ### Defeating Microsoft Defender
-- Use https://github.com/rasta-mouse/ThreatCheck or https://github.com/matterpreter/DefenderCheck
+- Use https://github.com/rasta-mouse/ThreatCheck
+- Or https://github.com/matterpreter/DefenderCheck
+- Or https://github.com/gatariee/gocheck (Supports multiple av's)
 1. Run Threatcheck ```.\ThreatCheck.exe -f .\shell.exe```
 2. Replace string which gets detected.
 3. Recompile and check again!
