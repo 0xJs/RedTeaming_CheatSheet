@@ -1,6 +1,6 @@
 # Initial access attacks
 
-* [Password and credentials attacks](#Password--and-credentials-attacks)
+* [Password and credentials](#Password-and-credentials)
   * [Password spraying](#Password-spraying)
   * [Bypass MFA](#Bypass-MFA)
   * [Key disclosure in public repositories](#Key-disclosure-in-public-repositories)
@@ -24,7 +24,7 @@
   * [Google Storage Buckets](#Google-Storage-Buckets)
 * [Misc](#misc)
 
-## Password and credentials attacks
+## Password and credentials
 ### Password spraying
 - https://github.com/dafthack/MSOLSpray
 - https://github.com/ustayready/fireprox
