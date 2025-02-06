@@ -1,6 +1,6 @@
 # Initial access attacks
 
-* [Password and crentials attacks](#Password--and-credentials-attacks)
+* [Password and credentials attacks](#Password--and-credentials-attacks)
   * [Password spraying](#Password-spraying)
   * [Bypass MFA](#Bypass-MFA)
   * [Key disclosure in public repositories](#Key-disclosure-in-public-repositories)
