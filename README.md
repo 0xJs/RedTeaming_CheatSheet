@@ -55,6 +55,10 @@ Most of my knowledge is gathered from the following coures, so big thanks to the
 - Coding: Pavel Yosifovich & Sektor7 Reenz0h
 
 # Misc
+#### C2 frameworks overview
+- [Collection of C2 frameworks that leverage legitimate services to evade detection](https://lolc2.github.io/)
+- [C2 Matrix](https://docs.google.com/spreadsheets/d/1b4mUxa6cDQuTV2BPC6aA-GR4zGZi0ooPYtBe4IgPsSc/edit?gid=0#gid=0)
+
 #### Data exfiltration simulation
 - https://github.com/FortyNorthSecurity/Egress-Assess
 
