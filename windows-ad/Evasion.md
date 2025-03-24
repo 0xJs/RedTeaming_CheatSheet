@@ -722,6 +722,10 @@ reg query HKLM\SYSTEM\CurrentControlSet\Control\Lsa\RunAsPPL
 #### Go binaries
 - https://github.com/burrowers/garble
 
+#### Command line arguments
+- https://argfuscator.net/
+- Blogpost: https://www.wietzebeukema.nl/blog/bypassing-detections-with-command-line-obfuscation
+
 #### Powershell
 - [https://github.com/danielbohannon/Invoke-Obfuscation](https://github.com/danielbohannon/Invoke-Obfuscation)
 - [https://github.com/JoelGMSec/Invoke-Stealth](https://github.com/JoelGMSec/Invoke-Stealth)
