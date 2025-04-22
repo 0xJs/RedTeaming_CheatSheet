@@ -48,7 +48,7 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
 # Sources & Credits
 Most of my knowledge is gathered from the following coures, so big thanks to them! If you like a specific topic I would recommend taking the courses from them!
 
-- Cloud: CARTP from Altered Security, breaching the cloud from antisyphon, OASP from Cloudbreach, GCRTS from cyberwarfare
+- Cloud: CARTP and CARTE from Altered Security, breaching the cloud from antisyphon, OASP from Cloudbreach, GCRTS from cyberwarfare
 - Windows: CRTP, CRTE, PACES from Altered Security, ECPTX from eLearnSecurity and CRTO from ZeroPointSecurity.
 - Infra: OSCP, PNPT from TCM Security and Tiberius privesc courses
 - OSINT: PNPT Course
