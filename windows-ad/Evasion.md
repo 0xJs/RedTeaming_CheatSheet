@@ -10,10 +10,10 @@
       * [Escapes for Constrained Lanuage Mode](#Escapes-for-Constrained-Language-Mode)
    * [Logging evasion](#Logging-evasion)
    * [Just Enough Admin](#Just-Enough-Admin)
-* [Applocker](#Applocker)
-* [WDAC](#WDAC)
-  * [Code signing](#Code-signing) 
-* [LOLBAS](#LOLBAS)
+* [Application allowlisting and denylisting](#Application-allowlisting-and-denylisting)
+	* [Applocker](#Applocker)
+	* [Windows Application Control](#Windows-Application-Control)
+	* [Bypass-application-allowlisting-and-denylisting](#Bypass-application-allowlisting-and-denylisting)
 * [LSASS Protections](#LSASS-Protections)
 * [Defeating AV](#Defeating-AV)
   * [Obfuscation tools](#Obfuscation-tools)
@@ -410,7 +410,8 @@ Enter-PSSession $sess
 Get-PSSessionConfiguration
 ```
 
-## Applocker
+## Application allowlisting and denylisting
+### Applocker
 - AppLocker rules are split into 5 categories - `Executable`, `Windows Installer`, `Script`, `Packaged App` and `DLLs`, and each category can have its own enforcement (enforced, audit only, none).
 - AppLocker has a set of default allow rules such as, `allow everyone to execute anything within C:\Windows\*` - the theory being that everything in `C:\Windows` is trusted and safe to execute.
 - The difficulty of bypassing AppLocker depends on the robustness of the rules that have been implemented. The default rule sets are quite trivial to bypass in a number of ways:
@@ -464,20 +465,16 @@ winrs -r:<PC NAME> cmd
 ls C:\Windows\system32\CodeIntegrity
 ```
 
-### WDAC
+### Windows Application Control
 - Tool to bypass: https://github.com/nettitude/Aladdin
-
-### Disable WDAC
-- Policy in `C:\Windows\System32\CodeIntegrity\` in a `.p7b` file. Delete the file and reboot to delete policy.
-- Only works if WDAC isn't enforced through GPO but setup locally!
 
 #### Check for WDAC
 - `SecurityServicesConfigured` and `SecurityServicesRunning` values are:
-  - 0. No services configured/running
-  - 1. If present, Credential Guard is configured/running.
-  - 2. If present, HVCI is configured/running.
-  - 3. If present, System Guard Secure Launch is configured/running.
-  - 4. If present, SMM Firmware Measurement is configured/running.
+  - `0` No services configured/running
+  - `1` If present, Credential Guard is configured/running.
+  - `2` If present, HVCI is configured/running.
+  - `3` If present, System Guard Secure Launch is configured/running.
+  - `4` If present, SMM Firmware Measurement is configured/running.
 
 ```
 Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
@@ -496,7 +493,11 @@ ls C:\Windows\system32\CodeIntegrity
 ls C:\Windows\system32\CodeIntegrity -Recurse -Include *.xml
 ```
 
-### Code signing
+### Disable WDAC
+- Policy in `C:\Windows\System32\CodeIntegrity\` in a `.p7b` file. Delete the file and reboot to delete policy.
+- Only works if WDAC isn't enforced through GPO but setup locally!
+
+#### Code signing WDAC
 - Code signing ensures that files weren't tampered with and are verified by a trusted authority.
 - ADCS code signing EKU = `Code Signing` (`1.3.6.1.5.5.7.3.3`)
 - Requires Code Signing cert to be extracted from a system, or created through ADCS and it should be allowed in the WDAC policy!
@@ -524,7 +525,10 @@ certutil -v -dump -p "<PASSWORD>" <PATH TO PFX>
 Get-AuthenticodeSignature -FilePath <PATH TO EXE>
 ```
 
-### LOLBAS
+### Bypass application allowlisting and denylisting
+- https://github.com/bohops/UltimateWDACBypassList
+
+#### LOLBAS
 - Use Microsoft Signed Binaries to exploit https://lolbas-project.github.io/
 - Can be used to bypass Applocker or WDAC
 
