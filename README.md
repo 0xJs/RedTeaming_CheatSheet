@@ -29,7 +29,7 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
   * [Domain Privilege Escalation](windows-ad/Domain-Privilege-Escalation.md)
   * [Domain Persistence](windows-ad/Domain-Persistence.md)
 * [Cloud](cloud/readme.md)
-  * [Recon \ OSINT](cloud/recon.md)
+  * [Recon \ OSINT](OSINT.md#cloud)
   * [Initial access attacks](cloud/initial-access-attacks.md)
   * [Cloud services](cloud/readme.md)
     * [Azure](cloud/azure/readme.md)
