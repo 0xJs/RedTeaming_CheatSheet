@@ -14,7 +14,7 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
   * [Exploitation](infrastructure/exploitation.md)
   * [Privilege Escalation Windows](infrastructure/privesc_windows.md)
   * [Privilege Escalation Linux](infrastructure/privesc_linux.md)
-  * [Post Exploitation](infrastructure/post_exploitation.md)
+  * [Post Exploitation](infrastructure/pivoting.md#post-exploitation)
   * [Pivoting](infrastructure/pivoting.md)
 * [Windows AD](windows-ad/readme.md)
   * [Relaying](windows-ad/relaying.md)
