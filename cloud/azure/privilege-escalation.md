@@ -219,6 +219,7 @@ $userData = Invoke-RestMethod -Headers @{"Metadata"="true"} -Method GET -Uri "ht
 - print environment variables and check for `IDENTITY_HEADER` and `IDENTITY_ENDPOINT` variables exist.
 ```
 env
+Get-ChildItem Env:
 ```
 
 #### Get access token
