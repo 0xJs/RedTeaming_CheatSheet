@@ -31,7 +31,7 @@ Pentesting / RedTeaming cheatsheet with all the commands and techniques I learne
   * [General](defense-evasion/General.md)
   * [Endpoint Detection & Response](defense-evasion/Endpoint-Detection-Response.md)
   * [Sysmon](defense-evasion/Sysmon.md)
-  * [Driver Attacks](defense-evasion/Drivers-Driver-Attacks.md)
+  * [Driver Attacks](defense-evasion/Driver-Attacks.md)
   * [WinDbg](defense-evasion/Windbg.md)
   * [LSASS](defense-evasion/LSASS.md)
   * [Evading Static Detection](defense-evasion/Evading-Static-Detection.md)
