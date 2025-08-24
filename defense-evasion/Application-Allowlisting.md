@@ -1,3 +1,4 @@
+## Application Allowlisting
 - [Applocker](#applocker)
 - [Windows Application Control](#windows-application-control)
 - [Bypass application allowlisting](#bypass-application-allowlisting)

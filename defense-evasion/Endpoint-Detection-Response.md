@@ -1,3 +1,4 @@
+## Endpoint Detection Response
 - [Enumerate EDR's](#enumerate-edrs)
 - [EDR Internals](#edr-internals)
   - [Kernel Callbacks](#kernel-callbacks)

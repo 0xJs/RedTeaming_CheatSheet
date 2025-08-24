@@ -1,3 +1,4 @@
+## LSASS
 - [LSASS Protections](#lsass-protections)
 	- [Enumerate LSASS protections](#enumerate-lsass-protections)
 	- [Process protection level](#Process-protection-level)

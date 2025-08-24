@@ -1,9 +1,11 @@
+## General index
 - [General](#general)
 	- [Obfuscation tools](#obfuscation-tools)
 	- [Evasion techniques](#evasion-techniques)
 	- [Defeating Microsoft Defender](#defeating-microsoft-defender)
 	- [Privileges](#privileges)
 	- [UAC bypass](#uac-bypass)
+
 ## General
 ### Obfuscation tools
 #### C# binaries
