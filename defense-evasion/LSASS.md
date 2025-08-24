@@ -54,13 +54,13 @@ reg query HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v RunAsPPL
 - [WinDbg section](Windbg.md)
 
 #### Vulnerable driver
-- [Drivers & Driver Attacks – Protection Changer](Drivers & Driver Attacks.md#protection-changer)
+- [Driver Attacks – Protection Changer](Driver-Attacks.md#protection-changer)
 
 ### Change process protection before dumping
 - It is also possible to dump `lsass.exe` by changing the protection level of the current process to `0x72`
 
 #### Vulnerable driver
-- [Drivers & Driver Attacks – Protection Changer](Drivers & Driver Attacks.md#protection-changer)
+- [Driver Attacks – Protection Changer](Driver-Attacks.md#protection-changer)
 
 ### Credential Guard
 - Isolates LSASS secrets using Virtualization-Based Security (VBS). Secrets such as NTLM-hashes and TGT's are now stored in `lsasio.exe`.

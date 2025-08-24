@@ -124,14 +124,14 @@
 - [WinDbg – Removing Kernel Callbacks](Windbg.md#removing-kernel-callbacks)
 
 #### Vulnerable driver
-- [Drivers & Driver Attacks – Kernel Callback Remover](Drivers & Driver Attacks.md#kernel-callback-remover)
+- [Driver Attacks – Kernel Callback Remover](Driver-Attacks.md#kernel-callback-remover)
 
 ### Removing kernel callbacks
 #### Windbg
 - [WinDbg – Removing Kernel Callbacks](Windbg.md#removing-kernel-callbacks)
 
 #### Vulnerable driver
-- [Drivers & Driver Attacks – Kernel Callback Remover](Drivers & Driver Attacks.md#kernel-callback-remover)
+- [Driver Attacks – Kernel Callback Remover](Driver-Attacks.md#kernel-callback-remover)
 
 ## Event Tracing for Windows (ETW)
 ### Reverse ETW registrations of EDR driver
@@ -206,7 +206,7 @@ logman.exe update trace <TRACING SESSION NAME> --p <PROVIDER NAME> -ets
 - [WinDbg – ETW Kernel-mode provider](Windbg.md#etw-kernel-mode-provider)
 
 #### Disable Microsoft Windows Threat Intelligence (EtwTi)
-- [Drivers & Driver Attacks – ETwTi Remover](Drivers & Driver Attacks.md#etwti-remover)
+- [Driver Attacks – ETwTi Remover](Driver-Attacks.md#etwti-remover)
 
 ## Minifilters
 #### Load order explained
@@ -331,4 +331,4 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\WIMMount\Instances\WIMMount" /v 
 - [WinDbg – Stealing tokens](Windbg.md#stealing-tokens)
 
 #### Vulnerable driver
-- [Drivers & Driver Attacks – Token Changer (Downgrade EDR)](Drivers & Driver Attacks.md#token-changer---downgrade-edr)
+- [Driver Attacks – Token Changer (Downgrade EDR)](Driver-Attacks.md#token-changer---downgrade-edr)

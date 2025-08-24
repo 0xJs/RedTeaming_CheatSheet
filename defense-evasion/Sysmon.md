@@ -19,7 +19,7 @@
 
 ### Attacking Sysmon
 ### Removing kernel callbacks
-- [Drivers & Driver Attacks – Vulnerable drivers](Drivers & Driver Attacks.md#vulnerable-drivers)
+- [Driver Attacks – Vulnerable drivers](Driver-Attacks.md#vulnerable-drivers)
 
 ### Altitude takeover
 - [Manual Altitude takeover](Endpoint Detection Response (EDR).md#manual-altitude-takeover)
