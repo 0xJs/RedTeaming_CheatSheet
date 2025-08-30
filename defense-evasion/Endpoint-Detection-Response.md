@@ -103,6 +103,9 @@
 
 - A small implementation of such kernel callbacks are implemented in [MyMiniEDR](https://github.com/0xJs/MyMiniEDR) project. Which I might develop further.
 
+#### Telemetry overview
+- [edr-telemetry.com](https://www.edr-telemetry.com/windows) Website contains a overview of EDR's and which telemetry they collect.
+
 ## Kernel Callbacks
 ### Reverse kernel callbacks registrations of EDR driver
 - Open the EDR driver in IDA.
