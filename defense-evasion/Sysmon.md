@@ -18,7 +18,44 @@
 	- The client collects network (DNS) telemetry from the ETW session and from the driver and writes it to a ETW session
 	- Uses a `XML` file for configuration, which telemetry sources is enabled and what to include and exclude
 
+### Sysmon Capabilities
+- Early Boot Monitoring
+    - Generates events from the early boot process to capture activity, even from kernel-mode malware
+- Process Monitoring
+    - Logs process creation with full command line details for both parent and child processes
+    - Assigns a process GUID to creation events, allowing correlation even if Windows reuses process IDs
+    - Includes a session GUID in each event to correlate activities within the same logon session
+- File and Image Tracking
+    - Records cryptographic hashes of process image files using SHA1 (default), MD5, SHA256, or IMHASH
+    - Supports using multiple hash algorithms at the same time
+    - Detects changes in file creation timestamps (a common malware technique to cover tracks)
+- Module and Driver Monitoring
+    - Logs loading of drivers and DLLs, along with their digital signatures and hashes
+- Disk and Volume Access
+    - Logs raw read access to disks and volumes
+- Network Activity Monitoring
+    - Optionally logs network connections, including source process, IP addresses, port numbers, hostnames, and port names
+- Configuration and Filtering
+    - Automatically reloads configuration if modified in the registry
+    - Provides rule-based filtering to include or exclude specific events dynamically
+
 ### Attacking Sysmon
+### Finding exclusions
+#### Find driver name
+```
+reg query "HKLM\SYSTEM\CurrentControlSet\Services\Sysmon\Parameters" /v DriverName
+```
+
+#### Find current config file
+```
+reg query "HKLM\SYSTEM\CurrentControlSet\Services\SysmonDrv\Parameters" /v ConfigFile
+```
+
+#### Read the config file
+```
+type <CONFIG FILE PATH>
+```
+
 ### Removing kernel callbacks
 - [Driver Attacks – Vulnerable drivers](Driver-Attacks.md#vulnerable-drivers)
 
@@ -67,6 +104,7 @@ shutdown /r /t 0
 	- Local administrator / system privileges
 	- Restart of the sysmon process
 - See manual steps to copy and add exclusion to config file
+- Link to code (Not published yet)
 
 ```
 .\OverwriteConfigFile --replace <NEW CONFIG FILE PATH> --config <SYSMON CONFIG FILE PATH>
