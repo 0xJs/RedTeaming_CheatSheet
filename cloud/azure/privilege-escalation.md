@@ -148,7 +148,7 @@ $Name = "<RESOURCE NAME>"
 $ARMAccessToken = "<TOKEN>"
 
 $Resource = Get-AzResource -Name $Name
-$SubscriptionID = (Get-AzSubscription).Id
+$SubscriptionID = (Get-AzContext).SubscriptionId
 $ResourceGroupName = $Resource.ResourceGroupName
 $ResourceName = $Resource.Name
 $ResourceProviderNamespace = $Resource.ResourceType
