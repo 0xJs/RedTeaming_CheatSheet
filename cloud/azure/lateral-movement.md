@@ -58,6 +58,12 @@ $StorageAccessToken = (Get-AzAccessToken -ResourceTypeName Storage).Token
 $KeyVault (Get-AzAccessToken -ResourceTypeName Storage).Token
 ```
 
+- They changed the token received to a secure string. To decode it use;
+```
+$secureToken = (Get-AzAccessToken -ResourceTypeName Arm).Token
+$ARMAccessToken = [System.Net.NetworkCredential]::new("", $secureToken).Password
+```
+
 #### TokenTactics
 - Using Refresh token, `$tokens` variable from TokenTactics
 
