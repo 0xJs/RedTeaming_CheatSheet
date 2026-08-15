@@ -204,7 +204,7 @@ chaos -d <DOMAIN> -silent
 ```
 
 #### Amass 
-- https://github.com/OWASP/Amass
+- https://github.com/owasp-amass/amass
 ```
 amass enum -d example.com
 ```
@@ -286,6 +286,7 @@ exiftool <img>
 - http://spoonbill.io/
 - https://tinfoleak.com/
 - https://tweetdeck.com/
+- https://github.com/Xquik-dev/x-twitter-scraper
 
 #### Twint
 - https://github.com/twintproject/twint
